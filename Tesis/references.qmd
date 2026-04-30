@@ -1,4 +1,7 @@
-# References {.unnumbered}
+---
+lang: es
+---
+# Referencias {.unnumbered}
 
 ::: {#refs}
 :::

@@ -1,0 +1,13 @@
+---
+lang: es
+---
+
+# Q-Learning  
+::: {style="text-align: justify"}
+Algoritmo de aprendizaje por refuerzo...
+:::
+
+::: {#def-sub style="text-align: justify"}
+## Fitted Q-Iteration
+Algoritmo Offline (aprende analizando el historial de experiencias)...
+:::

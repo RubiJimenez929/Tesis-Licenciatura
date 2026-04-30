@@ -1,14 +1,35 @@
 {
   "index.qmd": {
-    "index.html": "6cdf42fa"
+    "index.html": "133ee2f3"
   },
   "intro.qmd": {
-    "intro.html": "6fbc2ef1"
+    "intro.html": "585201f2"
   },
   "summary.qmd": {
-    "summary.html": "867c18b6"
+    "summary.html": "f5d42cdb"
   },
   "references.qmd": {
-    "references.html": "ed38a155"
+    "references.html": "559e6d9c"
+  },
+  "marco_teorico.qmd": {
+    "marco_teorico.html": "c8cc9a06"
+  },
+  "metodologia.qmd": {
+    "metodologia.html": "ccfeaf03"
+  },
+  "conclusiones.qmd": {
+    "conclusiones.html": "f7a28522"
+  },
+  "futuros_trabajos.qmd": {
+    "futuros_trabajos.html": "05f56693"
+  },
+  "Inteligencia artificial.qmd": {
+    "Inteligencia artificial.html": "ffcfa59c"
+  },
+  "Q-Learning.qmd": {
+    "Q-Learning.html": "9c67036a"
+  },
+  "Caso_estudio.qmd": {
+    "Caso_estudio.html": "f65ca282"
   }
 }
