@@ -1,0 +1,132 @@
+---
+lang: es
+---
+
+# FORMULACIÓN MATEMÁTICA Y MARCO COMPUTACIONAL PARA LA OPTIMIZACIÓN HIDROELÉCTRICA MULTIRRESERVORIO
+
+## Introducción y alcance del capítulo
+::: {style="text-align: justify"}
+- Objetivo: contextualizar el problema dentro de la programación dinámica estocástica y justificar el uso de métodos de aprendizaje por refuerzo fuera de política (*batch RL*).
+- Contenido esperado: breve recapitulación del problema de operación hidroeléctrica, motivación para la discretización y agregación temporal, y estructura del capítulo.
+- Recomendación: incluir un párrafo que declare explícitamente que el modelo se formula bajo los axiomas de Puterman (1994) @puterman1994markov y que el capítulo culmina con un análisis de convergencia y propiedades numéricas.
+:::
+
+## Formulación como Proceso de Decisión de Markov (MDP)
+### Índice temporal y agregación hidrológica
+::: {style="text-align: justify"}
+- Definición formal del horizonte discreto $\mathcal{T}=\mathbb{N}_0$, mapeo quincena $\to$ etapa $\mu(q)$, y periodicidad estacional $m \in \{0,\dots,5\}$.
+- Incluir la función $\mu(q)$ como definición formal y comentar su papel en la reducción de dimensionalidad temporal.
+:::
+
+### Espacio de estados y operador de discretización
+::: {style="text-align: justify"}
+- Espacio continuo $V_{i,t,q} \in \mathbb{R}_{\geq 0}$, paso $\Delta V$, y operador $\mathcal{D}: \mathbb{R}_{\geq 0} \times \mathbb{N} \to \{0,\dots,N-1\}$.
+- **Elemento matemático sugerido:** *Definición X.1 (Operador de discretización uniforme)* + comentario sobre preservación de la medida y cuantización óptima en norma $L_1$.
+:::
+
+### Espacio de acciones y restricciones operativas dependientes de la etapa
+::: {style="text-align: justify"}
+- Conjuntos $\mathcal{K}_{i,m}$, vector de unidades $u_m$, y espacio producto $\mathcal{A}_s = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m}$.
+- Comentar la dependencia estacional y la estructura de retículos enteros.
+:::
+
+### Dinámica de transición y construcción del kernel empírico
+::: {style="text-align: justify"}
+- Ecuación de balance hídrico continua y proyección discreta.
+- **Elemento matemático sugerido:** *Definición X.2 (Kernel empírico-determinista)* $\mathcal{P}(s'|s,a) = \mathbb{I}\{s' = \Phi(s,a,I_\tau)\}$ y discusión sobre muestreo histórico como aproximación de la distribución hidrológica real.
+:::
+
+## Función de recompensa y criterio de optimalidad
+### Modelo hidráulico-energético linealizado
+::: {style="text-align: justify"}
+- Aproximación de la altura $H_i(s_i,s'_i)$ y fórmula de generación $E_i = \alpha H_i k_i u_m$.
+- Justificación física y rango de validez del *surrogate* lineal.
+:::
+
+### Estructura de penalizaciones y manejo de restricciones blandas
+::: {style="text-align: justify"}
+- Definición de $\Pi_{\text{spill}}, \Pi_{\text{def}}, \Pi_{\text{CG}}, \Pi_{\text{crit}}$ y operador $(\cdot)^+$.
+- **Elemento matemático sugerido:** *Observación X.1* sobre la equivalencia entre penalizaciones cuadráticas/lineales y métodos de barrera interior en optimización restringida.
+:::
+
+### Ecuación de optimalidad de Bellman descontada
+::: {style="text-align: justify"}
+- Formulación de $Q^*(s,a) = \mathcal{R}(s,a,s') + \gamma \max_{a'} Q^*(s',a')$.
+- Declaración explícita del criterio de optimalidad esperado descontado $J(\pi)$.
+:::
+
+## Aproximación numérica mediante Fitted Q-Iteration (FQI)
+### Motivación: maldición de la dimensionalidad y aprendizaje por refuerzo fuera de política
+::: {style="text-align: justify"}
+- Justificación de no usar iteración de política clásica o programación dinámica exacta.
+- Referencias a Ernst et al. (2005), Antos et al. (2008).
+:::
+
+### Iteración de Bellman empírica y estabilización numérica
+::: {style="text-align: justify"}
+- Cálculo de $y_n^{(j)}$, operador de truncamiento $\text{clip}(\cdot)$, y manejo de divergencias en métodos *off-policy*.
+- **Elemento matemático sugerido:** *Algoritmo X.1* en pseudocódigo estructurado (estilo ACM/IEEE).
+:::
+
+### Aproximación funcional por regresión no paramétrica
+::: {style="text-align: justify"}
+- Problema de mínimos cuadrados empírico sobre $\mathcal{F}$, hiperparámetros (árboles, profundidad, *min_samples_leaf*), y justificación de *Extra Trees* (reducción de varianza, sesgo controlado).
+- Comentario sobre universalidad y capacidad de aproximación de bosques aleatorios.
+:::
+
+### Criterios de convergencia y tolerancia computacional
+::: {style="text-align: justify"}
+- Norma media en conjunto fijo $\mathcal{S}_{\text{test}}$, umbral $\varepsilon=10^{-3}$, y detección temprana de estancamiento.
+- **Elemento matemático sugerido:** *Criterio de parada X.1* con justificación numérica (estabilidad de punto fijo aproximado).
+:::
+
+## Protocolo de simulación en lazo cerrado y evaluación operativa
+### Extracción de la política greedy óptima
+::: {style="text-align: justify"}
+- Definición de $\pi^*(s) \in \arg\max_{a \in \mathcal{A}_s} \hat{Q}^*(s,a)$ y discusión sobre no unicidad y desempate determinista.
+:::
+
+### Dinámica forward y proyección sobre restricciones físicas
+::: {style="text-align: justify"}
+- Simulación sobre series históricas, proyección $\min\{\max\{\tilde{V}_i,0\}, N_i\Delta V\}$, y manejo de fronteras anuales.
+- Comentario sobre desacople entre entrenamiento (penalizaciones blandas) y evaluación (restricciones duras).
+:::
+
+### Métricas de desempeño y validación estadística
+::: {style="text-align: justify"}
+- Energía esperada por reserva, derrames acumulados, violaciones de curvas guía, y análisis de varianza interanual.
+- **Elemento sugerido:** *Tabla X.1* resumen de parámetros operativos y *Figura X.1* trayectoria típica de volúmenes y energía.
+:::
+
+## Análisis teórico y propiedades del modelo
+### Contractividad del operador de Bellman en norma $\ell_\infty$
+::: {style="text-align: justify"}
+- **Lema X.1:** $\|\mathcal{T}Q_1 - \mathcal{T}Q_2\|_\infty \leq \gamma \|Q_1 - Q_2\|_\infty$.
+- Breve demostración usando la propiedad $\max - \max \leq \max(|\cdot|)$ y citando Puterman (1994, Thm. 6.2.3).
+:::
+
+### Cotas de error de aproximación y complejidad muestral
+::: {style="text-align: justify"}
+- Descomposición del error: $\|\hat{Q}^* - Q^*\|_\infty \leq \frac{2\gamma}{(1-\gamma)^2}\epsilon_{\text{approx}} + \mathcal{O}(N^{-1/2})$.
+- Comentario sobre trade-off sesgo-varianza en $\mathcal{F}$ y efecto del tamaño de muestra histórico.
+:::
+
+### Alineación con el marco axiomático de Puterman (1994)
+::: {style="text-align: justify"}
+- **Tabla X.2** correspondencia código $\leftrightarrow$ teoría MDP.
+- Discusión sobre validez de supuestos: horizonte infinito, descuento, espacios finitos, kernel empírico como aproximación de $\mathcal{P}$.
+:::
+
+## Limitaciones, extensiones y trabajo futuro
+::: {style="text-align: justify"}
+- Limitaciones: discretización fija, modelo lineal de altura, ausencia de incertidumbre explícita en afluentes, penalizaciones estáticas.
+- Extensiones: curvas cota-volumen reales, kernels estocásticos (ARIMA, copulas), FQI con regularización, métodos de política primal-dual para restricciones duras.
+- Aplicación a otros sistemas multirreservorio y escalabilidad computacional.
+:::
+
+## Conclusiones del capítulo
+::: {style="text-align: justify"}
+- Síntesis de contribuciones matemáticas y numéricas.
+- Reafirmación de la coherencia entre formulación teórica, implementación algorítmica y validación operativa.
+- Declaración de cierre alineada con los objetivos de la tesis.
+:::

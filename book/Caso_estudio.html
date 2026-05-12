@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; FORMULACIÓN MATEMÁTICA Y MARCO COMPUTACIONAL PARA LA OPTIMIZACIÓN HIDROELÉCTRICA MULTIRRESERVORIO – Fitted Q-Iteration: Estimación de niveles de presas</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./conclusiones.html" rel="next">
+<link href="./Q-Learning.html" rel="prev">
+<link href="./Imagenes/fcfm.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-cad2a2f8a56dfe71ee895a68e79c9b9a.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-70be5ccd51f03de5ce195d75fadf0882.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-cad2a2f8a56dfe71ee895a68e79c9b9a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-e376646338697af8583008ac829f38be.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-65cd1d279db3df99065ad4b96d9d595a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-e376646338697af8583008ac829f38be.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Caso_estudio.html">Caso de estudio</a></li><li class="breadcrumb-item"><a href="./Caso_estudio.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">FORMULACIÓN MATEMÁTICA Y MARCO COMPUTACIONAL PARA LA OPTIMIZACIÓN HIDROELÉCTRICA MULTIRRESERVORIO</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./index.html" class="sidebar-logo-link">
+      <img src="./Imagenes\logos.jpeg" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
+      <img src="./Imagenes\logos.jpeg" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Fitted Q-Iteration: Estimación de niveles de presas</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/RubiJimenez929/Tesis-Licenciatura" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <div class="dropdown">
+      <a href="" title="Download" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Download"><i class="bi bi-download"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="./Fitted-Q-Iteration--Estimación-de-niveles-de-presas.pdf">
+              <i class="bi bi-file-pdf pe-1"></i>
+            Download PDF
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="./Fitted-Q-Iteration--Estimación-de-niveles-de-presas.epub">
+              <i class="bi bi-journal pe-1"></i>
+            Download ePub
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo oscuro"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Resumen</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Preliminares</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Inteligencia artificial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Inteligencia Artificial</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Q-Learning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Q-Learning</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Caso de estudio</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Caso_estudio.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">FORMULACIÓN MATEMÁTICA Y MARCO COMPUTACIONAL PARA LA OPTIMIZACIÓN HIDROELÉCTRICA MULTIRRESERVORIO</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./conclusiones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">conclusiones.html</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./futuros_trabajos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">futuros_trabajos.html</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referencias</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenidos</h2>
+   
+  <ul>
+  <li><a href="#introducción-y-alcance-del-capítulo" id="toc-introducción-y-alcance-del-capítulo" class="nav-link active" data-scroll-target="#introducción-y-alcance-del-capítulo"><span class="header-section-number">3.1</span> Introducción y alcance del capítulo</a></li>
+  <li><a href="#formulación-como-proceso-de-decisión-de-markov-mdp" id="toc-formulación-como-proceso-de-decisión-de-markov-mdp" class="nav-link" data-scroll-target="#formulación-como-proceso-de-decisión-de-markov-mdp"><span class="header-section-number">3.2</span> Formulación como Proceso de Decisión de Markov (MDP)</a>
+  <ul class="collapse">
+  <li><a href="#índice-temporal-y-agregación-hidrológica" id="toc-índice-temporal-y-agregación-hidrológica" class="nav-link" data-scroll-target="#índice-temporal-y-agregación-hidrológica"><span class="header-section-number">3.2.1</span> Índice temporal y agregación hidrológica</a></li>
+  <li><a href="#espacio-de-estados-y-operador-de-discretización" id="toc-espacio-de-estados-y-operador-de-discretización" class="nav-link" data-scroll-target="#espacio-de-estados-y-operador-de-discretización"><span class="header-section-number">3.2.2</span> Espacio de estados y operador de discretización</a></li>
+  <li><a href="#espacio-de-acciones-y-restricciones-operativas-dependientes-de-la-etapa" id="toc-espacio-de-acciones-y-restricciones-operativas-dependientes-de-la-etapa" class="nav-link" data-scroll-target="#espacio-de-acciones-y-restricciones-operativas-dependientes-de-la-etapa"><span class="header-section-number">3.2.3</span> Espacio de acciones y restricciones operativas dependientes de la etapa</a></li>
+  <li><a href="#dinámica-de-transición-y-construcción-del-kernel-empírico" id="toc-dinámica-de-transición-y-construcción-del-kernel-empírico" class="nav-link" data-scroll-target="#dinámica-de-transición-y-construcción-del-kernel-empírico"><span class="header-section-number">3.2.4</span> Dinámica de transición y construcción del kernel empírico</a></li>
+  </ul></li>
+  <li><a href="#función-de-recompensa-y-criterio-de-optimalidad" id="toc-función-de-recompensa-y-criterio-de-optimalidad" class="nav-link" data-scroll-target="#función-de-recompensa-y-criterio-de-optimalidad"><span class="header-section-number">3.3</span> Función de recompensa y criterio de optimalidad</a>
+  <ul class="collapse">
+  <li><a href="#modelo-hidráulico-energético-linealizado" id="toc-modelo-hidráulico-energético-linealizado" class="nav-link" data-scroll-target="#modelo-hidráulico-energético-linealizado"><span class="header-section-number">3.3.1</span> Modelo hidráulico-energético linealizado</a></li>
+  <li><a href="#estructura-de-penalizaciones-y-manejo-de-restricciones-blandas" id="toc-estructura-de-penalizaciones-y-manejo-de-restricciones-blandas" class="nav-link" data-scroll-target="#estructura-de-penalizaciones-y-manejo-de-restricciones-blandas"><span class="header-section-number">3.3.2</span> Estructura de penalizaciones y manejo de restricciones blandas</a></li>
+  <li><a href="#ecuación-de-optimalidad-de-bellman-descontada" id="toc-ecuación-de-optimalidad-de-bellman-descontada" class="nav-link" data-scroll-target="#ecuación-de-optimalidad-de-bellman-descontada"><span class="header-section-number">3.3.3</span> Ecuación de optimalidad de Bellman descontada</a></li>
+  </ul></li>
+  <li><a href="#aproximación-numérica-mediante-fitted-q-iteration-fqi" id="toc-aproximación-numérica-mediante-fitted-q-iteration-fqi" class="nav-link" data-scroll-target="#aproximación-numérica-mediante-fitted-q-iteration-fqi"><span class="header-section-number">3.4</span> Aproximación numérica mediante Fitted Q-Iteration (FQI)</a>
+  <ul class="collapse">
+  <li><a href="#motivación-maldición-de-la-dimensionalidad-y-aprendizaje-por-refuerzo-fuera-de-política" id="toc-motivación-maldición-de-la-dimensionalidad-y-aprendizaje-por-refuerzo-fuera-de-política" class="nav-link" data-scroll-target="#motivación-maldición-de-la-dimensionalidad-y-aprendizaje-por-refuerzo-fuera-de-política"><span class="header-section-number">3.4.1</span> Motivación: maldición de la dimensionalidad y aprendizaje por refuerzo fuera de política</a></li>
+  <li><a href="#iteración-de-bellman-empírica-y-estabilización-numérica" id="toc-iteración-de-bellman-empírica-y-estabilización-numérica" class="nav-link" data-scroll-target="#iteración-de-bellman-empírica-y-estabilización-numérica"><span class="header-section-number">3.4.2</span> Iteración de Bellman empírica y estabilización numérica</a></li>
+  <li><a href="#aproximación-funcional-por-regresión-no-paramétrica" id="toc-aproximación-funcional-por-regresión-no-paramétrica" class="nav-link" data-scroll-target="#aproximación-funcional-por-regresión-no-paramétrica"><span class="header-section-number">3.4.3</span> Aproximación funcional por regresión no paramétrica</a></li>
+  <li><a href="#criterios-de-convergencia-y-tolerancia-computacional" id="toc-criterios-de-convergencia-y-tolerancia-computacional" class="nav-link" data-scroll-target="#criterios-de-convergencia-y-tolerancia-computacional"><span class="header-section-number">3.4.4</span> Criterios de convergencia y tolerancia computacional</a></li>
+  </ul></li>
+  <li><a href="#protocolo-de-simulación-en-lazo-cerrado-y-evaluación-operativa" id="toc-protocolo-de-simulación-en-lazo-cerrado-y-evaluación-operativa" class="nav-link" data-scroll-target="#protocolo-de-simulación-en-lazo-cerrado-y-evaluación-operativa"><span class="header-section-number">3.5</span> Protocolo de simulación en lazo cerrado y evaluación operativa</a>
+  <ul class="collapse">
+  <li><a href="#extracción-de-la-política-greedy-óptima" id="toc-extracción-de-la-política-greedy-óptima" class="nav-link" data-scroll-target="#extracción-de-la-política-greedy-óptima"><span class="header-section-number">3.5.1</span> Extracción de la política greedy óptima</a></li>
+  <li><a href="#dinámica-forward-y-proyección-sobre-restricciones-físicas" id="toc-dinámica-forward-y-proyección-sobre-restricciones-físicas" class="nav-link" data-scroll-target="#dinámica-forward-y-proyección-sobre-restricciones-físicas"><span class="header-section-number">3.5.2</span> Dinámica forward y proyección sobre restricciones físicas</a></li>
+  <li><a href="#métricas-de-desempeño-y-validación-estadística" id="toc-métricas-de-desempeño-y-validación-estadística" class="nav-link" data-scroll-target="#métricas-de-desempeño-y-validación-estadística"><span class="header-section-number">3.5.3</span> Métricas de desempeño y validación estadística</a></li>
+  </ul></li>
+  <li><a href="#análisis-teórico-y-propiedades-del-modelo" id="toc-análisis-teórico-y-propiedades-del-modelo" class="nav-link" data-scroll-target="#análisis-teórico-y-propiedades-del-modelo"><span class="header-section-number">3.6</span> Análisis teórico y propiedades del modelo</a>
+  <ul class="collapse">
+  <li><a href="#contractividad-del-operador-de-bellman-en-norma-ell_infty" id="toc-contractividad-del-operador-de-bellman-en-norma-ell_infty" class="nav-link" data-scroll-target="#contractividad-del-operador-de-bellman-en-norma-ell_infty"><span class="header-section-number">3.6.1</span> Contractividad del operador de Bellman en norma <span class="math inline">\(\ell_\infty\)</span></a></li>
+  <li><a href="#cotas-de-error-de-aproximación-y-complejidad-muestral" id="toc-cotas-de-error-de-aproximación-y-complejidad-muestral" class="nav-link" data-scroll-target="#cotas-de-error-de-aproximación-y-complejidad-muestral"><span class="header-section-number">3.6.2</span> Cotas de error de aproximación y complejidad muestral</a></li>
+  <li><a href="#alineación-con-el-marco-axiomático-de-puterman-1994" id="toc-alineación-con-el-marco-axiomático-de-puterman-1994" class="nav-link" data-scroll-target="#alineación-con-el-marco-axiomático-de-puterman-1994"><span class="header-section-number">3.6.3</span> Alineación con el marco axiomático de Puterman (1994)</a></li>
+  </ul></li>
+  <li><a href="#limitaciones-extensiones-y-trabajo-futuro" id="toc-limitaciones-extensiones-y-trabajo-futuro" class="nav-link" data-scroll-target="#limitaciones-extensiones-y-trabajo-futuro"><span class="header-section-number">3.7</span> Limitaciones, extensiones y trabajo futuro</a></li>
+  <li><a href="#conclusiones-del-capítulo" id="toc-conclusiones-del-capítulo" class="nav-link" data-scroll-target="#conclusiones-del-capítulo"><span class="header-section-number">3.8</span> Conclusiones del capítulo</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Caso_estudio.html">Caso de estudio</a></li><li class="breadcrumb-item"><a href="./Caso_estudio.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">FORMULACIÓN MATEMÁTICA Y MARCO COMPUTACIONAL PARA LA OPTIMIZACIÓN HIDROELÉCTRICA MULTIRRESERVORIO</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">FORMULACIÓN MATEMÁTICA Y MARCO COMPUTACIONAL PARA LA OPTIMIZACIÓN HIDROELÉCTRICA MULTIRRESERVORIO</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introducción-y-alcance-del-capítulo" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="introducción-y-alcance-del-capítulo"><span class="header-section-number">3.1</span> Introducción y alcance del capítulo</h2>
+<div style="text-align: justify">
+<ul>
+<li>Objetivo: contextualizar el problema dentro de la programación dinámica estocástica y justificar el uso de métodos de aprendizaje por refuerzo fuera de política (<em>batch RL</em>).</li>
+<li>Contenido esperado: breve recapitulación del problema de operación hidroeléctrica, motivación para la discretización y agregación temporal, y estructura del capítulo.</li>
+<li>Recomendación: incluir un párrafo que declare explícitamente que el modelo se formula bajo los axiomas de Puterman (1994) <span class="citation" data-cites="puterman1994markov">Puterman (<a href="references.html#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span> y que el capítulo culmina con un análisis de convergencia y propiedades numéricas.</li>
+</ul>
+</div>
+</section>
+<section id="formulación-como-proceso-de-decisión-de-markov-mdp" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="formulación-como-proceso-de-decisión-de-markov-mdp"><span class="header-section-number">3.2</span> Formulación como Proceso de Decisión de Markov (MDP)</h2>
+<section id="índice-temporal-y-agregación-hidrológica" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="índice-temporal-y-agregación-hidrológica"><span class="header-section-number">3.2.1</span> Índice temporal y agregación hidrológica</h3>
+<div style="text-align: justify">
+<ul>
+<li>Definición formal del horizonte discreto <span class="math inline">\(\mathcal{T}=\mathbb{N}_0\)</span>, mapeo quincena <span class="math inline">\(\to\)</span> etapa <span class="math inline">\(\mu(q)\)</span>, y periodicidad estacional <span class="math inline">\(m \in \{0,\dots,5\}\)</span>.</li>
+<li>Incluir la función <span class="math inline">\(\mu(q)\)</span> como definición formal y comentar su papel en la reducción de dimensionalidad temporal.</li>
+</ul>
+</div>
+</section>
+<section id="espacio-de-estados-y-operador-de-discretización" class="level3" data-number="3.2.2">
+<h3 data-number="3.2.2" class="anchored" data-anchor-id="espacio-de-estados-y-operador-de-discretización"><span class="header-section-number">3.2.2</span> Espacio de estados y operador de discretización</h3>
+<div style="text-align: justify">
+<ul>
+<li>Espacio continuo <span class="math inline">\(V_{i,t,q} \in \mathbb{R}_{\geq 0}\)</span>, paso <span class="math inline">\(\Delta V\)</span>, y operador <span class="math inline">\(\mathcal{D}: \mathbb{R}_{\geq 0} \times \mathbb{N} \to \{0,\dots,N-1\}\)</span>.</li>
+<li><strong>Elemento matemático sugerido:</strong> <em>Definición X.1 (Operador de discretización uniforme)</em> + comentario sobre preservación de la medida y cuantización óptima en norma <span class="math inline">\(L_1\)</span>.</li>
+</ul>
+</div>
+</section>
+<section id="espacio-de-acciones-y-restricciones-operativas-dependientes-de-la-etapa" class="level3" data-number="3.2.3">
+<h3 data-number="3.2.3" class="anchored" data-anchor-id="espacio-de-acciones-y-restricciones-operativas-dependientes-de-la-etapa"><span class="header-section-number">3.2.3</span> Espacio de acciones y restricciones operativas dependientes de la etapa</h3>
+<div style="text-align: justify">
+<ul>
+<li>Conjuntos <span class="math inline">\(\mathcal{K}_{i,m}\)</span>, vector de unidades <span class="math inline">\(u_m\)</span>, y espacio producto <span class="math inline">\(\mathcal{A}_s = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m}\)</span>.</li>
+<li>Comentar la dependencia estacional y la estructura de retículos enteros.</li>
+</ul>
+</div>
+</section>
+<section id="dinámica-de-transición-y-construcción-del-kernel-empírico" class="level3" data-number="3.2.4">
+<h3 data-number="3.2.4" class="anchored" data-anchor-id="dinámica-de-transición-y-construcción-del-kernel-empírico"><span class="header-section-number">3.2.4</span> Dinámica de transición y construcción del kernel empírico</h3>
+<div style="text-align: justify">
+<ul>
+<li>Ecuación de balance hídrico continua y proyección discreta.</li>
+<li><strong>Elemento matemático sugerido:</strong> <em>Definición X.2 (Kernel empírico-determinista)</em> <span class="math inline">\(\mathcal{P}(s'|s,a) = \mathbb{I}\{s' = \Phi(s,a,I_\tau)\}\)</span> y discusión sobre muestreo histórico como aproximación de la distribución hidrológica real.</li>
+</ul>
+</div>
+</section>
+</section>
+<section id="función-de-recompensa-y-criterio-de-optimalidad" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="función-de-recompensa-y-criterio-de-optimalidad"><span class="header-section-number">3.3</span> Función de recompensa y criterio de optimalidad</h2>
+<section id="modelo-hidráulico-energético-linealizado" class="level3" data-number="3.3.1">
+<h3 data-number="3.3.1" class="anchored" data-anchor-id="modelo-hidráulico-energético-linealizado"><span class="header-section-number">3.3.1</span> Modelo hidráulico-energético linealizado</h3>
+<div style="text-align: justify">
+<ul>
+<li>Aproximación de la altura <span class="math inline">\(H_i(s_i,s'_i)\)</span> y fórmula de generación <span class="math inline">\(E_i = \alpha H_i k_i u_m\)</span>.</li>
+<li>Justificación física y rango de validez del <em>surrogate</em> lineal.</li>
+</ul>
+</div>
+</section>
+<section id="estructura-de-penalizaciones-y-manejo-de-restricciones-blandas" class="level3" data-number="3.3.2">
+<h3 data-number="3.3.2" class="anchored" data-anchor-id="estructura-de-penalizaciones-y-manejo-de-restricciones-blandas"><span class="header-section-number">3.3.2</span> Estructura de penalizaciones y manejo de restricciones blandas</h3>
+<div style="text-align: justify">
+<ul>
+<li>Definición de <span class="math inline">\(\Pi_{\text{spill}}, \Pi_{\text{def}}, \Pi_{\text{CG}}, \Pi_{\text{crit}}\)</span> y operador <span class="math inline">\((\cdot)^+\)</span>.</li>
+<li><strong>Elemento matemático sugerido:</strong> <em>Observación X.1</em> sobre la equivalencia entre penalizaciones cuadráticas/lineales y métodos de barrera interior en optimización restringida.</li>
+</ul>
+</div>
+</section>
+<section id="ecuación-de-optimalidad-de-bellman-descontada" class="level3" data-number="3.3.3">
+<h3 data-number="3.3.3" class="anchored" data-anchor-id="ecuación-de-optimalidad-de-bellman-descontada"><span class="header-section-number">3.3.3</span> Ecuación de optimalidad de Bellman descontada</h3>
+<div style="text-align: justify">
+<ul>
+<li>Formulación de <span class="math inline">\(Q^*(s,a) = \mathcal{R}(s,a,s') + \gamma \max_{a'} Q^*(s',a')\)</span>.</li>
+<li>Declaración explícita del criterio de optimalidad esperado descontado <span class="math inline">\(J(\pi)\)</span>.</li>
+</ul>
+</div>
+</section>
+</section>
+<section id="aproximación-numérica-mediante-fitted-q-iteration-fqi" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="aproximación-numérica-mediante-fitted-q-iteration-fqi"><span class="header-section-number">3.4</span> Aproximación numérica mediante Fitted Q-Iteration (FQI)</h2>
+<section id="motivación-maldición-de-la-dimensionalidad-y-aprendizaje-por-refuerzo-fuera-de-política" class="level3" data-number="3.4.1">
+<h3 data-number="3.4.1" class="anchored" data-anchor-id="motivación-maldición-de-la-dimensionalidad-y-aprendizaje-por-refuerzo-fuera-de-política"><span class="header-section-number">3.4.1</span> Motivación: maldición de la dimensionalidad y aprendizaje por refuerzo fuera de política</h3>
+<div style="text-align: justify">
+<ul>
+<li>Justificación de no usar iteración de política clásica o programación dinámica exacta.</li>
+<li>Referencias a Ernst et al.&nbsp;(2005), Antos et al.&nbsp;(2008).</li>
+</ul>
+</div>
+</section>
+<section id="iteración-de-bellman-empírica-y-estabilización-numérica" class="level3" data-number="3.4.2">
+<h3 data-number="3.4.2" class="anchored" data-anchor-id="iteración-de-bellman-empírica-y-estabilización-numérica"><span class="header-section-number">3.4.2</span> Iteración de Bellman empírica y estabilización numérica</h3>
+<div style="text-align: justify">
+<ul>
+<li>Cálculo de <span class="math inline">\(y_n^{(j)}\)</span>, operador de truncamiento <span class="math inline">\(\text{clip}(\cdot)\)</span>, y manejo de divergencias en métodos <em>off-policy</em>.</li>
+<li><strong>Elemento matemático sugerido:</strong> <em>Algoritmo X.1</em> en pseudocódigo estructurado (estilo ACM/IEEE).</li>
+</ul>
+</div>
+</section>
+<section id="aproximación-funcional-por-regresión-no-paramétrica" class="level3" data-number="3.4.3">
+<h3 data-number="3.4.3" class="anchored" data-anchor-id="aproximación-funcional-por-regresión-no-paramétrica"><span class="header-section-number">3.4.3</span> Aproximación funcional por regresión no paramétrica</h3>
+<div style="text-align: justify">
+<ul>
+<li>Problema de mínimos cuadrados empírico sobre <span class="math inline">\(\mathcal{F}\)</span>, hiperparámetros (árboles, profundidad, <em>min_samples_leaf</em>), y justificación de <em>Extra Trees</em> (reducción de varianza, sesgo controlado).</li>
+<li>Comentario sobre universalidad y capacidad de aproximación de bosques aleatorios.</li>
+</ul>
+</div>
+</section>
+<section id="criterios-de-convergencia-y-tolerancia-computacional" class="level3" data-number="3.4.4">
+<h3 data-number="3.4.4" class="anchored" data-anchor-id="criterios-de-convergencia-y-tolerancia-computacional"><span class="header-section-number">3.4.4</span> Criterios de convergencia y tolerancia computacional</h3>
+<div style="text-align: justify">
+<ul>
+<li>Norma media en conjunto fijo <span class="math inline">\(\mathcal{S}_{\text{test}}\)</span>, umbral <span class="math inline">\(\varepsilon=10^{-3}\)</span>, y detección temprana de estancamiento.</li>
+<li><strong>Elemento matemático sugerido:</strong> <em>Criterio de parada X.1</em> con justificación numérica (estabilidad de punto fijo aproximado).</li>
+</ul>
+</div>
+</section>
+</section>
+<section id="protocolo-de-simulación-en-lazo-cerrado-y-evaluación-operativa" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="protocolo-de-simulación-en-lazo-cerrado-y-evaluación-operativa"><span class="header-section-number">3.5</span> Protocolo de simulación en lazo cerrado y evaluación operativa</h2>
+<section id="extracción-de-la-política-greedy-óptima" class="level3" data-number="3.5.1">
+<h3 data-number="3.5.1" class="anchored" data-anchor-id="extracción-de-la-política-greedy-óptima"><span class="header-section-number">3.5.1</span> Extracción de la política greedy óptima</h3>
+<div style="text-align: justify">
+<ul>
+<li>Definición de <span class="math inline">\(\pi^*(s) \in \arg\max_{a \in \mathcal{A}_s} \hat{Q}^*(s,a)\)</span> y discusión sobre no unicidad y desempate determinista.</li>
+</ul>
+</div>
+</section>
+<section id="dinámica-forward-y-proyección-sobre-restricciones-físicas" class="level3" data-number="3.5.2">
+<h3 data-number="3.5.2" class="anchored" data-anchor-id="dinámica-forward-y-proyección-sobre-restricciones-físicas"><span class="header-section-number">3.5.2</span> Dinámica forward y proyección sobre restricciones físicas</h3>
+<div style="text-align: justify">
+<ul>
+<li>Simulación sobre series históricas, proyección <span class="math inline">\(\min\{\max\{\tilde{V}_i,0\}, N_i\Delta V\}\)</span>, y manejo de fronteras anuales.</li>
+<li>Comentario sobre desacople entre entrenamiento (penalizaciones blandas) y evaluación (restricciones duras).</li>
+</ul>
+</div>
+</section>
+<section id="métricas-de-desempeño-y-validación-estadística" class="level3" data-number="3.5.3">
+<h3 data-number="3.5.3" class="anchored" data-anchor-id="métricas-de-desempeño-y-validación-estadística"><span class="header-section-number">3.5.3</span> Métricas de desempeño y validación estadística</h3>
+<div style="text-align: justify">
+<ul>
+<li>Energía esperada por reserva, derrames acumulados, violaciones de curvas guía, y análisis de varianza interanual.</li>
+<li><strong>Elemento sugerido:</strong> <em>Tabla X.1</em> resumen de parámetros operativos y <em>Figura X.1</em> trayectoria típica de volúmenes y energía.</li>
+</ul>
+</div>
+</section>
+</section>
+<section id="análisis-teórico-y-propiedades-del-modelo" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="análisis-teórico-y-propiedades-del-modelo"><span class="header-section-number">3.6</span> Análisis teórico y propiedades del modelo</h2>
+<section id="contractividad-del-operador-de-bellman-en-norma-ell_infty" class="level3" data-number="3.6.1">
+<h3 data-number="3.6.1" class="anchored" data-anchor-id="contractividad-del-operador-de-bellman-en-norma-ell_infty"><span class="header-section-number">3.6.1</span> Contractividad del operador de Bellman en norma <span class="math inline">\(\ell_\infty\)</span></h3>
+<div style="text-align: justify">
+<ul>
+<li><strong>Lema X.1:</strong> <span class="math inline">\(\|\mathcal{T}Q_1 - \mathcal{T}Q_2\|_\infty \leq \gamma \|Q_1 - Q_2\|_\infty\)</span>.</li>
+<li>Breve demostración usando la propiedad <span class="math inline">\(\max - \max \leq \max(|\cdot|)\)</span> y citando Puterman (1994, Thm. 6.2.3).</li>
+</ul>
+</div>
+</section>
+<section id="cotas-de-error-de-aproximación-y-complejidad-muestral" class="level3" data-number="3.6.2">
+<h3 data-number="3.6.2" class="anchored" data-anchor-id="cotas-de-error-de-aproximación-y-complejidad-muestral"><span class="header-section-number">3.6.2</span> Cotas de error de aproximación y complejidad muestral</h3>
+<div style="text-align: justify">
+<ul>
+<li>Descomposición del error: <span class="math inline">\(\|\hat{Q}^* - Q^*\|_\infty \leq \frac{2\gamma}{(1-\gamma)^2}\epsilon_{\text{approx}} + \mathcal{O}(N^{-1/2})\)</span>.</li>
+<li>Comentario sobre trade-off sesgo-varianza en <span class="math inline">\(\mathcal{F}\)</span> y efecto del tamaño de muestra histórico.</li>
+</ul>
+</div>
+</section>
+<section id="alineación-con-el-marco-axiomático-de-puterman-1994" class="level3" data-number="3.6.3">
+<h3 data-number="3.6.3" class="anchored" data-anchor-id="alineación-con-el-marco-axiomático-de-puterman-1994"><span class="header-section-number">3.6.3</span> Alineación con el marco axiomático de Puterman (1994)</h3>
+<div style="text-align: justify">
+<ul>
+<li><strong>Tabla X.2</strong> correspondencia código <span class="math inline">\(\leftrightarrow\)</span> teoría MDP.</li>
+<li>Discusión sobre validez de supuestos: horizonte infinito, descuento, espacios finitos, kernel empírico como aproximación de <span class="math inline">\(\mathcal{P}\)</span>.</li>
+</ul>
+</div>
+</section>
+</section>
+<section id="limitaciones-extensiones-y-trabajo-futuro" class="level2" data-number="3.7">
+<h2 data-number="3.7" class="anchored" data-anchor-id="limitaciones-extensiones-y-trabajo-futuro"><span class="header-section-number">3.7</span> Limitaciones, extensiones y trabajo futuro</h2>
+<div style="text-align: justify">
+<ul>
+<li>Limitaciones: discretización fija, modelo lineal de altura, ausencia de incertidumbre explícita en afluentes, penalizaciones estáticas.</li>
+<li>Extensiones: curvas cota-volumen reales, kernels estocásticos (ARIMA, copulas), FQI con regularización, métodos de política primal-dual para restricciones duras.</li>
+<li>Aplicación a otros sistemas multirreservorio y escalabilidad computacional.</li>
+</ul>
+</div>
+</section>
+<section id="conclusiones-del-capítulo" class="level2" data-number="3.8">
+<h2 data-number="3.8" class="anchored" data-anchor-id="conclusiones-del-capítulo"><span class="header-section-number">3.8</span> Conclusiones del capítulo</h2>
+<div style="text-align: justify">
+<ul>
+<li>Síntesis de contribuciones matemáticas y numéricas.</li>
+<li>Reafirmación de la coherencia entre formulación teórica, implementación algorítmica y validación operativa.</li>
+<li>Declaración de cierre alineada con los objetivos de la tesis.</li>
+</ul>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-puterman1994markov" class="csl-entry" role="listitem">
+Puterman, Martin L. 1994. <em>Markov Decision Processes: Discrete Stochastic Dynamic Programming</em>. Wiley Series en Probability y Statistics. John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9780470316887">https://doi.org/10.1002/9780470316887</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./Q-Learning.html" class="pagination-link" aria-label="Q-Learning">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Q-Learning</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./conclusiones.html" class="pagination-link" aria-label="conclusiones.html">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">conclusiones.html</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

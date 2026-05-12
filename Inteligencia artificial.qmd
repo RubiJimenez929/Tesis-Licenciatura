@@ -1,0 +1,28 @@
+---
+lang: es
+---
+
+# Inteligencia Artificial   
+::: {style="text-align: justify"}
+La IA es...
+:::
+
+::: {style="text-align: justify"}
+## Machine Learning (Aprendizaje Automático)
+Disciplina dentro de la IA... Tipos principales
+:::
+
+::: {#def-sub style="text-align: justify"}
+### Aprendizaje Supervisado
+Se entrena con datos etiquetados...
+:::
+
+::: {#def-sub style="text-align: justify"}
+### Aprendizaje No Supervisado
+Se entrena con datos no etiquetados...
+:::
+
+::: {#def-sub style="text-align: justify"}
+### Aprendizaje por Refuerzo
+El agente aprende a través de la interacción con el entorno...
+:::
