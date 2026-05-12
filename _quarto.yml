@@ -2,6 +2,10 @@ project:
   type: book
   output-dir: docs
 
+website:
+  comments:
+    hypothesis: true
+
 execute: 
   freeze: auto
 
