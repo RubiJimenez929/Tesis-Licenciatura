@@ -1,8 +1,7 @@
 ---
 lang: es
 ---
-
-# FORMULACIÓN MATEMÁTICA Y MARCO COMPUTACIONAL PARA LA OPTIMIZACIÓN HIDROELÉCTRICA MULTIRRESERVORIO
+# Formulación matemática y marco computacional para la optimización hidroeléctrica de presas
 
 ## Introducción y alcance del capítulo
 ::: {style="text-align: justify"}
