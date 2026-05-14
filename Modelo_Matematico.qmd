@@ -1,13 +1,10 @@
 ---
 lang: es
 ---
-# Formulación matemática y marco computacional para la optimización hidroeléctrica de presas
+# Modelo Matemático para Optimizar la Operación de un Sistema Hidroelectrico.
 
-## Introducción y alcance del capítulo
 ::: {style="text-align: justify"}
-- Objetivo: contextualizar el problema dentro de la programación dinámica estocástica y justificar el uso de métodos de aprendizaje por refuerzo fuera de política (*batch RL*).
-- Contenido esperado: breve recapitulación del problema de operación hidroeléctrica, motivación para la discretización y agregación temporal, y estructura del capítulo.
-- Recomendación: incluir un párrafo que declare explícitamente que el modelo se formula bajo los axiomas de Puterman (1994) @puterman1994markov y que el capítulo culmina con un análisis de convergencia y propiedades numéricas.
+El objetivo de este capítulo es presentar una formulación rigurosa del problema de optimización de la operación de un sistema hidroeléctrico como un Proceso de Decisión de Markov (MDP), junto con una descripción detallada del algoritmo de Fitted Q-Iteration (FQI) utilizado para aproximar la política óptima. Se enfatizará la conexión entre los elementos matemáticos formales y su implementación numérica, así como la validación operativa mediante simulación en lazo cerrado.
 :::
 
 ## Formulación como Proceso de Decisión de Markov (MDP)
