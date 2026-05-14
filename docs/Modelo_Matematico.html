@@ -413,7 +413,7 @@ window.Quarto = {
   <ul>
   <li><a href="#formulación-como-proceso-de-decisión-de-markov-mdp" id="toc-formulación-como-proceso-de-decisión-de-markov-mdp" class="nav-link active" data-scroll-target="#formulación-como-proceso-de-decisión-de-markov-mdp"><span class="header-section-number">3.1</span> Formulación como Proceso de Decisión de Markov (MDP)</a>
   <ul class="collapse">
-  <li><a href="#índice-temporal-y-agregación-hidrológica" id="toc-índice-temporal-y-agregación-hidrológica" class="nav-link" data-scroll-target="#índice-temporal-y-agregación-hidrológica"><span class="header-section-number">3.1.1</span> Índice temporal y agregación hidrológica</a></li>
+  <li><a href="#estructura-temporal" id="toc-estructura-temporal" class="nav-link" data-scroll-target="#estructura-temporal"><span class="header-section-number">3.1.1</span> Estructura Temporal</a></li>
   <li><a href="#espacio-de-estados-y-operador-de-discretización" id="toc-espacio-de-estados-y-operador-de-discretización" class="nav-link" data-scroll-target="#espacio-de-estados-y-operador-de-discretización"><span class="header-section-number">3.1.2</span> Espacio de estados y operador de discretización</a></li>
   <li><a href="#espacio-de-acciones-y-restricciones-operativas-dependientes-de-la-etapa" id="toc-espacio-de-acciones-y-restricciones-operativas-dependientes-de-la-etapa" class="nav-link" data-scroll-target="#espacio-de-acciones-y-restricciones-operativas-dependientes-de-la-etapa"><span class="header-section-number">3.1.3</span> Espacio de acciones y restricciones operativas dependientes de la etapa</a></li>
   <li><a href="#dinámica-de-transición-y-construcción-del-kernel-empírico" id="toc-dinámica-de-transición-y-construcción-del-kernel-empírico" class="nav-link" data-scroll-target="#dinámica-de-transición-y-construcción-del-kernel-empírico"><span class="header-section-number">3.1.4</span> Dinámica de transición y construcción del kernel empírico</a></li>
@@ -476,13 +476,10 @@ window.Quarto = {
 </div>
 <section id="formulación-como-proceso-de-decisión-de-markov-mdp" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="formulación-como-proceso-de-decisión-de-markov-mdp"><span class="header-section-number">3.1</span> Formulación como Proceso de Decisión de Markov (MDP)</h2>
-<section id="índice-temporal-y-agregación-hidrológica" class="level3" data-number="3.1.1">
-<h3 data-number="3.1.1" class="anchored" data-anchor-id="índice-temporal-y-agregación-hidrológica"><span class="header-section-number">3.1.1</span> Índice temporal y agregación hidrológica</h3>
+<section id="estructura-temporal" class="level3" data-number="3.1.1">
+<h3 data-number="3.1.1" class="anchored" data-anchor-id="estructura-temporal"><span class="header-section-number">3.1.1</span> Estructura Temporal</h3>
 <div style="text-align: justify">
-<ul>
-<li>Definición formal del horizonte discreto <span class="math inline">\(\mathcal{T}=\mathbb{N}_0\)</span>, mapeo quincena <span class="math inline">\(\to\)</span> etapa <span class="math inline">\(\mu(q)\)</span>, y periodicidad estacional <span class="math inline">\(m \in \{0,\dots,5\}\)</span>.</li>
-<li>Incluir la función <span class="math inline">\(\mu(q)\)</span> como definición formal y comentar su papel en la reducción de dimensionalidad temporal.</li>
-</ul>
+<p>Se considera un horizonte temporal de operación compuesto por <span class="math inline">\(T = 50\)</span> años históricos, en donde cada uno de ellos se dividieron en <span class="math inline">\(q = 24\)</span> quincenas. Con el fin de reducir la dimensionalidad temporal y poder capturar la estacionalidad, se agruparon las quincenas en <span class="math inline">\(M = 6\)</span> etapas hidrológicas mediante la siguiente función de agregación <span class="math inline">\(\mu: \{0,\dots,q-1\} \to \{0,\dots,M-1\}\)</span> definida por <span class="math display">\[\mu(q) = \begin{cases} 0, &amp; 0 \leq q &lt;10\\ 1, &amp; 10 \leq q &lt;14\\ 2, &amp; 14 \leq q &lt; 16\\ 3, &amp; 16 \leq q &lt; 18\\ 4, &amp; 18 \leq q &lt; 20\\ 5, &amp; 20 \leq q &lt; 23\\ \end{cases}\]</span> así, la variable <span class="math inline">\(m = \mu(q)\)</span> representará la etapa hidrológica correspondiente a la quincena <span class="math inline">\(q\)</span>. El índice temporal completo se denotará por como <span class="math inline">\(\tau = (t,q)\)</span> con <span class="math inline">\(t \in \{0,\dots,T-1\}\)</span> y <span class="math inline">\(q \in \{0,\dots,q-1\}\)</span>.</p>
 </div>
 </section>
 <section id="espacio-de-estados-y-operador-de-discretización" class="level3" data-number="3.1.2">

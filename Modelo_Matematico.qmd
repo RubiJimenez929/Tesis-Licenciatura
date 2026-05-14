@@ -8,10 +8,11 @@ El objetivo de este capítulo es presentar una formulación rigurosa del problem
 :::
 
 ## Formulación como Proceso de Decisión de Markov (MDP)
-### Índice temporal y agregación hidrológica
+### Estructura Temporal 
 ::: {style="text-align: justify"}
-- Definición formal del horizonte discreto $\mathcal{T}=\mathbb{N}_0$, mapeo quincena $\to$ etapa $\mu(q)$, y periodicidad estacional $m \in \{0,\dots,5\}$.
-- Incluir la función $\mu(q)$ como definición formal y comentar su papel en la reducción de dimensionalidad temporal.
+Se considera un horizonte temporal de operación compuesto por $T = 50$ años históricos, en donde cada uno de ellos se dividieron en $q = 24$ quincenas. Con el fin de reducir la dimensionalidad temporal y poder capturar la estacionalidad, se agruparon las quincenas en $M = 6$ etapas hidrológicas mediante la siguiente función de agregación $\mu: \{0,\dots,q-1\} \to \{0,\dots,M-1\}$ definida por $$\mu(q) = \begin{cases} 0, & 0 \leq q <10\\ 1, & 10 \leq q <14\\ 2, & 14 \leq q < 16\\ 3, & 16 \leq q < 18\\ 4, & 18 \leq q < 20\\ 5, & 20 \leq q < 23\\ \end{cases}$$
+así, la variable $m = \mu(q)$ representará la etapa hidrológica correspondiente a la quincena $q$.
+El índice temporal completo se denotará por como $\tau = (t,q)$ con $t \in \{0,\dots,T-1\}$ y $q \in \{0,\dots,q-1\}$.
 :::
 
 ### Espacio de estados y operador de discretización
