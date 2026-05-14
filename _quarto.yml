@@ -3,6 +3,10 @@ project:
   output-dir: docs
 
 website:
+  reader-mode: true
+  search:
+    location: sidebar
+    type: overlay
   comments:
     hypothesis: true
 
