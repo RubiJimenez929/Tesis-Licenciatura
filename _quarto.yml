@@ -37,9 +37,9 @@ book:
         - Inteligencia artificial.qmd
         - Q-Learning.qmd
       
-    - part: "Caso de estudio"
+    - part: "Modelo Matemático"
       chapters:
-        - Caso_estudio.qmd
+        - Modelo_Matematico.qmd
 
 
     - conclusiones.qmd
