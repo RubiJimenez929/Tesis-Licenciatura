@@ -8,7 +8,9 @@ website:
     location: sidebar
     type: overlay
   comments:
-    hypothesis: true
+    hypothesis:
+      openSidebar: true
+      theme: clean
 
 execute: 
   freeze: auto
@@ -50,6 +52,9 @@ book:
     - futuros_trabajos.qmd
     - references.qmd
 
+  comments:
+    hypothesis: true 
+
 bibliography: references.bib
 
 format:
@@ -72,3 +77,6 @@ format:
 
   epub:
     cover-image: Imagenes\fcfm.png
+
+
+editor: visual
