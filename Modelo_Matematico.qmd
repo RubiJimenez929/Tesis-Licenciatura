@@ -1,7 +1,7 @@
 ---
 lang: es
 ---
-# Modelo Matemático para Optimizar la Operación de un Sistema Hidroelectrico.
+# Modelo Matemático para Optimizar la Operación de un Sistema Hidroeléctrico.
 
 ::: {style="text-align: justify"}
 El objetivo de este capítulo es presentar una formulación rigurosa del problema de optimización de la operación de un sistema hidroeléctrico como un Proceso de Decisión de Markov (MDP), junto con una descripción detallada del algoritmo de Fitted Q-Iteration (FQI) utilizado para aproximar la política óptima. Se enfatizará la conexión entre los elementos matemáticos formales y su implementación numérica, así como la validación operativa mediante simulación en lazo cerrado.
