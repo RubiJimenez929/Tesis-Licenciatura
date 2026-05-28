@@ -8,14 +8,17 @@ El objetivo de este capítulo es presentar una formulación rigurosa del problem
 :::
 
 ## Formulación como Proceso de Decisión de Markov (MDP)
-### Estructura Temporal 
+
+Siguiendo la notación de @puterman1994markov, se define el MDP como la colección de objetos $\{(T, \mathcal{S}, \mathcal{K}, \mathbb{P}, \mathcal{R})\}$, donde cada componente se especifica a continuación:
+
+### Estructura Temporal $(T)$
 ::: {style="text-align: justify"}
 Se considera un horizonte temporal de operación compuesto por $T = 50$ años históricos, en donde cada uno de ellos se dividieron en $q = 24$ quincenas. Con el fin de reducir la dimensionalidad temporal y poder capturar la estacionalidad, se agruparon las quincenas en $M = 6$ etapas hidrológicas (segmentación temporal del año) mediante la siguiente función de agregación $\mu: \{0,\dots,q-1\} \to \{0,\dots,M-1\}$ definida por $$\mu(q) = \begin{cases} 0, & 0 \leq q <10\\ 1, & 10 \leq q <14\\ 2, & 14 \leq q < 16\\ 3, & 16 \leq q < 18\\ 4, & 18 \leq q < 20\\ 5, & 20 \leq q < 23\\ \end{cases}$$ {#eq-etapas}
 así, la variable $m = \mu(q)$ representará la etapa hidrológica correspondiente a la quincena $q$.
 El índice temporal completo se denotará por como $\tau = (t,q)$ con $t \in \{0,\dots,T-1\}$ y $q \in \{0,\dots,q-1\}$.
 :::
 
-### Espacio de estados y operador de discretización
+### Espacio de estados y operador de discretización $(\mathcal{S})$
 ::: {style="text-align: justify"}
 El sistema está compuesto por dos presas: [La Angostura](https://maps.app.goo.gl/NHNQdHdfYAoRGxhPA) $(i = 1)$ y [Malpaso](https://maps.app.goo.gl/acX7hVXswX5uYYUBA) $(i =2)$. El volumen de almacenamiento de cada una de ellas en la quincena $q$ del año $t$ se representará por $V_{i,t,q} \in \mathbb{R}_{\geq 0}$ $(Mm^3)$.
 
@@ -23,7 +26,7 @@ Dado que los datos históricos se utilizan para construir un conjunto de transi�
 donde $N_1 = 27$ y $N_2 = 17$ son las capacidades discretas máximas de cada presa.
 :::
 
-### Espacio de acciones
+### Espacio de acciones $(\mathcal{K})$
 ::: {style="text-align: justify"}
 Para cada etapa $m$, se define una unidad de extracción de agua $u_m = \{60, 150, 300, 300, 300, 150\}$, así la decisión de operación en la etapa $m$ corresponderá a los niveles de turbinado $k_1, k_2$. Cada nivel de turbinado se multiplica por la unidad de extracción $u_m$ para obtener el volumen de agua extraído en cada presa. Por lo tanto, el espacio de acciones se define como $$\mathcal{K}_m = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m},$$
 donde $\mathcal{K}_{i,m}$ representa el conjunto de niveles de turbinado disponibles para la presa $i$ en la etapa $m$.
@@ -31,7 +34,7 @@ donde $\mathcal{K}_{i,m}$ representa el conjunto de niveles de turbinado disponi
 Una acción denotada por $a = (k_1, k_2)$, representará el nivel de turbinado aplicado simultaneamente en ambas presas. Por ejemplo, suponga que $m = 0$ entonces $$\mathcal{K}_1, \mathcal{K}_2 = \{0,1,...,7\},$$ y así $a = (3,5)$ significaría que Angostura turbina $3\times 60 = 180$ $Mm^3$ de agua y Malpaso turbina $5\times 60 = 300$ $Mm^3$ de agua.
 :::
 
-### Dinámica de transición 
+### Dinámica de transición $(\mathcal{P})$
 ::: {style="text-align: justify"}
 La ecuación de transición continua tras la operación del sistema se define por $$V_{i,t,q+1} = V_{i,t,q} + W_{i, t, q+1}-k_iu_m, \quad q<23$$ {#eq-transicion}
 donde $V_{i,t,q}$ representa el volumen almacenado en la presa $i$ antes de tomar la acción de turbinado y $W_{i, t,q+1}$ representa el afluente neto (caudal de ingreso) para la presa $i$ en la quincena $q+1$ del año $t$. 
@@ -44,8 +47,7 @@ mientras que la etapa evoluciona mediante $m' = (m+1) \mod M$.
 Por lo tanto, el estado discreto siguiente está dado por $$s' = (s_1', s_2', m').$$
 
 Desde el punto de vista de @puterman1994markov, la transición de MDP se define mediante una función de probabilidad condicional $$\mathbb{P}(s'|s,a),$$ {#eq-transicion} 
-la cual especifica la probabilidad de transicionar al estado $s'$ dado que se tomó la acción $a$ en el estado $s$. Sin embargo, en el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos $$\text{Trans} = \{(s, a, r, s')\}$$ 
-en donde cada $(s, a, r, s')$ representa una experiencia de transición observada en los datos históricos, con $r$ representando la recompensa obtenida al tomar la acción $a$ en el estado $s$ y transicionar a $s'$. Este enfoque se alinea con un esquema de ***Batch Reinforcement Learning.***
+la cual especifica la probabilidad de transicionar al estado $s'$ dado que se tomó la acción $a$ en el estado $s$.
 :::
 
 ## Función de recompensa
@@ -73,6 +75,8 @@ La recompensa incorpora penalizaciones para garantizar el cumplimiento de restri
 donde $C_{derr}, C_{def}, C_{CG}, C_{crit}$ son constantes de penalización ajustadas empíricamente, y $\text{CG}_i(m)$ representa la curva guía para la presa $i$ en la etapa $m$.
 
 La función de recompensa total se define por $$\mathcal{R}(s,a,s') = E - \Pi_{derr} - \Pi_{def} - \Pi_{CG} - \Pi_{crit}.$$ {#eq-recompensa}
+
+En el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos. La dinámica se construye a partir de trayectorias históricas $$(s, a, r, s')$$ en donde cada una de ellas representa una experiencia de transición observada en los datos históricos, siendo $r$ el valor obtenido de la ecuación {#eq-recompensa}, representando la recompensa obtenida al tomar la acción $a$ en el estado $s$ y transicionar a $s'$. Este enfoque se alinea con un esquema de ***Batch Reinforcement Learning.***
 :::
 
 ### Ecuación de optimalidad de Bellman descontada
