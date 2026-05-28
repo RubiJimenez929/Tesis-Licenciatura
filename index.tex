@@ -301,11 +301,13 @@ validación operativa mediante simulación en lazo cerrado.
 \section{Formulación como Proceso de Decisión de Markov
 (MDP)}\label{formulaciuxf3n-como-proceso-de-decisiuxf3n-de-markov-mdp}
 
-Siguiendo la notación de Puterman (1994), se define el MDP como una
-\(4-\)tupla \((T, \mathcal{S}, \mathcal{K}, \mathbb{P}, \mathcal{R})\),
-donde cada componente se especifica a continuación:
+Siguiendo la notación de Puterman (1994), se define el MDP como la
+colección de objetos
+\(\{(T, \mathcal{S}, \mathcal{K}, \mathbb{P}, \mathcal{R})\}\), donde
+cada componente se especifica a continuación:
 
-\subsection{Estructura Temporal}\label{estructura-temporal}
+\subsection{\texorpdfstring{Estructura Temporal
+\((T)\)}{Estructura Temporal (T)}}\label{estructura-temporal-t}
 
 Se considera un horizonte temporal de operación compuesto por \(T = 50\)
 años históricos, en donde cada uno de ellos se dividieron en \(q = 24\)
@@ -320,8 +322,9 @@ correspondiente a la quincena \(q\). El índice temporal completo se
 denotará por como \(\tau = (t,q)\) con \(t \in \{0,\dots,T-1\}\) y
 \(q \in \{0,\dots,q-1\}\).
 
-\subsection{Espacio de estados y operador de
-discretización}\label{espacio-de-estados-y-operador-de-discretizaciuxf3n}
+\subsection{\texorpdfstring{Espacio de estados y operador de
+discretización
+\((\mathcal{S})\)}{Espacio de estados y operador de discretización (\textbackslash mathcal\{S\})}}\label{espacio-de-estados-y-operador-de-discretizaciuxf3n-mathcals}
 
 El sistema está compuesto por dos presas:
 \href{https://maps.app.goo.gl/NHNQdHdfYAoRGxhPA}{La Angostura}
@@ -343,7 +346,8 @@ dado por
 donde \(N_1 = 27\) y \(N_2 = 17\) son las capacidades discretas máximas
 de cada presa.
 
-\subsection{Espacio de acciones}\label{espacio-de-acciones}
+\subsection{\texorpdfstring{Espacio de acciones
+\((\mathcal{K})\)}{Espacio de acciones (\textbackslash mathcal\{K\})}}\label{espacio-de-acciones-mathcalk}
 
 Para cada etapa \(m\), se define una unidad de extracción de agua
 \(u_m = \{60, 150, 300, 300, 300, 150\}\), así la decisión de operación
@@ -362,7 +366,8 @@ y así \(a = (3,5)\) significaría que Angostura turbina
 \(3\times 60 = 180\) \(Mm^3\) de agua y Malpaso turbina
 \(5\times 60 = 300\) \(Mm^3\) de agua.
 
-\subsection{Dinámica de transición}\label{dinuxe1mica-de-transiciuxf3n}
+\subsection{\texorpdfstring{Dinámica de transición
+\((\mathcal{P})\)}{Dinámica de transición (\textbackslash mathcal\{P\})}}\label{dinuxe1mica-de-transiciuxf3n-mathcalp}
 
 La ecuación de transición continua tras la operación del sistema se
 define por
