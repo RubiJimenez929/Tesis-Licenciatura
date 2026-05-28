@@ -441,9 +441,9 @@ window.Quarto = {
   <li><a href="#estructura-temporal-t" id="toc-estructura-temporal-t" class="nav-link" data-scroll-target="#estructura-temporal-t"><span class="header-section-number">3.1.1</span> Estructura Temporal <span class="math inline">\((T)\)</span></a></li>
   <li><a href="#espacio-de-estados-y-operador-de-discretización-mathcals" id="toc-espacio-de-estados-y-operador-de-discretización-mathcals" class="nav-link" data-scroll-target="#espacio-de-estados-y-operador-de-discretización-mathcals"><span class="header-section-number">3.1.2</span> Espacio de estados y operador de discretización <span class="math inline">\((\mathcal{S})\)</span></a></li>
   <li><a href="#espacio-de-acciones-mathcalk" id="toc-espacio-de-acciones-mathcalk" class="nav-link" data-scroll-target="#espacio-de-acciones-mathcalk"><span class="header-section-number">3.1.3</span> Espacio de acciones <span class="math inline">\((\mathcal{K})\)</span></a></li>
-  <li><a href="#dinámica-de-transición-mathcalp" id="toc-dinámica-de-transición-mathcalp" class="nav-link" data-scroll-target="#dinámica-de-transición-mathcalp"><span class="header-section-number">3.1.4</span> Dinámica de transición <span class="math inline">\((\mathcal{P})\)</span></a></li>
+  <li><a href="#dinámica-de-transición-mathbbp" id="toc-dinámica-de-transición-mathbbp" class="nav-link" data-scroll-target="#dinámica-de-transición-mathbbp"><span class="header-section-number">3.1.4</span> Dinámica de transición <span class="math inline">\((\mathbb{P})\)</span></a></li>
   </ul></li>
-  <li><a href="#función-de-recompensa" id="toc-función-de-recompensa" class="nav-link" data-scroll-target="#función-de-recompensa"><span class="header-section-number">3.2</span> Función de recompensa</a>
+  <li><a href="#función-de-recompensa-mathcalr" id="toc-función-de-recompensa-mathcalr" class="nav-link" data-scroll-target="#función-de-recompensa-mathcalr"><span class="header-section-number">3.2</span> Función de recompensa <span class="math inline">\((\mathcal{R})\)</span></a>
   <ul class="collapse">
   <li><a href="#modelo-hidráulico-energético-linealizado" id="toc-modelo-hidráulico-energético-linealizado" class="nav-link" data-scroll-target="#modelo-hidráulico-energético-linealizado"><span class="header-section-number">3.2.1</span> Modelo hidráulico-energético linealizado</a></li>
   <li><a href="#estructura-de-penalizaciones" id="toc-estructura-de-penalizaciones" class="nav-link" data-scroll-target="#estructura-de-penalizaciones"><span class="header-section-number">3.2.2</span> Estructura de penalizaciones</a></li>
@@ -501,7 +501,7 @@ window.Quarto = {
 </div>
 <section id="formulación-como-proceso-de-decisión-de-markov-mdp" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="formulación-como-proceso-de-decisión-de-markov-mdp"><span class="header-section-number">3.1</span> Formulación como Proceso de Decisión de Markov (MDP)</h2>
-<p>Siguiendo la notación de <span class="citation" data-cites="puterman1994markov">Puterman (<a href="#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, se define el MDP como la colección de objetos <span class="math inline">\(\{(T, \mathcal{S}, \mathcal{K}, \mathbb{P}, \mathcal{R})\}\)</span>, donde cada componente se especifica a continuación:</p>
+<p>Siguiendo la notación de <span class="citation" data-cites="puterman1994markov">Puterman (<a href="references.html#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, se define el MDP como la colección de objetos <span class="math inline">\(\{(T, \mathcal{S}, \mathcal{K}, \mathbb{P}, \mathcal{R})\}\)</span>, donde cada componente se especifica a continuación:</p>
 <section id="estructura-temporal-t" class="level3" data-number="3.1.1">
 <h3 data-number="3.1.1" class="anchored" data-anchor-id="estructura-temporal-t"><span class="header-section-number">3.1.1</span> Estructura Temporal <span class="math inline">\((T)\)</span></h3>
 <div style="text-align: justify">
@@ -522,19 +522,19 @@ window.Quarto = {
 <p>Una acción denotada por <span class="math inline">\(a = (k_1, k_2)\)</span>, representará el nivel de turbinado aplicado simultaneamente en ambas presas. Por ejemplo, suponga que <span class="math inline">\(m = 0\)</span> entonces <span class="math display">\[\mathcal{K}_1, \mathcal{K}_2 = \{0,1,...,7\},\]</span> y así <span class="math inline">\(a = (3,5)\)</span> significaría que Angostura turbina <span class="math inline">\(3\times 60 = 180\)</span> <span class="math inline">\(Mm^3\)</span> de agua y Malpaso turbina <span class="math inline">\(5\times 60 = 300\)</span> <span class="math inline">\(Mm^3\)</span> de agua.</p>
 </div>
 </section>
-<section id="dinámica-de-transición-mathcalp" class="level3" data-number="3.1.4">
-<h3 data-number="3.1.4" class="anchored" data-anchor-id="dinámica-de-transición-mathcalp"><span class="header-section-number">3.1.4</span> Dinámica de transición <span class="math inline">\((\mathcal{P})\)</span></h3>
+<section id="dinámica-de-transición-mathbbp" class="level3" data-number="3.1.4">
+<h3 data-number="3.1.4" class="anchored" data-anchor-id="dinámica-de-transición-mathbbp"><span class="header-section-number">3.1.4</span> Dinámica de transición <span class="math inline">\((\mathbb{P})\)</span></h3>
 <div style="text-align: justify">
 <p>La ecuación de transición continua tras la operación del sistema se define por <span id="eq-transicion"><span class="math display">\[V_{i,t,q+1} = V_{i,t,q} + W_{i, t, q+1}-k_iu_m, \quad q&lt;23 \tag{3.3}\]</span></span> donde <span class="math inline">\(V_{i,t,q}\)</span> representa el volumen almacenado en la presa <span class="math inline">\(i\)</span> antes de tomar la acción de turbinado y <span class="math inline">\(W_{i, t,q+1}\)</span> representa el afluente neto (caudal de ingreso) para la presa <span class="math inline">\(i\)</span> en la quincena <span class="math inline">\(q+1\)</span> del año <span class="math inline">\(t\)</span>.</p>
 <p>Cuando <span class="math inline">\(q=23\)</span>, la transición se define por <span id="eq-transicion23"><span class="math display">\[V_{i,t+1,0} = V_{i,t,23} + W_{i, t+1, 0}-k_iu_m. \tag{3.4}\]</span></span></p>
 <p>En ambos casos, el volumen discretizado siguiente se obtiene aplicando el operador de discretización <span class="math inline">\(\mathcal{D}\)</span> al volumen resultante, es decir, <span class="math display">\[s_i' = \mathcal{D}(V_{i,t,q+1}, N_i),\]</span> mientras que la etapa evoluciona mediante <span class="math inline">\(m' = (m+1) \mod M\)</span>.</p>
 <p>Por lo tanto, el estado discreto siguiente está dado por <span class="math display">\[s' = (s_1', s_2', m').\]</span></p>
-<p>Desde el punto de vista de <span class="citation" data-cites="puterman1994markov">Puterman (<a href="#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, la transición de MDP se define mediante una función de probabilidad condicional <span id="eq-transicion"><span class="math display">\[\mathbb{P}(s'|s,a), \tag{3.5}\]</span></span> la cual especifica la probabilidad de transicionar al estado <span class="math inline">\(s'\)</span> dado que se tomó la acción <span class="math inline">\(a\)</span> en el estado <span class="math inline">\(s\)</span>.</p>
+<p>Desde el punto de vista de <span class="citation" data-cites="puterman1994markov">Puterman (<a href="references.html#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, la transición de MDP se define mediante una función de probabilidad condicional <span id="eq-transicion"><span class="math display">\[\mathbb{P}(s'|s,a), \tag{3.5}\]</span></span> la cual especifica la probabilidad de transicionar al estado <span class="math inline">\(s'\)</span> dado que se tomó la acción <span class="math inline">\(a\)</span> en el estado <span class="math inline">\(s\)</span>.</p>
 </div>
 </section>
 </section>
-<section id="función-de-recompensa" class="level2" data-number="3.2">
-<h2 data-number="3.2" class="anchored" data-anchor-id="función-de-recompensa"><span class="header-section-number">3.2</span> Función de recompensa</h2>
+<section id="función-de-recompensa-mathcalr" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="función-de-recompensa-mathcalr"><span class="header-section-number">3.2</span> Función de recompensa <span class="math inline">\((\mathcal{R})\)</span></h2>
 <section id="modelo-hidráulico-energético-linealizado" class="level3" data-number="3.2.1">
 <h3 data-number="3.2.1" class="anchored" data-anchor-id="modelo-hidráulico-energético-linealizado"><span class="header-section-number">3.2.1</span> Modelo hidráulico-energético linealizado</h3>
 <div style="text-align: justify">
@@ -554,7 +554,7 @@ window.Quarto = {
 </ul>
 <p>donde <span class="math inline">\(C_{derr}, C_{def}, C_{CG}, C_{crit}\)</span> son constantes de penalización ajustadas empíricamente, y <span class="math inline">\(\text{CG}_i(m)\)</span> representa la curva guía para la presa <span class="math inline">\(i\)</span> en la etapa <span class="math inline">\(m\)</span>.</p>
 <p>La función de recompensa total se define por <span id="eq-recompensa"><span class="math display">\[\mathcal{R}(s,a,s') = E - \Pi_{derr} - \Pi_{def} - \Pi_{CG} - \Pi_{crit}. \tag{3.13}\]</span></span></p>
-<p>En el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos. La dinámica se construye a partir de trayectorias históricas <span class="math display">\[(s, a, r, s')\]</span> en donde cada una de ellas representa una experiencia de transición observada en los datos históricos, siendo <span class="math inline">\(r\)</span> el valor obtenido de la ecuación {#eq-recompensa}, representando la recompensa obtenida al tomar la acción <span class="math inline">\(a\)</span> en el estado <span class="math inline">\(s\)</span> y transicionar a <span class="math inline">\(s'\)</span>. Este enfoque se alinea con un esquema de <strong><em>Batch Reinforcement Learning.</em></strong></p>
+<p>En el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos. La dinámica se construye a partir de trayectorias históricas <span class="math display">\[(s, a, r, s')\]</span> en donde cada una de ellas representa una experiencia de transición observada en los datos históricos, siendo <span class="math inline">\(r\)</span> el valor obtenido de la ecuación <a href="#eq-recompensa" class="quarto-xref">Ecuación&nbsp;<span>3.13</span></a>, representando la recompensa obtenida al tomar la acción <span class="math inline">\(a\)</span> en el estado <span class="math inline">\(s\)</span> y transicionar a <span class="math inline">\(s'\)</span>. Este enfoque se alinea con un esquema de <strong><em>Batch Reinforcement Learning.</em></strong></p>
 </div>
 </section>
 <section id="ecuación-de-optimalidad-de-bellman-descontada" class="level3" data-number="3.2.3">
@@ -683,7 +683,7 @@ window.Quarto = {
 </div>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
 <div id="ref-puterman1994markov" class="csl-entry" role="listitem">
 Puterman, Martin L. 1994. <em>Markov Decision Processes: Discrete Stochastic Dynamic Programming</em>. Wiley Series en Probability y Statistics. John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9780470316887">https://doi.org/10.1002/9780470316887</a>.
 </div>

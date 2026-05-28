@@ -76,7 +76,7 @@ donde $C_{derr}, C_{def}, C_{CG}, C_{crit}$ son constantes de penalización ajus
 
 La función de recompensa total se define por $$\mathcal{R}(s,a,s') = E - \Pi_{derr} - \Pi_{def} - \Pi_{CG} - \Pi_{crit}.$$ {#eq-recompensa}
 
-En el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos. La dinámica se construye a partir de trayectorias históricas $$(s, a, r, s')$$ en donde cada una de ellas representa una experiencia de transición observada en los datos históricos, siendo $r$ el valor obtenido de la ecuación @{#eq-recompensa}, representando la recompensa obtenida al tomar la acción $a$ en el estado $s$ y transicionar a $s'$. Este enfoque se alinea con un esquema de ***Batch Reinforcement Learning.***
+En el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos. La dinámica se construye a partir de trayectorias históricas $$(s, a, r, s')$$ en donde cada una de ellas representa una experiencia de transición observada en los datos históricos, siendo $r$ el valor obtenido de la ecuación @eq-recompensa, representando la recompensa obtenida al tomar la acción $a$ en el estado $s$ y transicionar a $s'$. Este enfoque se alinea con un esquema de ***Batch Reinforcement Learning.***
 :::
 
 ### Ecuación de optimalidad de Bellman descontada
