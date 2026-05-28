@@ -34,7 +34,7 @@ donde $\mathcal{K}_{i,m}$ representa el conjunto de niveles de turbinado disponi
 Una acción denotada por $a = (k_1, k_2)$, representará el nivel de turbinado aplicado simultaneamente en ambas presas. Por ejemplo, suponga que $m = 0$ entonces $$\mathcal{K}_1, \mathcal{K}_2 = \{0,1,...,7\},$$ y así $a = (3,5)$ significaría que Angostura turbina $3\times 60 = 180$ $Mm^3$ de agua y Malpaso turbina $5\times 60 = 300$ $Mm^3$ de agua.
 :::
 
-### Dinámica de transición $(\mathcal{P})$
+### Dinámica de transición $(\mathbb{P})$
 ::: {style="text-align: justify"}
 La ecuación de transición continua tras la operación del sistema se define por $$V_{i,t,q+1} = V_{i,t,q} + W_{i, t, q+1}-k_iu_m, \quad q<23$$ {#eq-transicion}
 donde $V_{i,t,q}$ representa el volumen almacenado en la presa $i$ antes de tomar la acción de turbinado y $W_{i, t,q+1}$ representa el afluente neto (caudal de ingreso) para la presa $i$ en la quincena $q+1$ del año $t$. 
@@ -50,7 +50,7 @@ Desde el punto de vista de @puterman1994markov, la transición de MDP se define 
 la cual especifica la probabilidad de transicionar al estado $s'$ dado que se tomó la acción $a$ en el estado $s$.
 :::
 
-## Función de recompensa
+## Función de recompensa $(\mathcal{R})$
 ### Modelo hidráulico-energético linealizado
 ::: {style="text-align: justify"}
 La energía generada depende del volumen de agua turbinado y una aproximación lineal de la altura hidraúlica. Para cada presa $i$, se define la función de altura $$H_i (s_i,s'_i) = 10 (s_i + s_i'+2)$$ {#eq-altura} 
@@ -76,7 +76,7 @@ donde $C_{derr}, C_{def}, C_{CG}, C_{crit}$ son constantes de penalización ajus
 
 La función de recompensa total se define por $$\mathcal{R}(s,a,s') = E - \Pi_{derr} - \Pi_{def} - \Pi_{CG} - \Pi_{crit}.$$ {#eq-recompensa}
 
-En el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos. La dinámica se construye a partir de trayectorias históricas $$(s, a, r, s')$$ en donde cada una de ellas representa una experiencia de transición observada en los datos históricos, siendo $r$ el valor obtenido de la ecuación {#eq-recompensa}, representando la recompensa obtenida al tomar la acción $a$ en el estado $s$ y transicionar a $s'$. Este enfoque se alinea con un esquema de ***Batch Reinforcement Learning.***
+En el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos. La dinámica se construye a partir de trayectorias históricas $$(s, a, r, s')$$ en donde cada una de ellas representa una experiencia de transición observada en los datos históricos, siendo $r$ el valor obtenido de la ecuación @{#eq-recompensa}, representando la recompensa obtenida al tomar la acción $a$ en el estado $s$ y transicionar a $s'$. Este enfoque se alinea con un esquema de ***Batch Reinforcement Learning.***
 :::
 
 ### Ecuación de optimalidad de Bellman descontada
