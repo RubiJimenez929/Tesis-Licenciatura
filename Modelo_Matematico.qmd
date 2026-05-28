@@ -45,7 +45,7 @@ Por lo tanto, el estado discreto siguiente está dado por $$s' = (s_1', s_2', m'
 
 Desde el punto de vista de @puterman1994markov, la transición de MDP se define mediante una función de probabilidad condicional $$\mathbb{P}(s'|s,a),$$ {#eq-transicion} 
 la cual especifica la probabilidad de transicionar al estado $s'$ dado que se tomó la acción $a$ en el estado $s$. Sin embargo, en el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos $$\text{Trans} = \{(s, a, r, s')\}$$ 
-en donde cada $(s, a, r, s')$ representa una experiencia de transición observada en los datos históricos, con $r$ representando la recompensa obtenida al tomar la acción $a$ en el estado $s$ y transicionar a $s'$. Este enfoque se alinea con un esquema de ***Batch Reinforcement Learning***.
+en donde cada $(s, a, r, s')$ representa una experiencia de transición observada en los datos históricos, con $r$ representando la recompensa obtenida al tomar la acción $a$ en el estado $s$ y transicionar a $s'$. Este enfoque se alinea con un esquema de ***Batch Reinforcement Learning.***
 :::
 
 ## Función de recompensa
