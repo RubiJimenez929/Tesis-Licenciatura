@@ -10,7 +10,7 @@ El objetivo de este capítulo es presentar una formulación rigurosa del problem
 ## Formulación como Proceso de Decisión de Markov (MDP)
 ### Estructura Temporal 
 ::: {style="text-align: justify"}
-Se considera un horizonte temporal de operación compuesto por $T = 50$ años históricos, en donde cada uno de ellos se dividieron en $q = 24$ quincenas. Con el fin de reducir la dimensionalidad temporal y poder capturar la estacionalidad, se agruparon las quincenas en $M = 6$ etapas hidrológicas mediante la siguiente función de agregación $\mu: \{0,\dots,q-1\} \to \{0,\dots,M-1\}$ definida por $$\mu(q) = \begin{cases} 0, & 0 \leq q <10\\ 1, & 10 \leq q <14\\ 2, & 14 \leq q < 16\\ 3, & 16 \leq q < 18\\ 4, & 18 \leq q < 20\\ 5, & 20 \leq q < 23\\ \end{cases}$$ {#eq-etapas}
+Se considera un horizonte temporal de operación compuesto por $T = 50$ años históricos, en donde cada uno de ellos se dividieron en $q = 24$ quincenas. Con el fin de reducir la dimensionalidad temporal y poder capturar la estacionalidad, se agruparon las quincenas en $M = 6$ etapas hidrológicas (segmentación temporal del año) mediante la siguiente función de agregación $\mu: \{0,\dots,q-1\} \to \{0,\dots,M-1\}$ definida por $$\mu(q) = \begin{cases} 0, & 0 \leq q <10\\ 1, & 10 \leq q <14\\ 2, & 14 \leq q < 16\\ 3, & 16 \leq q < 18\\ 4, & 18 \leq q < 20\\ 5, & 20 \leq q < 23\\ \end{cases}$$ {#eq-etapas}
 así, la variable $m = \mu(q)$ representará la etapa hidrológica correspondiente a la quincena $q$.
 El índice temporal completo se denotará por como $\tau = (t,q)$ con $t \in \{0,\dots,T-1\}$ y $q \in \{0,\dots,q-1\}$.
 :::
@@ -42,6 +42,10 @@ En ambos casos, el volumen discretizado siguiente se obtiene aplicando el operad
 mientras que la etapa evoluciona mediante $m' = (m+1) \mod M$.
 
 Por lo tanto, el estado discreto siguiente está dado por $$s' = (s_1', s_2', m').$$
+
+Desde el punto de vista de @puterman1994markov, la transición de MDP se define mediante una función de probabilidad condicional $$\mathbb{P}(s'|s,a),$$ {#eq-transicion} 
+la cual especifica la probabilidad de transicionar al estado $s'$ dado que se tomó la acción $a$ en el estado $s$. Sin embargo, en el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos $$\text{Trans} = \{(s, a, r, s')\}$$ 
+en donde cada $(s, a, r, s')$ representa una experiencia de transición observada en los datos históricos, con $r$ representando la recompensa obtenida al tomar la acción $a$ en el estado $s$ y transicionar a $s'$. Este enfoque se alinea con un esquema de ***Batch Reinforcement Learning***.
 :::
 
 ## Función de recompensa
