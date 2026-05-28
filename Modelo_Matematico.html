@@ -23,7 +23,26 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -485,7 +504,7 @@ window.Quarto = {
 <section id="estructura-temporal" class="level3" data-number="3.1.1">
 <h3 data-number="3.1.1" class="anchored" data-anchor-id="estructura-temporal"><span class="header-section-number">3.1.1</span> Estructura Temporal</h3>
 <div style="text-align: justify">
-<p>Se considera un horizonte temporal de operación compuesto por <span class="math inline">\(T = 50\)</span> años históricos, en donde cada uno de ellos se dividieron en <span class="math inline">\(q = 24\)</span> quincenas. Con el fin de reducir la dimensionalidad temporal y poder capturar la estacionalidad, se agruparon las quincenas en <span class="math inline">\(M = 6\)</span> etapas hidrológicas mediante la siguiente función de agregación <span class="math inline">\(\mu: \{0,\dots,q-1\} \to \{0,\dots,M-1\}\)</span> definida por <span id="eq-etapas"><span class="math display">\[\mu(q) = \begin{cases} 0, &amp; 0 \leq q &lt;10\\ 1, &amp; 10 \leq q &lt;14\\ 2, &amp; 14 \leq q &lt; 16\\ 3, &amp; 16 \leq q &lt; 18\\ 4, &amp; 18 \leq q &lt; 20\\ 5, &amp; 20 \leq q &lt; 23\\ \end{cases} \tag{3.1}\]</span></span> así, la variable <span class="math inline">\(m = \mu(q)\)</span> representará la etapa hidrológica correspondiente a la quincena <span class="math inline">\(q\)</span>. El índice temporal completo se denotará por como <span class="math inline">\(\tau = (t,q)\)</span> con <span class="math inline">\(t \in \{0,\dots,T-1\}\)</span> y <span class="math inline">\(q \in \{0,\dots,q-1\}\)</span>.</p>
+<p>Se considera un horizonte temporal de operación compuesto por <span class="math inline">\(T = 50\)</span> años históricos, en donde cada uno de ellos se dividieron en <span class="math inline">\(q = 24\)</span> quincenas. Con el fin de reducir la dimensionalidad temporal y poder capturar la estacionalidad, se agruparon las quincenas en <span class="math inline">\(M = 6\)</span> etapas hidrológicas (segmentación temporal del año) mediante la siguiente función de agregación <span class="math inline">\(\mu: \{0,\dots,q-1\} \to \{0,\dots,M-1\}\)</span> definida por <span id="eq-etapas"><span class="math display">\[\mu(q) = \begin{cases} 0, &amp; 0 \leq q &lt;10\\ 1, &amp; 10 \leq q &lt;14\\ 2, &amp; 14 \leq q &lt; 16\\ 3, &amp; 16 \leq q &lt; 18\\ 4, &amp; 18 \leq q &lt; 20\\ 5, &amp; 20 \leq q &lt; 23\\ \end{cases} \tag{3.1}\]</span></span> así, la variable <span class="math inline">\(m = \mu(q)\)</span> representará la etapa hidrológica correspondiente a la quincena <span class="math inline">\(q\)</span>. El índice temporal completo se denotará por como <span class="math inline">\(\tau = (t,q)\)</span> con <span class="math inline">\(t \in \{0,\dots,T-1\}\)</span> y <span class="math inline">\(q \in \{0,\dots,q-1\}\)</span>.</p>
 </div>
 </section>
 <section id="espacio-de-estados-y-operador-de-discretización" class="level3" data-number="3.1.2">
@@ -509,6 +528,7 @@ window.Quarto = {
 <p>Cuando <span class="math inline">\(q=23\)</span>, la transición se define por <span id="eq-transicion23"><span class="math display">\[V_{i,t+1,0} = V_{i,t,23} + W_{i, t+1, 0}-k_iu_m. \tag{3.4}\]</span></span></p>
 <p>En ambos casos, el volumen discretizado siguiente se obtiene aplicando el operador de discretización <span class="math inline">\(\mathcal{D}\)</span> al volumen resultante, es decir, <span class="math display">\[s_i' = \mathcal{D}(V_{i,t,q+1}, N_i),\]</span> mientras que la etapa evoluciona mediante <span class="math inline">\(m' = (m+1) \mod M\)</span>.</p>
 <p>Por lo tanto, el estado discreto siguiente está dado por <span class="math display">\[s' = (s_1', s_2', m').\]</span></p>
+<p>Desde el punto de vista de <span class="citation" data-cites="puterman1994markov">Puterman (<a href="references.html#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, la transición de MDP se define mediante una función de probabilidad condicional <span id="eq-transicion"><span class="math display">\[\mathbb{P}(s'|s,a), \tag{3.5}\]</span></span> la cual especifica la probabilidad de transicionar al estado <span class="math inline">\(s'\)</span> dado que se tomó la acción <span class="math inline">\(a\)</span> en el estado <span class="math inline">\(s\)</span>. Sin embargo, en el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos <span class="math display">\[\text{Trans} = \{(s, a, r, s')\}\]</span> en donde cada <span class="math inline">\((s, a, r, s')\)</span> representa una experiencia de transición observada en los datos históricos, con <span class="math inline">\(r\)</span> representando la recompensa obtenida al tomar la acción <span class="math inline">\(a\)</span> en el estado <span class="math inline">\(s\)</span> y transicionar a <span class="math inline">\(s'\)</span>. Este enfoque se alinea con un esquema de <strong><em>Batch Reinforcement Learning.</em></strong></p>
 </div>
 </section>
 </section>
@@ -517,8 +537,8 @@ window.Quarto = {
 <section id="modelo-hidráulico-energético-linealizado" class="level3" data-number="3.2.1">
 <h3 data-number="3.2.1" class="anchored" data-anchor-id="modelo-hidráulico-energético-linealizado"><span class="header-section-number">3.2.1</span> Modelo hidráulico-energético linealizado</h3>
 <div style="text-align: justify">
-<p>La energía generada depende del volumen de agua turbinado y una aproximación lineal de la altura hidraúlica. Para cada presa <span class="math inline">\(i\)</span>, se define la función de altura <span id="eq-altura"><span class="math display">\[H_i (s_i,s'_i) = 10 (s_i + s_i'+2) \tag{3.5}\]</span></span> tal expresión corresponde a un modelo lineal basado en estados discretizados, el término <span class="math inline">\(+2\)</span> se introdujo para evitar alturas nulas en estados con bajo volumen.</p>
-<p>Sea <span class="math inline">\(\eta = 0.9\)</span> eficiencia de conversión hidráulica a eléctrica, y <span class="math inline">\(g = 9.81\)</span> <span class="math inline">\(m/s^2\)</span> aceleración de la gravedad, entonces la energía generada por la presa <span class="math inline">\(i\)</span> al tomar la acción <span class="math inline">\(a\)</span> en el estado <span class="math inline">\(s\)</span> y transicionar a <span class="math inline">\(s'\)</span> se define por <span id="eq-energia"><span class="math display">\[E_i(s,a,s') = \frac{\eta g  H_i(s_i,s'_i) (k_iu_m\times 10^6)}{3600\times 10^6}, \tag{3.6}\]</span></span> así, la energía total generada por el sistema es <span id="eq-energia-total"><span class="math display">\[E = E_1+E_2. \tag{3.7}\]</span></span></p>
+<p>La energía generada depende del volumen de agua turbinado y una aproximación lineal de la altura hidraúlica. Para cada presa <span class="math inline">\(i\)</span>, se define la función de altura <span id="eq-altura"><span class="math display">\[H_i (s_i,s'_i) = 10 (s_i + s_i'+2) \tag{3.6}\]</span></span> tal expresión corresponde a un modelo lineal basado en estados discretizados, el término <span class="math inline">\(+2\)</span> se introdujo para evitar alturas nulas en estados con bajo volumen.</p>
+<p>Sea <span class="math inline">\(\eta = 0.9\)</span> eficiencia de conversión hidráulica a eléctrica, y <span class="math inline">\(g = 9.81\)</span> <span class="math inline">\(m/s^2\)</span> aceleración de la gravedad, entonces la energía generada por la presa <span class="math inline">\(i\)</span> al tomar la acción <span class="math inline">\(a\)</span> en el estado <span class="math inline">\(s\)</span> y transicionar a <span class="math inline">\(s'\)</span> se define por <span id="eq-energia"><span class="math display">\[E_i(s,a,s') = \frac{\eta g  H_i(s_i,s'_i) (k_iu_m\times 10^6)}{3600\times 10^6}, \tag{3.7}\]</span></span> así, la energía total generada por el sistema es <span id="eq-energia-total"><span class="math display">\[E = E_1+E_2. \tag{3.8}\]</span></span></p>
 </div>
 </section>
 <section id="estructura-de-penalizaciones" class="level3" data-number="3.2.2">
@@ -526,13 +546,13 @@ window.Quarto = {
 <div style="text-align: justify">
 <p>La recompensa incorpora penalizaciones para garantizar el cumplimiento de restricciones operativas. Se definen las siguientes penalizaciones:</p>
 <ul>
-<li><p>Penalización por derrame: si <span class="math inline">\(V_{i,t,q+1} &gt; N_i \Delta\)</span> se aplica <span id="eq-penalizacion-derrame"><span class="math display">\[\Pi_{derr} = C_{derr}\cdot\left(\frac{V_{i,t,q+1}-N_i \Delta}{\Delta}\right) \tag{3.8}\]</span></span></p></li>
-<li><p>Penalización por déficit de agua: si <span class="math inline">\(V_{i,t,q+1} &lt; 0\)</span> se aplica <span id="eq-penalizacion-deficit"><span class="math display">\[\Pi_{def} = C_{def} \tag{3.9}\]</span></span></p></li>
-<li><p>Penalización por violación de curva guía: si <span class="math inline">\(s_i' &lt; \text{CG}_i(m)\)</span> se aplica <span id="eq-penalizacion-curva-guia"><span class="math display">\[\Pi_{CG} = C_{CG}\cdot(s_i'- \text{CG}_i(m)) \tag{3.10}\]</span></span></p></li>
-<li><p>Penalización por niveles críticos: si <span class="math inline">\(s_i' \geq N_i-1\)</span> se aplica <span id="eq-penalizacion-niveles-criticos"><span class="math display">\[\Pi_{crit} = C_{crit} \tag{3.11}\]</span></span></p></li>
+<li><p>Penalización por derrame: si <span class="math inline">\(V_{i,t,q+1} &gt; N_i \Delta\)</span> se aplica <span id="eq-penalizacion-derrame"><span class="math display">\[\Pi_{derr} = C_{derr}\cdot\left(\frac{V_{i,t,q+1}-N_i \Delta}{\Delta}\right) \tag{3.9}\]</span></span></p></li>
+<li><p>Penalización por déficit de agua: si <span class="math inline">\(V_{i,t,q+1} &lt; 0\)</span> se aplica <span id="eq-penalizacion-deficit"><span class="math display">\[\Pi_{def} = C_{def} \tag{3.10}\]</span></span></p></li>
+<li><p>Penalización por violación de curva guía: si <span class="math inline">\(s_i' &lt; \text{CG}_i(m)\)</span> se aplica <span id="eq-penalizacion-curva-guia"><span class="math display">\[\Pi_{CG} = C_{CG}\cdot(s_i'- \text{CG}_i(m)) \tag{3.11}\]</span></span></p></li>
+<li><p>Penalización por niveles críticos: si <span class="math inline">\(s_i' \geq N_i-1\)</span> se aplica <span id="eq-penalizacion-niveles-criticos"><span class="math display">\[\Pi_{crit} = C_{crit} \tag{3.12}\]</span></span></p></li>
 </ul>
 <p>donde <span class="math inline">\(C_{derr}, C_{def}, C_{CG}, C_{crit}\)</span> son constantes de penalización ajustadas empíricamente, y <span class="math inline">\(\text{CG}_i(m)\)</span> representa la curva guía para la presa <span class="math inline">\(i\)</span> en la etapa <span class="math inline">\(m\)</span>.</p>
-<p>La función de recompensa total se define por <span id="eq-recompensa"><span class="math display">\[\mathcal{R}(s,a,s') = E - \Pi_{derr} - \Pi_{def} - \Pi_{CG} - \Pi_{crit}. \tag{3.12}\]</span></span></p>
+<p>La función de recompensa total se define por <span id="eq-recompensa"><span class="math display">\[\mathcal{R}(s,a,s') = E - \Pi_{derr} - \Pi_{def} - \Pi_{CG} - \Pi_{crit}. \tag{3.13}\]</span></span></p>
 </div>
 </section>
 <section id="ecuación-de-optimalidad-de-bellman-descontada" class="level3" data-number="3.2.3">
@@ -661,6 +681,11 @@ window.Quarto = {
 </div>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-puterman1994markov" class="csl-entry" role="listitem">
+Puterman, Martin L. 1994. <em>Markov Decision Processes: Discrete Stochastic Dynamic Programming</em>. Wiley Series en Probability y Statistics. John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9780470316887">https://doi.org/10.1002/9780470316887</a>.
+</div>
+</div>
 </section>
 
 </main> <!-- /main -->
