@@ -13,7 +13,7 @@ Siguiendo la notación de @puterman1994markov, se define el MDP como la colecci�
 
 ### Estructura Temporal $(T)$
 ::: {style="text-align: justify"}
-Se considera un horizonte temporal de operación compuesto por $T = 50$ años históricos, en donde cada uno de ellos se dividieron en $q = 24$ quincenas. Con el fin de reducir la dimensionalidad temporal y poder capturar la estacionalidad, se agruparon las quincenas en $M = 6$ etapas hidrológicas (segmentación temporal del año) mediante la siguiente función de agregación $\mu: \{0,\dots,q-1\} \to \{0,\dots,M-1\}$ definida por $$\mu(q) = \begin{cases} 0, & 0 \leq q <10\\ 1, & 10 \leq q <14\\ 2, & 14 \leq q < 16\\ 3, & 16 \leq q < 18\\ 4, & 18 \leq q < 20\\ 5, & 20 \leq q < 23\\ \end{cases}$$ {#eq-etapas}
+Se considera un horizonte temporal de operación compuesto por $T = 50$ años históricos, en donde cada uno de ellos se dividieron en $q = 24$ quincenas. Con el fin de reducir la dimensionalidad temporal y poder capturar la estacionalidad, se agruparon las quincenas en $M = 6$ etapas hidrológicas (segmentación temporal del año) mediante la siguiente función de agregación $\mu: \{0,\dots,q-1\} \to \{0,\dots,M-1\}$ definida por $$\mu(q) = \begin{cases} 0, & 0 \leq q <10\\ 1, & 10 \leq q <14\\ 2, & 14 \leq q < 16\\ 3, & 16 \leq q < 18\\ 4, & 18 \leq q < 20\\ 5, & 20 \leq q \leq 23\\ \end{cases}$$ {#eq-etapas}
 así, la variable $m = \mu(q)$ representará la etapa hidrológica correspondiente a la quincena $q$.
 El índice temporal completo se denotará por como $\tau = (t,q)$ con $t \in \{0,\dots,T-1\}$ y $q \in \{0,\dots,q-1\}$.
 :::
@@ -50,8 +50,8 @@ Desde el punto de vista de @puterman1994markov, la transición de MDP se define 
 la cual especifica la probabilidad de transicionar al estado $s'$ dado que se tomó la acción $a$ en el estado $s$.
 :::
 
-## Función de recompensa $(\mathcal{R})$
-### Modelo hidráulico-energético linealizado
+### Función de recompensa $(\mathcal{R})$
+#### Modelo hidráulico-energético linealizado
 ::: {style="text-align: justify"}
 La energía generada depende del volumen de agua turbinado y una aproximación lineal de la altura hidraúlica. Para cada presa $i$, se define la función de altura $$H_i (s_i,s'_i) = 10 (s_i + s_i'+2)$$ {#eq-altura} 
 tal expresión corresponde a un modelo lineal basado en estados discretizados, el término $+2$ se introdujo para evitar alturas nulas en estados con bajo volumen.
@@ -60,7 +60,7 @@ Sea $\eta = 0.9$ eficiencia de conversión hidráulica a eléctrica, y $g = 9.81
 así, la energía total generada por el sistema es $$E = E_1+E_2.$$ {#eq-energia-total}
 :::
 
-### Estructura de penalizaciones
+#### Estructura de penalizaciones
 ::: {style="text-align: justify"}
 La recompensa incorpora penalizaciones para garantizar el cumplimiento de restricciones operativas. Se definen las siguientes penalizaciones:
 
@@ -76,31 +76,35 @@ donde $C_{derr}, C_{def}, C_{CG}, C_{crit}$ son constantes de penalización ajus
 
 La función de recompensa total se define por $$\mathcal{R}(s,a,s') = E - \Pi_{derr} - \Pi_{def} - \Pi_{CG} - \Pi_{crit}.$$ {#eq-recompensa}
 
-En el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos. La dinámica se construye a partir de trayectorias históricas $$(s, a, r, s')$$ en donde cada una de ellas representa una experiencia de transición observada en los datos históricos, siendo $r$ el valor obtenido de la ecuación @eq-recompensa, representando la recompensa obtenida al tomar la acción $a$ en el estado $s$ y transicionar a $s'$. Este enfoque se alinea con un esquema de ***Batch Reinforcement Learning.***
+En el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos. La dinámica se construye a partir de trayectorias históricas $$(s, a, r, s')$$ en donde cada una de ellas representa una experiencia de transición observada en los datos históricos, siendo $r$ el valor obtenido de la @eq-recompensa, representando la recompensa obtenida al tomar la acción $a$ en el estado $s$ y transicionar a $s'$. Este enfoque se alinea con un esquema de ***Batch Reinforcement Learning.***
 :::
 
-### Ecuación de optimalidad de Bellman descontada
+## Ecuación de optimalidad de Bellman
 ::: {style="text-align: justify"}
+Conforme a @puterman1994markov, teorema 6.2.3, en un MDP descontado de horizonte infinito existe una única función de valor de acción óptima $Q^*:\mathcal{S}\times\mathcal{K} \to \mathbb{R}$ que satisface la ecuación de optimalidad de Bellman: $$Q^*(s,a) = \mathcal{R}(s,a,s') + \gamma \sum_{s'\in \mathcal{S}} P(s'|s,a) \max_{a' \in \mathcal{K}} Q^*(s',a'),$$ {#eq-bellman}
 
+ahora bien, dado que en lugar de una función de transición analítica se cuenta con un dataset empírico de trayectorias $(s, a, r, s')$, la ecuación de Bellman se reformula en su versión empírica como $$Q^*(s,a) = \mathcal{R}(s,a,s') + \gamma \max_{a' \in \mathcal{K}} Q^*(s',a').$$ {#eq-bellman-empirica}
 :::
 
 ## Aproximación numérica mediante Fitted Q-Iteration (FQI)
-### Motivación: maldición de la dimensionalidad y aprendizaje por refuerzo fuera de política
 ::: {style="text-align: justify"}
-- Justificación de no usar iteración de política clásica o programación dinámica exacta.
-- Referencias a Ernst et al. (2005), Antos et al. (2008).
+Si bien es sabido que la programación dinámica estocástica está afectada por la maldición de la dimensionalidad, @Castelletti2010, mientras más variables de estado hayan el requisito computacional crece exponencialmente, además de que se debe contar con un modelo de transición del sistema explícito, por ello el presente trabajo se basa en un enfoque de aproximación funcional mediante Fitted Q-Iteration (FQI), el cual es un algoritmo de aprendizaje por refuerzo que permite aproximar la función de valor de acción óptima $Q^*$ a partir de un conjunto de transiciones empíricas.
 :::
 
 ### Iteración de Bellman empírica y estabilización numérica
 ::: {style="text-align: justify"}
-- Cálculo de $y_n^{(j)}$, operador de truncamiento $\text{clip}(\cdot)$, y manejo de divergencias en métodos *off-policy*.
-- **Elemento matemático sugerido:** *Algoritmo X.1* en pseudocódigo estructurado (estilo ACM/IEEE).
+Al principio, se supone una función de valor de acción inicial $Q^{(0)}$ ($Q^{(0)}(s,a) = 0$ para todo $(s,a)$). Luego, sucesivamente se generan nuevas aproximaciones para cada iteración $n$, actualizando la función de valor de acción mediante la ecuación de Bellman empírica.
+Para cada transición observada $(s, a, r, s')$ en el dataset, se define el objetivo de Bellman por $$y^{(n)} = r + \gamma \max_{a' \in \mathcal{K}} Q^{(n-1)}(s',a'),$${#eq-objetivo-bellman}
+el cual representa una estimación del valor de acción óptimo asociado al par $(s,a)$ basada en la recompensa obtenida $r$ y el valor de acción máximo en el estado siguiente $s'$ según la función de valor de acción de la iteración anterior $Q^{(n-1)}$.
 :::
 
-### Aproximación funcional por regresión no paramétrica
+### Aproximación funcional por regresión no paramétrica (ExtraTrees)
 ::: {style="text-align: justify"}
-- Problema de mínimos cuadrados empírico sobre $\mathcal{F}$, hiperparámetros (árboles, profundidad, *min_samples_leaf*), y justificación de *Extra Trees* (reducción de varianza, sesgo controlado).
-- Comentario sobre universalidad y capacidad de aproximación de bosques aleatorios.
+Una vez calculados los objetivos de Bellman $y^{(n)}$ @eq-objetivo-bellman, se ajusta una función de valor de acción $Q^{(n)}$ que aproxime la relación entre los pares $(s,a)$ y los valores objetivos $y^{(n)}$, dicha función se obtiene resolviendo un problema de aprendizaje supervisado.
+
+El procedimiento se formula como un problema de regresión no paramétrica, en donde se busca encontrar una función $Q^{(n)}$ que minimice el error entre las predicciones $Q^{(n)}(s,a)$ y los objetivos $y^{(n)}$ para todas las transiciones $(s, a, r, s')$ en el dataset. En la práctica, se utiliza el algoritmo de *ExtraTrees*, que como menciona @Ernst2005, ofrece gran flexibilidad para aproximar funciones de valor en espacios continuos o de alta dimensionalidad. 
+
+Se modela un bosque de árboles extremadamente aleatorios compuesto por $300$ árboles de decisión, con una profundidad máxima de $14$ y un mínimo de $5$ muestras por hoja. Cada árbol particiona el espacio estado-acción en regiones homogéneas, (grupo de $(s,a)$ similares) y proporciona una estimación local de la función de valor. La predicción final corresponde al promedio de las predicciones individuales de todos los árboles.
 :::
 
 ### Criterios de convergencia y tolerancia computacional
@@ -125,25 +129,6 @@ En el presente trabajo no se modela una distribución analítica explícita, por
 ::: {style="text-align: justify"}
 - Energía esperada por reserva, derrames acumulados, violaciones de curvas guía, y análisis de varianza interanual.
 - **Elemento sugerido:** *Tabla X.1* resumen de parámetros operativos y *Figura X.1* trayectoria típica de volúmenes y energía.
-:::
-
-## Análisis teórico y propiedades del modelo
-### Contractividad del operador de Bellman en norma $\ell_\infty$
-::: {style="text-align: justify"}
-- **Lema X.1:** $\|\mathcal{T}Q_1 - \mathcal{T}Q_2\|_\infty \leq \gamma \|Q_1 - Q_2\|_\infty$.
-- Breve demostración usando la propiedad $\max - \max \leq \max(|\cdot|)$ y citando Puterman (1994, Thm. 6.2.3).
-:::
-
-### Cotas de error de aproximación y complejidad muestral
-::: {style="text-align: justify"}
-- Descomposición del error: $\|\hat{Q}^* - Q^*\|_\infty \leq \frac{2\gamma}{(1-\gamma)^2}\epsilon_{\text{approx}} + \mathcal{O}(N^{-1/2})$.
-- Comentario sobre trade-off sesgo-varianza en $\mathcal{F}$ y efecto del tamaño de muestra histórico.
-:::
-
-### Alineación con el marco axiomático de Puterman (1994)
-::: {style="text-align: justify"}
-- **Tabla X.2** correspondencia código $\leftrightarrow$ teoría MDP.
-- Discusión sobre validez de supuestos: horizonte infinito, descuento, espacios finitos, kernel empírico como aproximación de $\mathcal{P}$.
 :::
 
 ## Limitaciones, extensiones y trabajo futuro
