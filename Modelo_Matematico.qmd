@@ -9,13 +9,12 @@ El objetivo de este capítulo es presentar una formulación rigurosa del problem
 
 ## Formulación como Proceso de Decisión de Markov (MDP)
 
-Siguiendo la notación de @puterman1994markov, se define el MDP como la colección de objetos $\{(T, \mathcal{S}, \mathcal{K}, \mathbb{P}, \mathcal{R})\}$, donde cada componente se especifica a continuación:
+Siguiendo la notación de @puterman1994markov, se define el MDP como la colección de objetos $\{(T, \mathcal{S}, \mathcal{A}, \mathbb{P}, \mathcal{R})\}$, donde cada componente se especifica a continuación:
 
 ### Estructura Temporal $(T)$
 ::: {style="text-align: justify"}
 Se considera un horizonte temporal de operación compuesto por $T = 50$ años históricos, en donde cada uno de ellos se dividieron en $q = 24$ quincenas. Con el fin de reducir la dimensionalidad temporal y poder capturar la estacionalidad, se agruparon las quincenas en $M = 6$ etapas hidrológicas (segmentación temporal del año) mediante la siguiente función de agregación $\mu: \{0,\dots,q-1\} \to \{0,\dots,M-1\}$ definida por $$\mu(q) = \begin{cases} 0, & 0 \leq q <10\\ 1, & 10 \leq q <14\\ 2, & 14 \leq q < 16\\ 3, & 16 \leq q < 18\\ 4, & 18 \leq q < 20\\ 5, & 20 \leq q \leq 23\\ \end{cases}$$ {#eq-etapas}
 así, la variable $m = \mu(q)$ representará la etapa hidrológica correspondiente a la quincena $q$.
-El índice temporal completo se denotará por como $\tau = (t,q)$ con $t \in \{0,\dots,T-1\}$ y $q \in \{0,\dots,q-1\}$.
 :::
 
 ### Espacio de estados y operador de discretización $(\mathcal{S})$
@@ -26,12 +25,12 @@ Dado que los datos históricos se utilizan para construir un conjunto de transi�
 donde $N_1 = 27$ y $N_2 = 17$ son las capacidades discretas máximas de cada presa.
 :::
 
-### Espacio de acciones $(\mathcal{K})$
+### Espacio de acciones $(\mathcal{A})$
 ::: {style="text-align: justify"}
-Para cada etapa $m$, se define una unidad de extracción de agua $u_m = \{60, 150, 300, 300, 300, 150\}$, así la decisión de operación en la etapa $m$ corresponderá a los niveles de turbinado $k_1, k_2$. Cada nivel de turbinado se multiplica por la unidad de extracción $u_m$ para obtener el volumen de agua extraído en cada presa. Por lo tanto, el espacio de acciones se define como $$\mathcal{K}_m = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m},$$
+Para cada etapa $m$, se define una unidad de extracción de agua $u_m = \{60, 150, 300, 300, 300, 150\}$, así la decisión de operación en la etapa $m$ corresponderá a los niveles de turbinado $k_1, k_2$. Cada nivel de turbinado se multiplica por la unidad de extracción $u_m$ para obtener el volumen de agua extraído en cada presa. Por lo tanto, el espacio de acciones se define como $$\mathcal{A}_m = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m},$$
 donde $\mathcal{K}_{i,m}$ representa el conjunto de niveles de turbinado disponibles para la presa $i$ en la etapa $m$.
 
-Una acción denotada por $a = (k_1, k_2)$, representará el nivel de turbinado aplicado simultaneamente en ambas presas. Por ejemplo, suponga que $m = 0$ entonces $$\mathcal{K}_1, \mathcal{K}_2 = \{0,1,...,7\},$$ y así $a = (3,5)$ significaría que Angostura turbina $3\times 60 = 180$ $Mm^3$ de agua y Malpaso turbina $5\times 60 = 300$ $Mm^3$ de agua.
+Una acción denotada por $a = (k_1, k_2)$, representará el nivel de turbinado aplicado simultaneamente en ambas presas. Por ejemplo, suponga que $m = 0$ entonces $$u_0 = 60 \quad \text{y} \quad \mathcal{K}_{1,0}, \mathcal{K}_{2,0} = \{0,1,...,7\},$$ y así $a = (3,5)$ significaría que Angostura turbina $3\times 60 = 180$ $Mm^3$ de agua y Malpaso turbina $5\times 60 = 300$ $Mm^3$ de agua.
 :::
 
 ### Dinámica de transición $(\mathbb{P})$
@@ -76,53 +75,122 @@ donde $C_{derr}, C_{def}, C_{CG}, C_{crit}$ son constantes de penalización ajus
 
 La función de recompensa total se define por $$\mathcal{R}(s,a,s') = E - \Pi_{derr} - \Pi_{def} - \Pi_{CG} - \Pi_{crit}.$$ {#eq-recompensa}
 
-En el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos. La dinámica se construye a partir de trayectorias históricas $$(s, a, r, s')$$ en donde cada una de ellas representa una experiencia de transición observada en los datos históricos, siendo $r$ el valor obtenido de la @eq-recompensa, representando la recompensa obtenida al tomar la acción $a$ en el estado $s$ y transicionar a $s'$. Este enfoque se alinea con un esquema de ***Batch Reinforcement Learning.***
+En el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos. La dinámica se construye a partir de trayectorias históricas $$(s_t, a_t, r_t, s_{t+1}')$$ en donde cada una de ellas representa una experiencia de transición observada en los datos históricos, siendo $r_t$ el valor obtenido de la @eq-recompensa, representando la recompensa obtenida al tomar la acción $a_t$ en el estado $s_t$ y transicionar a $s_{t+1}'$. Este enfoque se alinea con un esquema de ***Batch Reinforcement Learning.***
 :::
 
 ## Ecuación de optimalidad de Bellman
 ::: {style="text-align: justify"}
-Conforme a @puterman1994markov, teorema 6.2.3, en un MDP descontado de horizonte infinito existe una única función de valor de acción óptima $Q^*:\mathcal{S}\times\mathcal{K} \to \mathbb{R}$ que satisface la ecuación de optimalidad de Bellman: $$Q^*(s,a) = \mathcal{R}(s,a,s') + \gamma \sum_{s'\in \mathcal{S}} P(s'|s,a) \max_{a' \in \mathcal{K}} Q^*(s',a'),$$ {#eq-bellman}
+Conforme a la teoría clásica de control estocástico, por ejemplo @puterman1994markov, teorema 6.2.3, en un MDP descontado existe una única función de valor de acción óptima $V^*:\mathcal{S}\times\mathcal{A} \to \mathbb{R}$ que satisface la ecuación de optimalidad de Bellman: $$V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \sum_{s'\in \mathcal{S}} P(s'|s,a) \max_{a' \in \mathcal{A}} V^*(s',a'),$$ {#eq-bellman}
 
-ahora bien, dado que en lugar de una función de transición analítica se cuenta con un dataset empírico de trayectorias $(s, a, r, s')$, la ecuación de Bellman se reformula en su versión empírica como $$Q^*(s,a) = \mathcal{R}(s,a,s') + \gamma \max_{a' \in \mathcal{K}} Q^*(s',a').$$ {#eq-bellman-empirica}
+ahora bien, dado que en lugar de una función de transición analítica se cuenta con un dataset empírico de trayectorias $(s_t, a_t, r_t, s_{t+1}')$, para todo $t$, la ecuación de Bellman se reformula en su versión empírica como $$V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \max_{a' \in \mathcal{A}} V^*(s',a').$$ {#eq-bellman-empirica}
 :::
 
 ## Aproximación numérica mediante Fitted Q-Iteration (FQI)
 ::: {style="text-align: justify"}
-Si bien es sabido que la programación dinámica estocástica está afectada por la maldición de la dimensionalidad, @Castelletti2010, mientras más variables de estado hayan el requisito computacional crece exponencialmente, además de que se debe contar con un modelo de transición del sistema explícito, por ello el presente trabajo se basa en un enfoque de aproximación funcional mediante Fitted Q-Iteration (FQI), el cual es un algoritmo de aprendizaje por refuerzo que permite aproximar la función de valor de acción óptima $Q^*$ a partir de un conjunto de transiciones empíricas.
+Si bien es sabido que la programación dinámica estocástica está afectada por la maldición de la dimensionalidad, @Castelletti2010, mientras más variables de estado hayan el requisito computacional crece exponencialmente, además de que se debe contar con un modelo de transición del sistema explícito, por ello el presente trabajo se basa en un enfoque de aproximación funcional mediante Fitted Q-Iteration (FQI), el cual es un algoritmo de aprendizaje por refuerzo que permite aproximar la función de valor de acción óptima $V^*$ a partir de un conjunto de transiciones empíricas.
 :::
 
-### Iteración de Bellman empírica y estabilización numérica
+### Iteración de Bellman empírica
 ::: {style="text-align: justify"}
-Al principio, se supone una función de valor de acción inicial $Q^{(0)}$ ($Q^{(0)}(s,a) = 0$ para todo $(s,a)$). Luego, sucesivamente se generan nuevas aproximaciones para cada iteración $n$, actualizando la función de valor de acción mediante la ecuación de Bellman empírica.
-Para cada transición observada $(s, a, r, s')$ en el dataset, se define el objetivo de Bellman por $$y^{(n)} = r + \gamma \max_{a' \in \mathcal{K}} Q^{(n-1)}(s',a'),$${#eq-objetivo-bellman}
-el cual representa una estimación del valor de acción óptimo asociado al par $(s,a)$ basada en la recompensa obtenida $r$ y el valor de acción máximo en el estado siguiente $s'$ según la función de valor de acción de la iteración anterior $Q^{(n-1)}$.
+Al principio, se supone una función de valor de acción inicial $V^{(0)}$ ($V^{(0)}(s,a) = 0$ para todo $(s,a)$). Luego, sucesivamente se generan nuevas aproximaciones para cada iteración $n$, actualizando la función de valor de acción mediante la ecuación de Bellman empírica.
+Para cada transición observada $(s_t, a_t, r_t, s_{t+1}')$ en el dataset, se define el **objetivo de Bellman** por $$y^{(n)} := r + \gamma \max_{a' \in \mathcal{A}} V^{(n-1)}(s',a'),$${#eq-objetivo-bellman}
+el cual representa una estimación del valor de acción óptimo asociado al par $(s,a)$ basada en la recompensa obtenida $r$ y el valor de acción máximo en el estado siguiente $s'$ según la función de valor de acción de la iteración anterior $V^{(n-1)}$.
 :::
 
 ### Aproximación funcional por regresión no paramétrica (ExtraTrees)
 ::: {style="text-align: justify"}
-Una vez calculados los objetivos de Bellman $y^{(n)}$ @eq-objetivo-bellman, se ajusta una función de valor de acción $Q^{(n)}$ que aproxime la relación entre los pares $(s,a)$ y los valores objetivos $y^{(n)}$, dicha función se obtiene resolviendo un problema de aprendizaje supervisado.
+Una vez calculados los objetivos de Bellman $y^{(n)}$ @eq-objetivo-bellman, se ajusta una función de valor de acción $V^{(n)}$ que aproxime la relación entre los pares $(s,a)$ y los valores objetivos $y^{(n)}$, dicha función se obtiene resolviendo un problema de aprendizaje supervisado que se explicó en la sección (pendiente).
 
-El procedimiento se formula como un problema de regresión no paramétrica, en donde se busca encontrar una función $Q^{(n)}$ que minimice el error entre las predicciones $Q^{(n)}(s,a)$ y los objetivos $y^{(n)}$ para todas las transiciones $(s, a, r, s')$ en el dataset. En la práctica, se utiliza el algoritmo de *ExtraTrees*, que como menciona @Ernst2005, ofrece gran flexibilidad para aproximar funciones de valor en espacios continuos o de alta dimensionalidad. 
+El procedimiento se formula como un problema de regresión no paramétrica, en donde se busca encontrar una función $V^{(n)}$ que minimice el error entre las predicciones $V^{(n)}(s,a)$ y los objetivos $y^{(n)}$ para todas las transiciones $(s_t, a_t, r_t, s_{t+1}')$ en el dataset. En la práctica, se utiliza el algoritmo de *ExtraTrees*, que como propone @Ernst2005, y se argumenta que ofrece gran flexibilidad para aproximar funciones de valor en espacios continuos o de alta dimensionalidad. 
 
-Se modela un bosque de árboles extremadamente aleatorios compuesto por $300$ árboles de decisión, con una profundidad máxima de $14$ y un mínimo de $5$ muestras por hoja. Cada árbol particiona el espacio estado-acción en regiones homogéneas, (grupo de $(s,a)$ similares) y proporciona una estimación local de la función de valor. La predicción final corresponde al promedio de las predicciones individuales de todos los árboles.
+La modelación mediante ExtraTrees compuesto por $300$ árboles de decisión, con una profundidad máxima de $14$ y un mínimo de $5$ muestras por hoja. Cada árbol de decisión particiona el espacio estado-acción en regiones homogéneas, (grupo de $(s,a)$ similares) y proporciona una estimación local de la función de valor. La predicción final corresponde al promedio de las predicciones individuales de todos los árboles de decisión.
+
+![Árbol de decisión descrita anteriormente.](Imagenes/arbol-decision.png){#fig-arbol width=70%}
+
+El algoritmo de FQI se repite iterativamente hasta que la función de valor de acción converge, en la práctica se definió una metrica de convergencia empírica por $$\Delta = \frac{1}{L}\sum_{l=1}^L |V^{(n)}(s_l,a_l) - V^{(n-1)}(s_l,a_l)|,$${#eq-convergencia} la cual se define sobre $\mathcal{D} \subset \{(s_t, a_t, r_t, s_{t+1}')\}$ siendo $L$ la cardinalidad de $\mathcal{D}$.
+
+Por lo que el algoritmo se detiene hasta que el $\Delta < \epsilon$, es decir, cuando el cambio entre $V^{(n)}$ y $V^{(n-1)}$ sea menor a un umbral predefinido o bien cuando se alcance un número máximo de iteraciones. 
 :::
 
-### Criterios de convergencia y tolerancia computacional
+## Política óptima y simulación operativa
 ::: {style="text-align: justify"}
-- Norma media en conjunto fijo $\mathcal{S}_{\text{test}}$, umbral $\varepsilon=10^{-3}$, y detección temprana de estancamiento.
-- **Elemento matemático sugerido:** *Criterio de parada X.1* con justificación numérica (estabilidad de punto fijo aproximado).
-:::
+Una vez obtenida la función de valor de acción óptima $V^*$, se deriva la política óptima $\pi^*:\mathcal{S} \to \mathcal{A}$ que asigna a cada estado $s$ la acción $a$ que maximiza el valor de acción, es decir, $$\pi^*(s) := \arg\max_{a \in \mathcal{A}} V^*(s,a),$${#eq-politica-optima}
 
-## Protocolo de simulación en lazo cerrado y evaluación operativa
-### Extracción de la política greedy óptima
-::: {style="text-align: justify"}
-- Definición de $\pi^*(s) \in \arg\max_{a \in \mathcal{A}_s} \hat{Q}^*(s,a)$ y discusión sobre no unicidad y desempate determinista.
-:::
+es decir, para cada estado $s$, la política óptima $\pi^*(s)$ indica la acción que se debe tomar para maximizar el valor de acción estimado.
 
-### Dinámica forward y proyección sobre restricciones físicas
-::: {style="text-align: justify"}
-- Simulación sobre series históricas, proyección $\min\{\max\{\tilde{V}_i,0\}, N_i\Delta V\}$, y manejo de fronteras anuales.
-- Comentario sobre desacople entre entrenamiento (penalizaciones blandas) y evaluación (restricciones duras).
+Finalmente, se valida la política óptima $\pi^*$ mediante simulación en lazo cerrado, es decir, se simula la operación del sistema hidroeléctrico utilizando la política $\pi^*$ para tomar decisiones de turbinado en cada estado observado durante las trayectorias históricas. 
+
+La evaluación de la política se realiza mediante un recorrido determinista sobre la serie histórica completa. El algoritmo opera de la siguiente manera:
+
+1. **Inicialización:** Se fijan los volúmenes iniciales $V_{1,0}$ y $V_{2,0}$.
+
+2. **Mapeo estacional:** Para cada quincena $q$, se determina $m = \mu(q)$ y la unidad de extracción $u_m$.
+
+3. **Discretización:**
+
+   $$
+   s_i = \mathcal{D}(V_i,N_i),
+   \quad i\in\{1,2\}.
+   $$
+
+4. **Selección de acción:**
+
+   $$
+   (k_1^*,k_2^*)
+   =
+   \arg\max_{k_1,k_2}\hat{V}^{*}(s,a),
+   $$
+
+   donde
+
+   $$
+   (s,a)=(s_1,s_2,m,k_1,k_2).
+   $$
+
+5. **Balance hídrico:**
+
+   $$
+   V_{i,t,q+1}
+   =
+   V_{i,t,q}
+   +
+   W_{i,t,q+1}
+   -
+   k_i^*u_m.
+   $$
+
+6. **Proyección física:**
+
+   $$
+   V_i^{\text{new}}
+   =
+   \min\{V_{i,t,q+1},N_i\Delta V\},
+   $$
+
+   $$
+   \text{derrame}_i
+   =
+   \max\{0,V_{i,t,q+1}-N_i\Delta V\}.
+   $$
+
+7. **Cálculo energético:**
+
+   $$
+   H_i
+   =
+   10\left(s_i+\mathcal{D}(V_{i,t,q+1},N_i)+2\right),
+   $$
+
+   $$
+   E_i(s,a,s')
+   =
+   \frac{\eta g H_i(s_i,s'_i)\left(k_i^*u_m\times10^6\right)}
+        {3600\times10^6}.
+   $$
+
+8. **Registro y actualización:** Se almacenan métricas de energía, derrames y volúmenes, y se actualiza el estado para la siguiente iteración.
+
+La metodología sigue la práctica estándar en aprendizaje por refuerzo aplicado a sistemas de control @Bertsekas2019, en la cual la política aprendida se valida mediante una simulación en lazo cerrado sobre trayectorias históricas.
 :::
 
 ### Métricas de desempeño y validación estadística
@@ -131,12 +199,6 @@ Se modela un bosque de árboles extremadamente aleatorios compuesto por $300$ á
 - **Elemento sugerido:** *Tabla X.1* resumen de parámetros operativos y *Figura X.1* trayectoria típica de volúmenes y energía.
 :::
 
-## Limitaciones, extensiones y trabajo futuro
-::: {style="text-align: justify"}
-- Limitaciones: discretización fija, modelo lineal de altura, ausencia de incertidumbre explícita en afluentes, penalizaciones estáticas.
-- Extensiones: curvas cota-volumen reales, kernels estocásticos (ARIMA, copulas), FQI con regularización, métodos de política primal-dual para restricciones duras.
-- Aplicación a otros sistemas multirreservorio y escalabilidad computacional.
-:::
 
 ## Conclusiones del capítulo
 ::: {style="text-align: justify"}
