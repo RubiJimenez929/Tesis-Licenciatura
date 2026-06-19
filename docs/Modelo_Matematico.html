@@ -486,7 +486,7 @@ window.Quarto = {
 </div>
 <section id="formulación-como-proceso-de-decisión-de-markov-mdp" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="formulación-como-proceso-de-decisión-de-markov-mdp"><span class="header-section-number">3.1</span> Formulación como Proceso de Decisión de Markov (MDP)</h2>
-<p>Siguiendo la notación de <span class="citation" data-cites="puterman1994markov">Puterman (<a href="references.html#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, se define el MDP como la colección de objetos <span class="math inline">\(\{(T, \mathcal{S}, \mathcal{A}, \mathbb{P}, \mathcal{R})\}\)</span>, donde cada componente se especifica a continuación:</p>
+<p>Siguiendo la notación de <span class="citation" data-cites="puterman1994markov">Puterman (<a href="references.html#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, se define el MDP como la colección de objetos <span class="math display">\[\{(T, \mathcal{S}, \mathcal{A}, \mathbb{P}, \mathcal{R})\},\]</span> donde cada componente se especifica a continuación:</p>
 <section id="estructura-temporal-t" class="level3" data-number="3.1.1">
 <h3 data-number="3.1.1" class="anchored" data-anchor-id="estructura-temporal-t"><span class="header-section-number">3.1.1</span> Estructura Temporal <span class="math inline">\((T)\)</span></h3>
 <div style="text-align: justify">
@@ -497,22 +497,22 @@ window.Quarto = {
 <h3 data-number="3.1.2" class="anchored" data-anchor-id="espacio-de-estados-y-operador-de-discretización-mathcals"><span class="header-section-number">3.1.2</span> Espacio de estados y operador de discretización <span class="math inline">\((\mathcal{S})\)</span></h3>
 <div style="text-align: justify">
 <p>El sistema está compuesto por dos presas: <a href="https://maps.app.goo.gl/NHNQdHdfYAoRGxhPA">La Angostura</a> <span class="math inline">\((i = 1)\)</span> y <a href="https://maps.app.goo.gl/acX7hVXswX5uYYUBA">Malpaso</a> <span class="math inline">\((i =2)\)</span>. El volumen de almacenamiento de cada una de ellas en la quincena <span class="math inline">\(q\)</span> del año <span class="math inline">\(t\)</span> se representará por <span class="math inline">\(V_{i,t,q} \in \mathbb{R}_{\geq 0}\)</span> <span class="math inline">\((Mm^3)\)</span>.</p>
-<p>Dado que los datos históricos se utilizan para construir un conjunto de transión empírica, se introduce un operador de discretización uniforme del espacio de estados mediante el parámetro <span class="math inline">\(\Delta = 600\)</span> <span class="math inline">\(Mm^3\)</span>. Así, el espacio de estados se define como <span class="math inline">\(\mathcal{S} = \mathcal{S}_1 \times \mathcal{S}_2 \times \{0,...,5\} = \{s = (s_1,s_2,m)\}\)</span> en donde <span class="math inline">\(s_i\)</span> representa el volumen discretizado de la presa <span class="math inline">\(i\)</span>, tal estado discreto se obtiene mediante el operador de discretización <span class="math inline">\(\mathcal{D}: \mathbb{R} \times \mathbb{N} \longrightarrow \{0,\dots,N-1\}\)</span> dado por <span id="eq-discretizacion"><span class="math display">\[s_i = \mathcal{D}(V_{i,t,q}, N_i) = \min \left(\max\left(\left\lfloor \frac{V_{i,t,q}}{\Delta} + \frac{1}{2}\right\rfloor, 0\right), N_i-1\right), \tag{3.2}\]</span></span> donde <span class="math inline">\(N_1 = 27\)</span> y <span class="math inline">\(N_2 = 17\)</span> son las capacidades discretas máximas de cada presa.</p>
+<p>Dado que los datos históricos se utilizan para construir un conjunto de transión empírica, se introduce un operador de discretización uniforme del espacio de estados mediante el parámetro <span class="math inline">\(\Delta = 600\)</span> <span class="math inline">\(Mm^3\)</span>, dicha unidad permite discretizar la capacidad de almacenamiento de cada presa en un numéro manejable de estados. Así, el espacio de estados se define como <span class="math inline">\(\mathcal{S} = \mathcal{S}_1 \times \mathcal{S}_2 \times \{0,...,5\} = \{s = (s_1,s_2,m)\}\)</span> en donde <span class="math inline">\(s_i\)</span> representa el volumen discretizado de la presa <span class="math inline">\(i\)</span>, tal estado discreto se obtiene mediante el operador de discretización <span class="math inline">\(\mathcal{D}: \mathbb{R} \times \mathbb{N} \longrightarrow \{0,\dots,N-1\}\)</span> dado por <span id="eq-discretizacion"><span class="math display">\[s_i = \mathcal{D}(V_{i,t,q}, N_i) = \min \left(\max\left(\left\lfloor \frac{V_{i,t,q}}{\Delta} + \frac{1}{2}\right\rfloor, 0\right), N_i-1\right), \tag{3.2}\]</span></span> donde <span class="math inline">\(N_1 = 27\)</span> y <span class="math inline">\(N_2 = 17\)</span> son las capacidades discretas máximas de cada presa.</p>
 </div>
 </section>
 <section id="espacio-de-acciones-mathcala" class="level3" data-number="3.1.3">
 <h3 data-number="3.1.3" class="anchored" data-anchor-id="espacio-de-acciones-mathcala"><span class="header-section-number">3.1.3</span> Espacio de acciones <span class="math inline">\((\mathcal{A})\)</span></h3>
 <div style="text-align: justify">
-<p>Para cada etapa <span class="math inline">\(m\)</span>, se define una unidad de extracción de agua <span class="math inline">\(u_m = \{60, 150, 300, 300, 300, 150\}\)</span>, así la decisión de operación en la etapa <span class="math inline">\(m\)</span> corresponderá a los niveles de turbinado <span class="math inline">\(k_1, k_2\)</span>. Cada nivel de turbinado se multiplica por la unidad de extracción <span class="math inline">\(u_m\)</span> para obtener el volumen de agua extraído en cada presa. Por lo tanto, el espacio de acciones se define como <span class="math display">\[\mathcal{A}_m = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m},\]</span> donde <span class="math inline">\(\mathcal{K}_{i,m}\)</span> representa el conjunto de niveles de turbinado disponibles para la presa <span class="math inline">\(i\)</span> en la etapa <span class="math inline">\(m\)</span>.</p>
-<p>Una acción denotada por <span class="math inline">\(a = (k_1, k_2)\)</span>, representará el nivel de turbinado aplicado simultaneamente en ambas presas. Por ejemplo, suponga que <span class="math inline">\(m = 0\)</span> entonces <span class="math display">\[u_0 = 60 \quad \text{y} \quad \mathcal{K}_{1,0}, \mathcal{K}_{2,0} = \{0,1,...,7\},\]</span> y así <span class="math inline">\(a = (3,5)\)</span> significaría que Angostura turbina <span class="math inline">\(3\times 60 = 180\)</span> <span class="math inline">\(Mm^3\)</span> de agua y Malpaso turbina <span class="math inline">\(5\times 60 = 300\)</span> <span class="math inline">\(Mm^3\)</span> de agua.</p>
+<p>Para cada etapa <span class="math inline">\(m\)</span>, se define una unidad de extracción de agua <span class="math inline">\(u_m = \{60, 150, 300, 300, 300, 150\}\)</span>, así la decisión de operación en la etapa <span class="math inline">\(m\)</span> corresponderá a los niveles de turbinado <span class="math inline">\(k_1, k_2\)</span>. Cada nivel de turbinado se multiplica por la unidad de extracción <span class="math inline">\(u_m\)</span>, la cual está en <span class="math inline">\(Mm^3\)</span>, para obtener el volumen de agua extraído en cada presa. Por lo tanto, el espacio de acciones se define como <span class="math display">\[\mathcal{A}_m = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m},\]</span> donde <span class="math inline">\(\mathcal{K}_{i,m}\)</span> representa el conjunto de niveles de turbinado disponibles para la presa <span class="math inline">\(i\)</span> en la etapa hidrológica <span class="math inline">\(m\)</span>.</p>
+<p>Una acción denotada por <span class="math inline">\(a = (k_1, k_2)\)</span>, representará el nivel de turbinado aplicado simultaneamente en ambas presas. Por ejemplo, suponga que <span class="math inline">\(m = 0\)</span> entonces <span class="math display">\[u_0 = 60 \quad \text{y} \quad \mathcal{K}_{1,0}, \mathcal{K}_{2,0} = \{0,1,...,10\},\]</span> y así <span class="math inline">\(a = (3,5)\)</span> significaría que Angostura turbina <span class="math inline">\(3\times 60 = 180\)</span> <span class="math inline">\(Mm^3\)</span> de agua y Malpaso turbina <span class="math inline">\(5\times 60 = 300\)</span> <span class="math inline">\(Mm^3\)</span> de agua. Cabe mencionar que Los valores de <span class="math inline">\(u_m\)</span> y <span class="math inline">\(\mathcal{K}_{i,m}\)</span> se seleccionaron para que el turbinado máximo por etapa hidrológica <span class="math inline">\(k_{i} \cdot u_m\)</span> no exceda la capacidad instalada de las plantas ni los caudales históricos máximos registrados, garantizando la factibilidad física de todas las acciones evaluadas.</p>
 </div>
 </section>
 <section id="dinámica-de-transición-mathbbp" class="level3" data-number="3.1.4">
 <h3 data-number="3.1.4" class="anchored" data-anchor-id="dinámica-de-transición-mathbbp"><span class="header-section-number">3.1.4</span> Dinámica de transición <span class="math inline">\((\mathbb{P})\)</span></h3>
 <div style="text-align: justify">
-<p>La ecuación de transición continua tras la operación del sistema se define por <span id="eq-transicion"><span class="math display">\[V_{i,t,q+1} = V_{i,t,q} + W_{i, t, q+1}-k_iu_m, \quad q&lt;23 \tag{3.3}\]</span></span> donde <span class="math inline">\(V_{i,t,q}\)</span> representa el volumen almacenado en la presa <span class="math inline">\(i\)</span> antes de tomar la acción de turbinado y <span class="math inline">\(W_{i, t,q+1}\)</span> representa el afluente neto (caudal de ingreso) para la presa <span class="math inline">\(i\)</span> en la quincena <span class="math inline">\(q+1\)</span> del año <span class="math inline">\(t\)</span>.</p>
+<p>La ecuación de transición continua tras la operación del sistema se define por <span id="eq-transicion"><span class="math display">\[V_{i,t,q+1} = V_{i,t,q} + W_{i, t, q+1}-k_iu_m, \quad q&lt;23 \tag{3.3}\]</span></span> donde <span class="math inline">\(V_{i,t,q}\)</span> representa el volumen almacenado en la presa <span class="math inline">\(i\)</span> antes de tomar la acción de turbinado, <span class="math inline">\(W_{i, t,q+1}\)</span> representa el afluente neto (caudal de ingreso) para la presa <span class="math inline">\(i\)</span> en la quincena <span class="math inline">\(q+1\)</span> del año <span class="math inline">\(t\)</span>, tales valores serán obtenidos de los datos históricos con los que ya se cuentan y <span class="math inline">\(k_iu_m\)</span> representa el volumen de agua extraído por la acción de turbinado aplicada en la etapa hidrológica correspondiente a la quincena <span class="math inline">\(q\)</span> (<span class="math inline">\(k_i \in \mathcal{K}_{i,m}\)</span>).</p>
 <p>Cuando <span class="math inline">\(q=23\)</span>, la transición se define por <span id="eq-transicion23"><span class="math display">\[V_{i,t+1,0} = V_{i,t,23} + W_{i, t+1, 0}-k_iu_m. \tag{3.4}\]</span></span></p>
-<p>En ambos casos, el volumen discretizado siguiente se obtiene aplicando el operador de discretización <span class="math inline">\(\mathcal{D}\)</span> al volumen resultante, es decir, <span class="math display">\[s_i' = \mathcal{D}(V_{i,t,q+1}, N_i),\]</span> mientras que la etapa evoluciona mediante <span class="math inline">\(m' = (m+1) \mod M\)</span>.</p>
+<p>En ambos casos, el volumen discretizado siguiente se obtiene aplicando el operador de discretización <span class="math inline">\(\mathcal{D}\)</span> al volumen resultante, es decir, <span class="math display">\[s_i' = \mathcal{D}(V_{i,t,q+1}, N_i),\]</span> mientras que la etapa hidrológica evoluciona mediante <span class="math inline">\(m' = (m+1) \mod M\)</span>.</p>
 <p>Por lo tanto, el estado discreto siguiente está dado por <span class="math display">\[s' = (s_1', s_2', m').\]</span></p>
 <p>Desde el punto de vista de <span class="citation" data-cites="puterman1994markov">Puterman (<a href="references.html#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, la transición de MDP se define mediante una función de probabilidad condicional <span id="eq-transicion"><span class="math display">\[\mathbb{P}(s'|s,a), \tag{3.5}\]</span></span> la cual especifica la probabilidad de transicionar al estado <span class="math inline">\(s'\)</span> dado que se tomó la acción <span class="math inline">\(a\)</span> en el estado <span class="math inline">\(s\)</span>.</p>
 </div>
@@ -522,8 +522,9 @@ window.Quarto = {
 <section id="modelo-hidráulico-energético-linealizado" class="level4" data-number="3.1.5.1">
 <h4 data-number="3.1.5.1" class="anchored" data-anchor-id="modelo-hidráulico-energético-linealizado"><span class="header-section-number">3.1.5.1</span> Modelo hidráulico-energético linealizado</h4>
 <div style="text-align: justify">
-<p>La energía generada depende del volumen de agua turbinado y una aproximación lineal de la altura hidraúlica. Para cada presa <span class="math inline">\(i\)</span>, se define la función de altura <span id="eq-altura"><span class="math display">\[H_i (s_i,s'_i) = 10 (s_i + s_i'+2) \tag{3.6}\]</span></span> tal expresión corresponde a un modelo lineal basado en estados discretizados, el término <span class="math inline">\(+2\)</span> se introdujo para evitar alturas nulas en estados con bajo volumen.</p>
-<p>Sea <span class="math inline">\(\eta = 0.9\)</span> eficiencia de conversión hidráulica a eléctrica, y <span class="math inline">\(g = 9.81\)</span> <span class="math inline">\(m/s^2\)</span> aceleración de la gravedad, entonces la energía generada por la presa <span class="math inline">\(i\)</span> al tomar la acción <span class="math inline">\(a\)</span> en el estado <span class="math inline">\(s\)</span> y transicionar a <span class="math inline">\(s'\)</span> se define por <span id="eq-energia"><span class="math display">\[E_i(s,a,s') = \frac{\eta g  H_i(s_i,s'_i) (k_iu_m\times 10^6)}{3600\times 10^6}, \tag{3.7}\]</span></span> así, la energía total generada por el sistema es <span id="eq-energia-total"><span class="math display">\[E = E_1+E_2. \tag{3.8}\]</span></span></p>
+<p>La energía generada depende del volumen de agua turbinado y una aproximación lineal de la altura hidraúlica. Para cada presa <span class="math inline">\(i\)</span>, se define la función de altura <span id="eq-altura"><span class="math display">\[H_i (s_i,s'_i) =\frac{20(s_i + s_i'+2)}{2} =10 (s_i + s_i'+2) \tag{3.6}\]</span></span> tal expresión corresponde a un modelo lineal basado en estados discretizados, el término <span class="math inline">\(+2\)</span> se introdujo para evitar alturas nulas en estados con bajo volumen y el término <span class="math inline">\(20\)</span> como intercepto representa la altura hidráulica mínima mientras que como pendiente representa cuántos metros de altura se ganan por cada incremento en el estado discretizado, es decir, por cada incremento de <span class="math inline">\(\Delta\)</span> en el volumen de agua almacenado.</p>
+<p>Sea <span class="math inline">\(\eta = 0.9\)</span> eficiencia de conversión hidráulica a eléctrica, y <span class="math inline">\(g = 9.81\)</span> <span class="math inline">\(m/s^2\)</span> aceleración de la gravedad, entonces la energía generada por la presa <span class="math inline">\(i\)</span> al tomar la acción <span class="math inline">\(a\)</span> en el estado <span class="math inline">\(s\)</span> y transicionar a <span class="math inline">\(s'\)</span> se define por <span id="eq-energia"><span class="math display">\[E_i(s,a,s') = \frac{\eta g  H_i(s_i,s'_i) (k_iu_m\times 10^6)}{3600\times 10^6}, \tag{3.7}\]</span></span> donde <span class="math inline">\(10^6\)</span> representa la conversión de <span class="math inline">\(Mm^3\)</span> a <span class="math inline">\(m^3\)</span> y <span class="math inline">\(3600\times 10^6\)</span> la conversión de <span class="math inline">\(kWh\)</span> a <span class="math inline">\(GWh\)</span>.</p>
+<p>Por lo tanto la energía total generada por el sistema es <span id="eq-energia-total"><span class="math display">\[E = E_1+E_2. \tag{3.8}\]</span></span></p>
 </div>
 </section>
 <section id="estructura-de-penalizaciones" class="level4" data-number="3.1.5.2">
@@ -537,7 +538,7 @@ window.Quarto = {
 <li><p>Penalización por niveles críticos: si <span class="math inline">\(s_i' \geq N_i-1\)</span> se aplica <span id="eq-penalizacion-niveles-criticos"><span class="math display">\[\Pi_{crit} = C_{crit} \tag{3.12}\]</span></span></p></li>
 </ul>
 <p>donde <span class="math inline">\(C_{derr}, C_{def}, C_{CG}, C_{crit}\)</span> son constantes de penalización ajustadas empíricamente, y <span class="math inline">\(\text{CG}_i(m)\)</span> representa la curva guía para la presa <span class="math inline">\(i\)</span> en la etapa <span class="math inline">\(m\)</span>.</p>
-<p>La función de recompensa total se define por <span id="eq-recompensa"><span class="math display">\[\mathcal{R}(s,a,s') = E - \Pi_{derr} - \Pi_{def} - \Pi_{CG} - \Pi_{crit}. \tag{3.13}\]</span></span></p>
+<p>La función de recompensa total se define finalmente por <span id="eq-recompensa"><span class="math display">\[\mathcal{R}(s,a,s') = E - \Pi_{derr} - \Pi_{def} - \Pi_{CG} - \Pi_{crit}. \tag{3.13}\]</span></span></p>
 <p>En el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos. La dinámica se construye a partir de trayectorias históricas <span class="math display">\[(s_t, a_t, r_t, s_{t+1}')\]</span> en donde cada una de ellas representa una experiencia de transición observada en los datos históricos, siendo <span class="math inline">\(r_t\)</span> el valor obtenido de la <a href="#eq-recompensa" class="quarto-xref">Ecuación&nbsp;<span>3.13</span></a>, representando la recompensa obtenida al tomar la acción <span class="math inline">\(a_t\)</span> en el estado <span class="math inline">\(s_t\)</span> y transicionar a <span class="math inline">\(s_{t+1}'\)</span>. Este enfoque se alinea con un esquema de <strong><em>Batch Reinforcement Learning.</em></strong></p>
 </div>
 </section>
@@ -546,14 +547,15 @@ window.Quarto = {
 <section id="ecuación-de-optimalidad-de-bellman" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="ecuación-de-optimalidad-de-bellman"><span class="header-section-number">3.2</span> Ecuación de optimalidad de Bellman</h2>
 <div style="text-align: justify">
-<p>Conforme a la teoría clásica de control estocástico, por ejemplo <span class="citation" data-cites="puterman1994markov">Puterman (<a href="references.html#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, teorema 6.2.3, en un MDP descontado existe una única función de valor de acción óptima <span class="math inline">\(V^*:\mathcal{S}\times\mathcal{A} \to \mathbb{R}\)</span> que satisface la ecuación de optimalidad de Bellman: <span id="eq-bellman"><span class="math display">\[V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \sum_{s'\in \mathcal{S}} P(s'|s,a) \max_{a' \in \mathcal{A}} V^*(s',a'), \tag{3.14}\]</span></span></p>
-<p>ahora bien, dado que en lugar de una función de transición analítica se cuenta con un dataset empírico de trayectorias <span class="math inline">\((s_t, a_t, r_t, s_{t+1}')\)</span>, para todo <span class="math inline">\(t\)</span>, la ecuación de Bellman se reformula en su versión empírica como <span id="eq-bellman-empirica"><span class="math display">\[V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \max_{a' \in \mathcal{A}} V^*(s',a'). \tag{3.15}\]</span></span></p>
+<p>Conforme a la teoría clásica de control estocástico, por ejemplo <span class="citation" data-cites="puterman1994markov">Puterman (<a href="references.html#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, teorema 6.2.3, en un MDP descontado existe una única función de valor de acción óptima <span class="math inline">\(V^*:\mathcal{S}\times\mathcal{A} \to \mathbb{R}\)</span> que satisface la ecuación de optimalidad de Bellman cuando los conjuntos de estados y acciones son finitos: <span id="eq-bellman"><span class="math display">\[V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \sum_{s'\in \mathcal{S}} P(s'|s,a) \max_{a' \in \mathcal{A}} V^*(s',a'), \tag{3.14}\]</span></span></p>
+<p>ahora bien, dado que en lugar de una función de transición analítica se cuenta con un dataset empírico de trayectorias <span class="math inline">\((s_t, a_t, r_t, s_{t+1}')\)</span>, para todo <span class="math inline">\(t\)</span>, la ecuación de Bellman se reformula en su versión empírica como <span id="eq-bellman-empirica"><span class="math display">\[V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \max_{a' \in \mathcal{A}} V^*(s',a'), \tag{3.15}\]</span></span></p>
+<p>para más detalles consultar <span class="citation" data-cites="Ernst2005">Ernst et&nbsp;al. (<a href="references.html#ref-Ernst2005" role="doc-biblioref">2005</a>)</span>.</p>
 </div>
 </section>
 <section id="aproximación-numérica-mediante-fitted-q-iteration-fqi" class="level2" data-number="3.3">
 <h2 data-number="3.3" class="anchored" data-anchor-id="aproximación-numérica-mediante-fitted-q-iteration-fqi"><span class="header-section-number">3.3</span> Aproximación numérica mediante Fitted Q-Iteration (FQI)</h2>
 <div style="text-align: justify">
-<p>Si bien es sabido que la programación dinámica estocástica está afectada por la maldición de la dimensionalidad, <span class="citation" data-cites="Castelletti2010">Castelletti et&nbsp;al. (<a href="references.html#ref-Castelletti2010" role="doc-biblioref">2010</a>)</span>, mientras más variables de estado hayan el requisito computacional crece exponencialmente, además de que se debe contar con un modelo de transición del sistema explícito, por ello el presente trabajo se basa en un enfoque de aproximación funcional mediante Fitted Q-Iteration (FQI), el cual es un algoritmo de aprendizaje por refuerzo que permite aproximar la función de valor de acción óptima <span class="math inline">\(V^*\)</span> a partir de un conjunto de transiciones empíricas.</p>
+<p>Si bien es sabido que la programación dinámica estocástica está afectada por la maldición de la dimensionalidad, <span class="citation" data-cites="Castelletti2010">Castelletti et&nbsp;al. (<a href="references.html#ref-Castelletti2010" role="doc-biblioref">2010</a>)</span>, mientras más variables de estado hayan, el requisito computacional crece exponencialmente, además de que se debe contar con un modelo de transición del sistema explícito, por ello el presente trabajo se basa en un enfoque de aproximación funcional mediante Fitted Q-Iteration (FQI), el cual es un algoritmo de aprendizaje por refuerzo que permite aproximar la función de valor de acción óptima <span class="math inline">\(V^*\)</span> a partir de un conjunto de transiciones empíricas.</p>
 </div>
 <section id="iteración-de-bellman-empírica" class="level3" data-number="3.3.1">
 <h3 data-number="3.3.1" class="anchored" data-anchor-id="iteración-de-bellman-empírica"><span class="header-section-number">3.3.1</span> Iteración de Bellman empírica</h3>
@@ -565,19 +567,19 @@ window.Quarto = {
 <h3 data-number="3.3.2" class="anchored" data-anchor-id="aproximación-funcional-por-regresión-no-paramétrica-extratrees"><span class="header-section-number">3.3.2</span> Aproximación funcional por regresión no paramétrica (ExtraTrees)</h3>
 <div style="text-align: justify">
 <p>Una vez calculados los objetivos de Bellman <span class="math inline">\(y^{(n)}\)</span> <a href="#eq-objetivo-bellman" class="quarto-xref">Ecuación&nbsp;<span>3.16</span></a>, se ajusta una función de valor de acción <span class="math inline">\(V^{(n)}\)</span> que aproxime la relación entre los pares <span class="math inline">\((s,a)\)</span> y los valores objetivos <span class="math inline">\(y^{(n)}\)</span>, dicha función se obtiene resolviendo un problema de aprendizaje supervisado que se explicó en la sección (pendiente).</p>
-<p>El procedimiento se formula como un problema de regresión no paramétrica, en donde se busca encontrar una función <span class="math inline">\(V^{(n)}\)</span> que minimice el error entre las predicciones <span class="math inline">\(V^{(n)}(s,a)\)</span> y los objetivos <span class="math inline">\(y^{(n)}\)</span> para todas las transiciones <span class="math inline">\((s_t, a_t, r_t, s_{t+1}')\)</span> en el dataset. En la práctica, se utiliza el algoritmo de <em>ExtraTrees</em>, que como propone <span class="citation" data-cites="Ernst2005">Ernst et&nbsp;al. (<a href="references.html#ref-Ernst2005" role="doc-biblioref">2005</a>)</span>, y se argumenta que ofrece gran flexibilidad para aproximar funciones de valor en espacios continuos o de alta dimensionalidad.</p>
+<p>El procedimiento se formula como un problema de regresión no paramétrica, en donde se busca encontrar una función <span class="math inline">\(V^{(n)}\)</span> que minimice el error entre las predicciones <span class="math inline">\(V^{(n)}(s,a)\)</span> y los objetivos <span class="math inline">\(y^{(n)}\)</span> para todas las transiciones <span class="math inline">\((s_t, a_t, r_t, s_{t+1}')\)</span> en el dataset. En la práctica, se utiliza el algoritmo de <em>ExtraTrees</em>, que como propone <span class="citation" data-cites="Ernst2005">Ernst et&nbsp;al. (<a href="references.html#ref-Ernst2005" role="doc-biblioref">2005</a>)</span>, el cual argumenta que ofrece gran flexibilidad para aproximar funciones de valor en espacios continuos o de alta dimensionalidad.</p>
 <p>La modelación mediante ExtraTrees compuesto por <span class="math inline">\(300\)</span> árboles de decisión, con una profundidad máxima de <span class="math inline">\(14\)</span> y un mínimo de <span class="math inline">\(5\)</span> muestras por hoja. Cada árbol de decisión particiona el espacio estado-acción en regiones homogéneas, (grupo de <span class="math inline">\((s,a)\)</span> similares) y proporciona una estimación local de la función de valor. La predicción final corresponde al promedio de las predicciones individuales de todos los árboles de decisión.</p>
 <div id="fig-arbol" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-arbol-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="Imagenes/arbol-decision.png" class="img-fluid figure-img" style="width:70.0%">
+<img src="Imagenes/arbol-decision.png" class="img-fluid figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-arbol-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figura&nbsp;3.1: Árbol de decisión descrita anteriormente.
+Figura&nbsp;3.1: Árbol de decisión con profundidad máxima de 14 y un mínimo de 5 muestras por hoja.
 </figcaption>
 </figure>
 </div>
-<p>El algoritmo de FQI se repite iterativamente hasta que la función de valor de acción converge, en la práctica se definió una metrica de convergencia empírica por <span id="eq-convergencia"><span class="math display">\[\Delta = \frac{1}{L}\sum_{l=1}^L |V^{(n)}(s_l,a_l) - V^{(n-1)}(s_l,a_l)|, \tag{3.17}\]</span></span> la cual se define sobre <span class="math inline">\(\mathcal{D} \subset \{(s_t, a_t, r_t, s_{t+1}')\}\)</span> siendo <span class="math inline">\(L\)</span> la cardinalidad de <span class="math inline">\(\mathcal{D}\)</span>.</p>
+<p>El algoritmo de FQI se repite iterativamente hasta que la función de valor de acción converge. En la práctica se definió una metrica de convergencia empírica por <span id="eq-convergencia"><span class="math display">\[\Delta = \frac{1}{L}\sum_{l=1}^L |V^{(n)}(s_l,a_l) - V^{(n-1)}(s_l,a_l)|, \tag{3.17}\]</span></span> la cual se define sobre <span class="math inline">\(\mathcal{T} \subset \{(s_t, a_t, r_t, s_{t+1}')\}\)</span> siendo <span class="math inline">\(L\)</span> la cardinalidad de <span class="math inline">\(\mathcal{T}\)</span>.</p>
 <p>Por lo que el algoritmo se detiene hasta que el <span class="math inline">\(\Delta &lt; \epsilon\)</span>, es decir, cuando el cambio entre <span class="math inline">\(V^{(n)}\)</span> y <span class="math inline">\(V^{(n-1)}\)</span> sea menor a un umbral predefinido o bien cuando se alcance un número máximo de iteraciones.</p>
 </div>
 </section>
@@ -585,7 +587,7 @@ Figura&nbsp;3.1: Árbol de decisión descrita anteriormente.
 <section id="política-óptima-y-simulación-operativa" class="level2" data-number="3.4">
 <h2 data-number="3.4" class="anchored" data-anchor-id="política-óptima-y-simulación-operativa"><span class="header-section-number">3.4</span> Política óptima y simulación operativa</h2>
 <div style="text-align: justify">
-<p>Una vez obtenida la función de valor de acción óptima <span class="math inline">\(V^*\)</span>, se deriva la política óptima <span class="math inline">\(\pi^*:\mathcal{S} \to \mathcal{A}\)</span> que asigna a cada estado <span class="math inline">\(s\)</span> la acción <span class="math inline">\(a\)</span> que maximiza el valor de acción, es decir, <span id="eq-politica-optima"><span class="math display">\[\pi^*(s) := \arg\max_{a \in \mathcal{A}} V^*(s,a), \tag{3.18}\]</span></span></p>
+<p>Una vez obtenida la función de valor de acción óptima <span class="math inline">\(V^*\)</span>, se deriva la política óptima <span class="math inline">\(\pi^*:\mathcal{S} \to \mathcal{A}\)</span> que asigna a cada estado <span class="math inline">\(s\)</span> la acción <span class="math inline">\(a\)</span> que maximiza el valor de acción <span id="eq-politica-optima"><span class="math display">\[\pi^*(s) := \arg\max_{a \in \mathcal{A}} V^*(s,a), \tag{3.18}\]</span></span></p>
 <p>es decir, para cada estado <span class="math inline">\(s\)</span>, la política óptima <span class="math inline">\(\pi^*(s)\)</span> indica la acción que se debe tomar para maximizar el valor de acción estimado.</p>
 <p>Finalmente, se valida la política óptima <span class="math inline">\(\pi^*\)</span> mediante simulación en lazo cerrado, es decir, se simula la operación del sistema hidroeléctrico utilizando la política <span class="math inline">\(\pi^*\)</span> para tomar decisiones de turbinado en cada estado observado durante las trayectorias históricas.</p>
 <p>La evaluación de la política se realiza mediante un recorrido determinista sobre la serie histórica completa. El algoritmo opera de la siguiente manera:</p>
@@ -642,15 +644,86 @@ E_i(s,a,s')
 \]</span></p></li>
 <li><p><strong>Registro y actualización:</strong> Se almacenan métricas de energía, derrames y volúmenes, y se actualiza el estado para la siguiente iteración.</p></li>
 </ol>
-<p>La metodología sigue la práctica estándar en aprendizaje por refuerzo aplicado a sistemas de control <span class="citation" data-cites="Bertsekas2019">Bertsekas (<a href="references.html#ref-Bertsekas2019" role="doc-biblioref">2019</a>)</span>, en la cual la política aprendida se valida mediante una simulación en lazo cerrado sobre trayectorias históricas.</p>
+<p>La metodología sigue la práctica estándar en aprendizaje por refuerzo aplicado a sistemas de control documentado en <span class="citation" data-cites="Bertsekas2019">Bertsekas (<a href="references.html#ref-Bertsekas2019" role="doc-biblioref">2019</a>)</span>, en el cual la política aprendida se valida mediante una simulación en lazo cerrado sobre trayectorias históricas.</p>
 </div>
 <section id="métricas-de-desempeño-y-validación-estadística" class="level3" data-number="3.4.1">
 <h3 data-number="3.4.1" class="anchored" data-anchor-id="métricas-de-desempeño-y-validación-estadística"><span class="header-section-number">3.4.1</span> Métricas de desempeño y validación estadística</h3>
 <div style="text-align: justify">
-<ul>
-<li>Energía esperada por reserva, derrames acumulados, violaciones de curvas guía, y análisis de varianza interanual.</li>
-<li><strong>Elemento sugerido:</strong> <em>Tabla X.1</em> resumen de parámetros operativos y <em>Figura X.1</em> trayectoria típica de volúmenes y energía.</li>
-</ul>
+<p>Una vez obtenidos los resultados de la simulación en lazo cerrado, se evalúa el desempeño de la política óptima <span class="math inline">\(\pi^*\)</span> utilizando métricas clave como las siguientes:</p>
+<div id="tbl-desempeno-energetico" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-desempeno-energetico-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla&nbsp;3.1: Resumen del desempeño energético del sistema bajo la política óptima aprendida mediante FQI. Los valores corresponden al promedio sobre el periodo de simulación 1959–2008.
+</figcaption>
+<div aria-describedby="tbl-desempeno-energetico-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Métrica</th>
+<th>Angostura</th>
+<th>Malpaso</th>
+<th>Sistema Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Energía promedio quincenal [GWh]</td>
+<td>242.85</td>
+<td>139.92</td>
+<td>382.78</td>
+</tr>
+<tr class="even">
+<td>Energía anual estimada [GWh]</td>
+<td>4,857</td>
+<td>2,798</td>
+<td>7,656</td>
+</tr>
+<tr class="odd">
+<td>Contribución al sistema [%]</td>
+<td>63.4</td>
+<td>36.6</td>
+<td>100.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Por otro lado, los derrames promedio quincenales y anuales se presentan en la siguiente tabla:</p>
+<div id="tbl-desempeno-hidrico" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-desempeno-hidrico-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla&nbsp;3.2: Resumen del desempeño hídrico del sistema bajo la política óptima aprendida mediante FQI. Los valores corresponden al promedio sobre el periodo de simulación 1959–2008.
+</figcaption>
+<div aria-describedby="tbl-desempeno-hidrico-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Métrica</th>
+<th>Angostura</th>
+<th>Malpaso</th>
+<th>Sistema Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Derrame total [Mm^3]</td>
+<td>7,722.10</td>
+<td>26,330.80</td>
+<td>34,052.90</td>
+</tr>
+<tr class="even">
+<td>Derrame promedio Anual [Mm^3]</td>
+<td>154.44</td>
+<td>526.62</td>
+<td>681.06</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>De acuerdo con los resultados obtenidos y con la información obtenida de <span class="citation" data-cites="Alegria2010">Díaz (<a href="references.html#ref-Alegria2010" role="doc-biblioref">2010</a>)</span>, se observa que la política no está gestionando adecuadamente los recursos hídricos, ya que el volumen de agua derramada es considerablemente alto, lo que sugiere que la política aprendida no está optimizando eficientemente el uso del agua disponible para generación energética. Además, la contribución energética de cada presa al sistema total no refleja un balance adecuado, lo que podría indicar que la política está favoreciendo excesivamente una presa sobre la otra, lo que no es deseable desde el punto de vista de la gestión integrada del sistema hidroeléctrico. Estos resultados sugieren que la política óptima aprendida mediante FQI no está logrando un equilibrio adecuado entre la generación de energía y la gestión eficiente del recurso hídrico, lo que podría requerir una revisión de la formulación del problema, la función de recompensa o la metodología de aprendizaje utilizada para mejorar el desempeño del sistema en términos de ambos objetivos.</p>
 </div>
 </section>
 </section>
@@ -671,6 +744,9 @@ Bertsekas, Dimitri P. 2019. <em>Reinforcement Learning and Optimal Control</em>.
 </div>
 <div id="ref-Castelletti2010" class="csl-entry" role="listitem">
 Castelletti, A., S. Galelli, M. Restelli, y R. Soncini-Sessa. 2010. <span>«Tree-based reinforcement learning for optimal water reservoir operation»</span>. <em>Water Resources Research</em> 46: W09507. <a href="https://doi.org/10.1029/2009WR008898">https://doi.org/10.1029/2009WR008898</a>.
+</div>
+<div id="ref-Alegria2010" class="csl-entry" role="listitem">
+Díaz, Arallely Alegría. 2010. <span>«Política de operación óptima del sistema de presas del Río Grijalva. Efectos de la curva guía»</span>. Tesis de Maestría en Ingeniería Civil -- Hidráulica, Universidad Nacional Autónoma de México, Facultad de Ingeniería.
 </div>
 <div id="ref-Ernst2005" class="csl-entry" role="listitem">
 Ernst, Damien, Pierre Geurts, y Louis Wehenkel. 2005. <span>«Tree-Based Batch Mode Reinforcement Learning»</span>. <em>Journal of Machine Learning Research</em> 6: 503-56. <a href="http://www.jmlr.org/papers/volume6/ernst05a/ernst05a.pdf">http://www.jmlr.org/papers/volume6/ernst05a/ernst05a.pdf</a>.

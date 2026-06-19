@@ -9,7 +9,7 @@ El objetivo de este capítulo es presentar una formulación rigurosa del problem
 
 ## Formulación como Proceso de Decisión de Markov (MDP)
 
-Siguiendo la notación de @puterman1994markov, se define el MDP como la colección de objetos $\{(T, \mathcal{S}, \mathcal{A}, \mathbb{P}, \mathcal{R})\}$, donde cada componente se especifica a continuación:
+Siguiendo la notación de @puterman1994markov, se define el MDP como la colección de objetos $$\{(T, \mathcal{S}, \mathcal{A}, \mathbb{P}, \mathcal{R})\},$$ donde cada componente se especifica a continuación:
 
 ### Estructura Temporal $(T)$
 ::: {style="text-align: justify"}
@@ -21,27 +21,27 @@ así, la variable $m = \mu(q)$ representará la etapa hidrológica correspondien
 ::: {style="text-align: justify"}
 El sistema está compuesto por dos presas: [La Angostura](https://maps.app.goo.gl/NHNQdHdfYAoRGxhPA) $(i = 1)$ y [Malpaso](https://maps.app.goo.gl/acX7hVXswX5uYYUBA) $(i =2)$. El volumen de almacenamiento de cada una de ellas en la quincena $q$ del año $t$ se representará por $V_{i,t,q} \in \mathbb{R}_{\geq 0}$ $(Mm^3)$.
 
-Dado que los datos históricos se utilizan para construir un conjunto de transión empírica, se introduce un operador de discretización uniforme del espacio de estados mediante el parámetro $\Delta = 600$ $Mm^3$. Así, el espacio de estados se define como $\mathcal{S} = \mathcal{S}_1 \times \mathcal{S}_2 \times \{0,...,5\} = \{s = (s_1,s_2,m)\}$ en donde $s_i$ representa el volumen discretizado de la presa $i$, tal estado discreto se obtiene mediante el operador de discretización $\mathcal{D}: \mathbb{R} \times \mathbb{N} \longrightarrow \{0,\dots,N-1\}$ dado por $$s_i = \mathcal{D}(V_{i,t,q}, N_i) = \min \left(\max\left(\left\lfloor \frac{V_{i,t,q}}{\Delta} + \frac{1}{2}\right\rfloor, 0\right), N_i-1\right),$$ {#eq-discretizacion}
+Dado que los datos históricos se utilizan para construir un conjunto de transión empírica, se introduce un operador de discretización uniforme del espacio de estados mediante el parámetro $\Delta = 600$ $Mm^3$, dicha unidad permite discretizar la capacidad de almacenamiento de cada presa en un numéro manejable de estados. Así, el espacio de estados se define como $\mathcal{S} = \mathcal{S}_1 \times \mathcal{S}_2 \times \{0,...,5\} = \{s = (s_1,s_2,m)\}$ en donde $s_i$ representa el volumen discretizado de la presa $i$, tal estado discreto se obtiene mediante el operador de discretización $\mathcal{D}: \mathbb{R} \times \mathbb{N} \longrightarrow \{0,\dots,N-1\}$ dado por $$s_i = \mathcal{D}(V_{i,t,q}, N_i) = \min \left(\max\left(\left\lfloor \frac{V_{i,t,q}}{\Delta} + \frac{1}{2}\right\rfloor, 0\right), N_i-1\right),$$ {#eq-discretizacion}
 donde $N_1 = 27$ y $N_2 = 17$ son las capacidades discretas máximas de cada presa.
 :::
 
 ### Espacio de acciones $(\mathcal{A})$
 ::: {style="text-align: justify"}
-Para cada etapa $m$, se define una unidad de extracción de agua $u_m = \{60, 150, 300, 300, 300, 150\}$, así la decisión de operación en la etapa $m$ corresponderá a los niveles de turbinado $k_1, k_2$. Cada nivel de turbinado se multiplica por la unidad de extracción $u_m$ para obtener el volumen de agua extraído en cada presa. Por lo tanto, el espacio de acciones se define como $$\mathcal{A}_m = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m},$$
-donde $\mathcal{K}_{i,m}$ representa el conjunto de niveles de turbinado disponibles para la presa $i$ en la etapa $m$.
+Para cada etapa $m$, se define una unidad de extracción de agua $u_m = \{60, 150, 300, 300, 300, 150\}$, así la decisión de operación en la etapa $m$ corresponderá a los niveles de turbinado $k_1, k_2$. Cada nivel de turbinado se multiplica por la unidad de extracción $u_m$, la cual está en $Mm^3$, para obtener el volumen de agua extraído en cada presa. Por lo tanto, el espacio de acciones se define como $$\mathcal{A}_m = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m},$$
+donde $\mathcal{K}_{i,m}$ representa el conjunto de niveles de turbinado disponibles para la presa $i$ en la etapa hidrológica $m$.
 
-Una acción denotada por $a = (k_1, k_2)$, representará el nivel de turbinado aplicado simultaneamente en ambas presas. Por ejemplo, suponga que $m = 0$ entonces $$u_0 = 60 \quad \text{y} \quad \mathcal{K}_{1,0}, \mathcal{K}_{2,0} = \{0,1,...,7\},$$ y así $a = (3,5)$ significaría que Angostura turbina $3\times 60 = 180$ $Mm^3$ de agua y Malpaso turbina $5\times 60 = 300$ $Mm^3$ de agua.
+Una acción denotada por $a = (k_1, k_2)$, representará el nivel de turbinado aplicado simultaneamente en ambas presas. Por ejemplo, suponga que $m = 0$ entonces $$u_0 = 60 \quad \text{y} \quad \mathcal{K}_{1,0}, \mathcal{K}_{2,0} = \{0,1,...,10\},$$ y así $a = (3,5)$ significaría que Angostura turbina $3\times 60 = 180$ $Mm^3$ de agua y Malpaso turbina $5\times 60 = 300$ $Mm^3$ de agua. Cabe mencionar que Los valores de $u_m$ y $\mathcal{K}_{i,m}$ se seleccionaron para que el turbinado máximo por etapa hidrológica $k_{i} \cdot u_m$ no exceda la capacidad instalada de las plantas ni los caudales históricos máximos registrados, garantizando la factibilidad física de todas las acciones evaluadas.
 :::
 
 ### Dinámica de transición $(\mathbb{P})$
 ::: {style="text-align: justify"}
 La ecuación de transición continua tras la operación del sistema se define por $$V_{i,t,q+1} = V_{i,t,q} + W_{i, t, q+1}-k_iu_m, \quad q<23$$ {#eq-transicion}
-donde $V_{i,t,q}$ representa el volumen almacenado en la presa $i$ antes de tomar la acción de turbinado y $W_{i, t,q+1}$ representa el afluente neto (caudal de ingreso) para la presa $i$ en la quincena $q+1$ del año $t$. 
+donde $V_{i,t,q}$ representa el volumen almacenado en la presa $i$ antes de tomar la acción de turbinado, $W_{i, t,q+1}$ representa el afluente neto (caudal de ingreso) para la presa $i$ en la quincena $q+1$ del año $t$, tales valores serán obtenidos de los datos históricos con los que ya se cuentan y $k_iu_m$ representa el volumen de agua extraído por la acción de turbinado aplicada en la etapa hidrológica correspondiente a la quincena $q$ ($k_i \in \mathcal{K}_{i,m}$).
 
 Cuando $q=23$, la transición se define por $$V_{i,t+1,0} = V_{i,t,23} + W_{i, t+1, 0}-k_iu_m.$$ {#eq-transicion23}
 
 En ambos casos, el volumen discretizado siguiente se obtiene aplicando el operador de discretización $\mathcal{D}$ al volumen resultante, es decir, $$s_i' = \mathcal{D}(V_{i,t,q+1}, N_i),$$
-mientras que la etapa evoluciona mediante $m' = (m+1) \mod M$.
+mientras que la etapa hidrológica evoluciona mediante $m' = (m+1) \mod M$.
 
 Por lo tanto, el estado discreto siguiente está dado por $$s' = (s_1', s_2', m').$$
 
@@ -52,11 +52,13 @@ la cual especifica la probabilidad de transicionar al estado $s'$ dado que se to
 ### Función de recompensa $(\mathcal{R})$
 #### Modelo hidráulico-energético linealizado
 ::: {style="text-align: justify"}
-La energía generada depende del volumen de agua turbinado y una aproximación lineal de la altura hidraúlica. Para cada presa $i$, se define la función de altura $$H_i (s_i,s'_i) = 10 (s_i + s_i'+2)$$ {#eq-altura} 
-tal expresión corresponde a un modelo lineal basado en estados discretizados, el término $+2$ se introdujo para evitar alturas nulas en estados con bajo volumen.
+La energía generada depende del volumen de agua turbinado y una aproximación lineal de la altura hidraúlica. Para cada presa $i$, se define la función de altura $$H_i (s_i,s'_i) =\frac{20(s_i + s_i'+2)}{2} =10 (s_i + s_i'+2)$$ {#eq-altura} 
+tal expresión corresponde a un modelo lineal basado en estados discretizados, el término $+2$ se introdujo para evitar alturas nulas en estados con bajo volumen y el término $20$ como intercepto representa la altura hidráulica mínima mientras que como pendiente representa cuántos metros de altura se ganan por cada incremento en el estado discretizado, es decir, por cada incremento de $\Delta$ en el volumen de agua almacenado.
 
 Sea $\eta = 0.9$ eficiencia de conversión hidráulica a eléctrica, y $g = 9.81$ $m/s^2$ aceleración de la gravedad, entonces la energía generada por la presa $i$ al tomar la acción $a$ en el estado $s$ y transicionar a $s'$ se define por $$E_i(s,a,s') = \frac{\eta g  H_i(s_i,s'_i) (k_iu_m\times 10^6)}{3600\times 10^6},$$ {#eq-energia}
-así, la energía total generada por el sistema es $$E = E_1+E_2.$$ {#eq-energia-total}
+donde $10^6$ representa la conversión de $Mm^3$ a $m^3$ y $3600\times 10^6$ la conversión de $kWh$ a $GWh$.
+
+Por lo tanto la energía total generada por el sistema es $$E = E_1+E_2.$$ {#eq-energia-total}
 :::
 
 #### Estructura de penalizaciones
@@ -73,21 +75,23 @@ La recompensa incorpora penalizaciones para garantizar el cumplimiento de restri
 
 donde $C_{derr}, C_{def}, C_{CG}, C_{crit}$ son constantes de penalización ajustadas empíricamente, y $\text{CG}_i(m)$ representa la curva guía para la presa $i$ en la etapa $m$.
 
-La función de recompensa total se define por $$\mathcal{R}(s,a,s') = E - \Pi_{derr} - \Pi_{def} - \Pi_{CG} - \Pi_{crit}.$$ {#eq-recompensa}
+La función de recompensa total se define finalmente por $$\mathcal{R}(s,a,s') = E - \Pi_{derr} - \Pi_{def} - \Pi_{CG} - \Pi_{crit}.$$ {#eq-recompensa}
 
 En el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos. La dinámica se construye a partir de trayectorias históricas $$(s_t, a_t, r_t, s_{t+1}')$$ en donde cada una de ellas representa una experiencia de transición observada en los datos históricos, siendo $r_t$ el valor obtenido de la @eq-recompensa, representando la recompensa obtenida al tomar la acción $a_t$ en el estado $s_t$ y transicionar a $s_{t+1}'$. Este enfoque se alinea con un esquema de ***Batch Reinforcement Learning.***
 :::
 
 ## Ecuación de optimalidad de Bellman
 ::: {style="text-align: justify"}
-Conforme a la teoría clásica de control estocástico, por ejemplo @puterman1994markov, teorema 6.2.3, en un MDP descontado existe una única función de valor de acción óptima $V^*:\mathcal{S}\times\mathcal{A} \to \mathbb{R}$ que satisface la ecuación de optimalidad de Bellman: $$V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \sum_{s'\in \mathcal{S}} P(s'|s,a) \max_{a' \in \mathcal{A}} V^*(s',a'),$$ {#eq-bellman}
+Conforme a la teoría clásica de control estocástico, por ejemplo @puterman1994markov, teorema 6.2.3, en un MDP descontado existe una única función de valor de acción óptima $V^*:\mathcal{S}\times\mathcal{A} \to \mathbb{R}$ que satisface la ecuación de optimalidad de Bellman cuando los conjuntos de estados y acciones son finitos: $$V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \sum_{s'\in \mathcal{S}} P(s'|s,a) \max_{a' \in \mathcal{A}} V^*(s',a'),$$ {#eq-bellman}
 
-ahora bien, dado que en lugar de una función de transición analítica se cuenta con un dataset empírico de trayectorias $(s_t, a_t, r_t, s_{t+1}')$, para todo $t$, la ecuación de Bellman se reformula en su versión empírica como $$V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \max_{a' \in \mathcal{A}} V^*(s',a').$$ {#eq-bellman-empirica}
+ahora bien, dado que en lugar de una función de transición analítica se cuenta con un dataset empírico de trayectorias $(s_t, a_t, r_t, s_{t+1}')$, para todo $t$, la ecuación de Bellman se reformula en su versión empírica como $$V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \max_{a' \in \mathcal{A}} V^*(s',a'),$$ {#eq-bellman-empirica}
+
+para más detalles consultar @Ernst2005.
 :::
 
 ## Aproximación numérica mediante Fitted Q-Iteration (FQI)
 ::: {style="text-align: justify"}
-Si bien es sabido que la programación dinámica estocástica está afectada por la maldición de la dimensionalidad, @Castelletti2010, mientras más variables de estado hayan el requisito computacional crece exponencialmente, además de que se debe contar con un modelo de transición del sistema explícito, por ello el presente trabajo se basa en un enfoque de aproximación funcional mediante Fitted Q-Iteration (FQI), el cual es un algoritmo de aprendizaje por refuerzo que permite aproximar la función de valor de acción óptima $V^*$ a partir de un conjunto de transiciones empíricas.
+Si bien es sabido que la programación dinámica estocástica está afectada por la maldición de la dimensionalidad, @Castelletti2010, mientras más variables de estado hayan, el requisito computacional crece exponencialmente, además de que se debe contar con un modelo de transición del sistema explícito, por ello el presente trabajo se basa en un enfoque de aproximación funcional mediante Fitted Q-Iteration (FQI), el cual es un algoritmo de aprendizaje por refuerzo que permite aproximar la función de valor de acción óptima $V^*$ a partir de un conjunto de transiciones empíricas.
 :::
 
 ### Iteración de Bellman empírica
@@ -101,20 +105,20 @@ el cual representa una estimación del valor de acción óptimo asociado al par 
 ::: {style="text-align: justify"}
 Una vez calculados los objetivos de Bellman $y^{(n)}$ @eq-objetivo-bellman, se ajusta una función de valor de acción $V^{(n)}$ que aproxime la relación entre los pares $(s,a)$ y los valores objetivos $y^{(n)}$, dicha función se obtiene resolviendo un problema de aprendizaje supervisado que se explicó en la sección (pendiente).
 
-El procedimiento se formula como un problema de regresión no paramétrica, en donde se busca encontrar una función $V^{(n)}$ que minimice el error entre las predicciones $V^{(n)}(s,a)$ y los objetivos $y^{(n)}$ para todas las transiciones $(s_t, a_t, r_t, s_{t+1}')$ en el dataset. En la práctica, se utiliza el algoritmo de *ExtraTrees*, que como propone @Ernst2005, y se argumenta que ofrece gran flexibilidad para aproximar funciones de valor en espacios continuos o de alta dimensionalidad. 
+El procedimiento se formula como un problema de regresión no paramétrica, en donde se busca encontrar una función $V^{(n)}$ que minimice el error entre las predicciones $V^{(n)}(s,a)$ y los objetivos $y^{(n)}$ para todas las transiciones $(s_t, a_t, r_t, s_{t+1}')$ en el dataset. En la práctica, se utiliza el algoritmo de *ExtraTrees*, que como propone @Ernst2005, el cual argumenta que ofrece gran flexibilidad para aproximar funciones de valor en espacios continuos o de alta dimensionalidad. 
 
 La modelación mediante ExtraTrees compuesto por $300$ árboles de decisión, con una profundidad máxima de $14$ y un mínimo de $5$ muestras por hoja. Cada árbol de decisión particiona el espacio estado-acción en regiones homogéneas, (grupo de $(s,a)$ similares) y proporciona una estimación local de la función de valor. La predicción final corresponde al promedio de las predicciones individuales de todos los árboles de decisión.
 
-![Árbol de decisión descrita anteriormente.](Imagenes/arbol-decision.png){#fig-arbol width=70%}
+![Árbol de decisión con profundidad máxima de 14 y un mínimo de 5 muestras por hoja.](Imagenes/arbol-decision.png){#fig-arbol width=100%}
 
-El algoritmo de FQI se repite iterativamente hasta que la función de valor de acción converge, en la práctica se definió una metrica de convergencia empírica por $$\Delta = \frac{1}{L}\sum_{l=1}^L |V^{(n)}(s_l,a_l) - V^{(n-1)}(s_l,a_l)|,$${#eq-convergencia} la cual se define sobre $\mathcal{D} \subset \{(s_t, a_t, r_t, s_{t+1}')\}$ siendo $L$ la cardinalidad de $\mathcal{D}$.
+El algoritmo de FQI se repite iterativamente hasta que la función de valor de acción converge. En la práctica se definió una metrica de convergencia empírica por $$\Delta = \frac{1}{L}\sum_{l=1}^L |V^{(n)}(s_l,a_l) - V^{(n-1)}(s_l,a_l)|,$${#eq-convergencia} la cual se define sobre $\mathcal{T} \subset \{(s_t, a_t, r_t, s_{t+1}')\}$ siendo $L$ la cardinalidad de $\mathcal{T}$.
 
 Por lo que el algoritmo se detiene hasta que el $\Delta < \epsilon$, es decir, cuando el cambio entre $V^{(n)}$ y $V^{(n-1)}$ sea menor a un umbral predefinido o bien cuando se alcance un número máximo de iteraciones. 
 :::
 
 ## Política óptima y simulación operativa
 ::: {style="text-align: justify"}
-Una vez obtenida la función de valor de acción óptima $V^*$, se deriva la política óptima $\pi^*:\mathcal{S} \to \mathcal{A}$ que asigna a cada estado $s$ la acción $a$ que maximiza el valor de acción, es decir, $$\pi^*(s) := \arg\max_{a \in \mathcal{A}} V^*(s,a),$${#eq-politica-optima}
+Una vez obtenida la función de valor de acción óptima $V^*$, se deriva la política óptima $\pi^*:\mathcal{S} \to \mathcal{A}$ que asigna a cada estado $s$ la acción $a$ que maximiza el valor de acción $$\pi^*(s) := \arg\max_{a \in \mathcal{A}} V^*(s,a),$${#eq-politica-optima}
 
 es decir, para cada estado $s$, la política óptima $\pi^*(s)$ indica la acción que se debe tomar para maximizar el valor de acción estimado.
 
@@ -190,13 +194,31 @@ La evaluación de la política se realiza mediante un recorrido determinista sob
 
 8. **Registro y actualización:** Se almacenan métricas de energía, derrames y volúmenes, y se actualiza el estado para la siguiente iteración.
 
-La metodología sigue la práctica estándar en aprendizaje por refuerzo aplicado a sistemas de control @Bertsekas2019, en la cual la política aprendida se valida mediante una simulación en lazo cerrado sobre trayectorias históricas.
+La metodología sigue la práctica estándar en aprendizaje por refuerzo aplicado a sistemas de control documentado en @Bertsekas2019, en el cual la política aprendida se valida mediante una simulación en lazo cerrado sobre trayectorias históricas.
 :::
 
 ### Métricas de desempeño y validación estadística
 ::: {style="text-align: justify"}
-- Energía esperada por reserva, derrames acumulados, violaciones de curvas guía, y análisis de varianza interanual.
-- **Elemento sugerido:** *Tabla X.1* resumen de parámetros operativos y *Figura X.1* trayectoria típica de volúmenes y energía.
+Una vez obtenidos los resultados de la simulación en lazo cerrado, se evalúa el desempeño de la política óptima $\pi^*$ utilizando métricas clave como las siguientes:
+
+| Métrica | Angostura | Malpaso | Sistema Total |
+|---|---|---|---|
+| Energía promedio quincenal [GWh] | 242.85 | 139.92 | 382.78 |
+| Energía anual estimada [GWh] | 4,857 | 2,798 | 7,656 |
+| Contribución al sistema [%] | 63.4 | 36.6 | 100.0 |
+
+: Resumen del desempeño energético del sistema bajo la política óptima aprendida mediante FQI. Los valores corresponden al promedio sobre el periodo de simulación 1959--2008. {#tbl-desempeno-energetico}
+
+Por otro lado, los derrames promedio quincenales y anuales se presentan en la siguiente tabla:
+
+| Métrica | Angostura | Malpaso | Sistema Total |
+|---|---|---|---|
+| Derrame total [Mm^3] | 7,722.10| 26,330.80 | 34,052.90|
+| Derrame promedio Anual [Mm^3] | 154.44 | 526.62 | 681.06 |
+
+: Resumen del desempeño hídrico del sistema bajo la política óptima aprendida mediante FQI. Los valores corresponden al promedio sobre el periodo de simulación 1959--2008. {#tbl-desempeno-hidrico}
+
+De acuerdo con los resultados obtenidos y con la información obtenida de @Alegria2010, se observa que la política no está gestionando adecuadamente los recursos hídricos, ya que el volumen de agua derramada es considerablemente alto, lo que sugiere que la política aprendida no está optimizando eficientemente el uso del agua disponible para generación energética. Además, la contribución energética de cada presa al sistema total no refleja un balance adecuado, lo que podría indicar que la política está favoreciendo excesivamente una presa sobre la otra, lo que no es deseable desde el punto de vista de la gestión integrada del sistema hidroeléctrico. Estos resultados sugieren que la política óptima aprendida mediante FQI no está logrando un equilibrio adecuado entre la generación de energía y la gestión eficiente del recurso hídrico, lo que podría requerir una revisión de la formulación del problema, la función de recompensa o la metodología de aprendizaje utilizada para mejorar el desempeño del sistema en términos de ambos objetivos. 
 :::
 
 
