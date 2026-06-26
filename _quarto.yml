@@ -17,9 +17,16 @@ execute:
 
 book:
   title: "Fitted Q-Iteration: Estimación de niveles de presas"
-  author: "Erika Rubí Jiménez Guzmán"
+  author:
+    - name: "Erika Rubí Jiménez Guzmán"
+      affiliations:
+        - name: "Universidad Autónoma Chiapas"
+    
+    - name: "Asesor: Dr. Yofre Hernán García Gómez"
+      affiliations:
+        - name: "Universidad Autónoma de Chiapas"
   language: es
-  date: "28/04/2026"
+  date: today
   image: Imagenes\fcfm.png
   favicon: Imagenes\fcfm.png
   downloads: [pdf, epub]

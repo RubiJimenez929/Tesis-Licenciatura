@@ -19,15 +19,15 @@ así, la variable $m = \mu(q)$ representará la etapa hidrológica correspondien
 
 ### Espacio de estados y operador de discretización $(\mathcal{S})$
 ::: {style="text-align: justify"}
-El sistema está compuesto por dos presas: [La Angostura](https://maps.app.goo.gl/NHNQdHdfYAoRGxhPA) $(i = 1)$ y [Malpaso](https://maps.app.goo.gl/acX7hVXswX5uYYUBA) $(i =2)$. El volumen de almacenamiento de cada una de ellas en la quincena $q$ del año $t$ se representará por $V_{i,t,q} \in \mathbb{R}_{\geq 0}$ $(Mm^3)$.
+El sistema está compuesto por dos presas: [La Angostura](https://maps.app.goo.gl/NHNQdHdfYAoRGxhPA) $(i = 1)$ y [Malpaso](https://maps.app.goo.gl/acX7hVXswX5uYYUBA) $(i =2)$. El volumen de almacenamiento de cada una de ellas en la quincena $q$ del año $t$ se representará por $V_{i,t,q} \in \mathbb{R}_{+} \cup \{0\}$ (Millones de metros cúbicos-$Mm^3$).
 
-Dado que los datos históricos se utilizan para construir un conjunto de transión empírica, se introduce un operador de discretización uniforme del espacio de estados mediante el parámetro $\Delta = 600$ $Mm^3$, dicha unidad permite discretizar la capacidad de almacenamiento de cada presa en un numéro manejable de estados. Así, el espacio de estados se define como $\mathcal{S} = \mathcal{S}_1 \times \mathcal{S}_2 \times \{0,...,5\} = \{s = (s_1,s_2,m)\}$ en donde $s_i$ representa el volumen discretizado de la presa $i$, tal estado discreto se obtiene mediante el operador de discretización $\mathcal{D}: \mathbb{R} \times \mathbb{N} \longrightarrow \{0,\dots,N-1\}$ dado por $$s_i = \mathcal{D}(V_{i,t,q}, N_i) = \min \left(\max\left(\left\lfloor \frac{V_{i,t,q}}{\Delta} + \frac{1}{2}\right\rfloor, 0\right), N_i-1\right),$$ {#eq-discretizacion}
+Dado que los datos históricos se utilizan para construir un conjunto de transión empírica, se introduce un operador de discretización uniforme $\mathcal{D}$ del espacio de estados $\mathcal{S}$ mediante el parámetro $\Delta = 600$ $Mm^3.$ Dicha unidad permite subdividir la capacidad de almacenamiento de cada presa en un número manejable de estados. Así, el espacio de estados se define como $\mathcal{S} = \mathcal{S}_1 \times \mathcal{S}_2 \times \{0,...,5\} = \{s = (s_1,s_2,m)\}$ en donde $s_i$ representa el volumen discretizado de la presa $i.$ Tal estado discreto se obtiene mediante el operador de discretización $\mathcal{D}: \mathbb{R} \times \mathbb{N} \longrightarrow \{0,\dots,N-1\}$ definido por $$s_i = \mathcal{D}(V_{i,t,q}, N_i) := \min \left(\max\left(\left\lfloor \frac{V_{i,t,q}}{\Delta} + \frac{1}{2}\right\rfloor, 0\right), N_i-1\right),$$ {#eq-discretizacion}
 donde $N_1 = 27$ y $N_2 = 17$ son las capacidades discretas máximas de cada presa.
 :::
 
 ### Espacio de acciones $(\mathcal{A})$
 ::: {style="text-align: justify"}
-Para cada etapa $m$, se define una unidad de extracción de agua $u_m = \{60, 150, 300, 300, 300, 150\}$, así la decisión de operación en la etapa $m$ corresponderá a los niveles de turbinado $k_1, k_2$. Cada nivel de turbinado se multiplica por la unidad de extracción $u_m$, la cual está en $Mm^3$, para obtener el volumen de agua extraído en cada presa. Por lo tanto, el espacio de acciones se define como $$\mathcal{A}_m = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m},$$
+Para cada etapa $m$, se define una unidad de extracción de agua $u_m = \{60, 150, 300, 300, 300, 150\}$, así la decisión de operación en la etapa $m$ corresponderá a los niveles de turbinado $k_1, k_2$. Cada nivel de turbinado se multiplica por la unidad de extracción $u_m$, la cual está en $Mm^3,$ para obtener el volumen de agua extraído en cada presa. Por lo tanto, el espacio de acciones se define como $$\mathcal{A}_m = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m},$$
 donde $\mathcal{K}_{i,m}$ representa el conjunto de niveles de turbinado disponibles para la presa $i$ en la etapa hidrológica $m$.
 
 Una acción denotada por $a = (k_1, k_2)$, representará el nivel de turbinado aplicado simultaneamente en ambas presas. Por ejemplo, suponga que $m = 0$ entonces $$u_0 = 60 \quad \text{y} \quad \mathcal{K}_{1,0}, \mathcal{K}_{2,0} = \{0,1,...,10\},$$ y así $a = (3,5)$ significaría que Angostura turbina $3\times 60 = 180$ $Mm^3$ de agua y Malpaso turbina $5\times 60 = 300$ $Mm^3$ de agua. Cabe mencionar que Los valores de $u_m$ y $\mathcal{K}_{i,m}$ se seleccionaron para que el turbinado máximo por etapa hidrológica $k_{i} \cdot u_m$ no exceda la capacidad instalada de las plantas ni los caudales históricos máximos registrados, garantizando la factibilidad física de todas las acciones evaluadas.
@@ -52,8 +52,8 @@ la cual especifica la probabilidad de transicionar al estado $s'$ dado que se to
 ### Función de recompensa $(\mathcal{R})$
 #### Modelo hidráulico-energético linealizado
 ::: {style="text-align: justify"}
-La energía generada depende del volumen de agua turbinado y una aproximación lineal de la altura hidraúlica. Para cada presa $i$, se define la función de altura $$H_i (s_i,s'_i) =\frac{20(s_i + s_i'+2)}{2} =10 (s_i + s_i'+2)$$ {#eq-altura} 
-tal expresión corresponde a un modelo lineal basado en estados discretizados, el término $+2$ se introdujo para evitar alturas nulas en estados con bajo volumen y el término $20$ como intercepto representa la altura hidráulica mínima mientras que como pendiente representa cuántos metros de altura se ganan por cada incremento en el estado discretizado, es decir, por cada incremento de $\Delta$ en el volumen de agua almacenado.
+La energía generada depende del volumen de agua turbinado y una aproximación lineal de la altura hidraúlica. Para cada presa $i$, se define la función de altura $$H_i (s_i,s'_i) =\frac{20(s_i + s_i'+2)}{2} =10 (s_i + s_i'+2).$$ {#eq-altura} 
+Tal expresión corresponde a un modelo lineal basado en estados discretizados, el término $+2$ se introdujo para evitar alturas nulas en estados con bajo volumen y el término $20$ como intercepto que representa la altura hidráulica mínima mientras que como pendiente representa cuántos metros de altura se ganan por cada incremento en el estado discretizado, es decir, la ganancia por cada incremento de $\Delta$ en el volumen de agua almacenado.
 
 Sea $\eta = 0.9$ eficiencia de conversión hidráulica a eléctrica, y $g = 9.81$ $m/s^2$ aceleración de la gravedad, entonces la energía generada por la presa $i$ al tomar la acción $a$ en el estado $s$ y transicionar a $s'$ se define por $$E_i(s,a,s') = \frac{\eta g  H_i(s_i,s'_i) (k_iu_m\times 10^6)}{3600\times 10^6},$$ {#eq-energia}
 donde $10^6$ representa la conversión de $Mm^3$ a $m^3$ y $3600\times 10^6$ la conversión de $kWh$ a $GWh$.
@@ -71,9 +71,9 @@ La recompensa incorpora penalizaciones para garantizar el cumplimiento de restri
 
 - Penalización por violación de curva guía: si $s_i' < \text{CG}_i(m)$ se aplica $$\Pi_{CG} = C_{CG}\cdot(s_i'- \text{CG}_i(m))$$ {#eq-penalizacion-curva-guia}
 
-- Penalización por niveles críticos: si $s_i' \geq N_i-1$ se aplica $$\Pi_{crit} = C_{crit}$$ {#eq-penalizacion-niveles-criticos}
+- Penalización por niveles críticos (casi desbordamiento): si $s_i' \geq N_i-1$ se aplica $$\Pi_{crit} = C_{crit}$$ {#eq-penalizacion-niveles-criticos}
 
-donde $C_{derr}, C_{def}, C_{CG}, C_{crit}$ son constantes de penalización ajustadas empíricamente, y $\text{CG}_i(m)$ representa la curva guía para la presa $i$ en la etapa $m$.
+donde $C_{derr}, C_{def}, C_{CG}, C_{crit}$ son constantes de penalización ajustadas empíricamente con valores $10000, 10000, 5000, 20000$ respectivamente y $\text{CG}_i(m)$ representa la curva guía para la presa $i$ en la etapa $m$.
 
 La función de recompensa total se define finalmente por $$\mathcal{R}(s,a,s') = E - \Pi_{derr} - \Pi_{def} - \Pi_{CG} - \Pi_{crit}.$$ {#eq-recompensa}
 
@@ -82,9 +82,9 @@ En el presente trabajo no se modela una distribución analítica explícita, por
 
 ## Ecuación de optimalidad de Bellman
 ::: {style="text-align: justify"}
-Conforme a la teoría clásica de control estocástico, por ejemplo @puterman1994markov, teorema 6.2.3, en un MDP descontado existe una única función de valor de acción óptima $V^*:\mathcal{S}\times\mathcal{A} \to \mathbb{R}$ que satisface la ecuación de optimalidad de Bellman cuando los conjuntos de estados y acciones son finitos: $$V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \sum_{s'\in \mathcal{S}} P(s'|s,a) \max_{a' \in \mathcal{A}} V^*(s',a'),$$ {#eq-bellman}
+Conforme a la teoría clásica de control estocástico, por ejemplo @puterman1994markov, teorema 6.2.3, en un MDP descontado existe una única función de valor de acción óptima $V^*:\mathcal{S}\times\mathcal{A} \to \mathbb{R}$ que satisface la ecuación de optimalidad de Bellman cuando los conjuntos de estados y acciones son finitos: $$V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \sum_{s'\in \mathcal{S}} P(s'|s,a) \max_{a' \in \mathcal{A}} V^*(s',a').$$ {#eq-bellman}
 
-ahora bien, dado que en lugar de una función de transición analítica se cuenta con un dataset empírico de trayectorias $(s_t, a_t, r_t, s_{t+1}')$, para todo $t$, la ecuación de Bellman se reformula en su versión empírica como $$V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \max_{a' \in \mathcal{A}} V^*(s',a'),$$ {#eq-bellman-empirica}
+Dado que en lugar de una función de transición analítica se cuenta con un dataset empírico de trayectorias $(s_t, a_t, r_t, s_{t+1}'),$ para todo $t,$ la ecuación de Bellman se reformula en su versión empírica como $$V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \max_{a' \in \mathcal{A}} V^*(s',a'),$$ {#eq-bellman-empirica}
 
 para más detalles consultar @Ernst2005.
 :::
@@ -111,14 +111,14 @@ La modelación mediante ExtraTrees compuesto por $300$ árboles de decisión, co
 
 ![Árbol de decisión con profundidad máxima de 14 y un mínimo de 5 muestras por hoja.](Imagenes/arbol-decision.png){#fig-arbol width=100%}
 
-El algoritmo de FQI se repite iterativamente hasta que la función de valor de acción converge. En la práctica se definió una metrica de convergencia empírica por $$\Delta = \frac{1}{L}\sum_{l=1}^L |V^{(n)}(s_l,a_l) - V^{(n-1)}(s_l,a_l)|,$${#eq-convergencia} la cual se define sobre $\mathcal{T} \subset \{(s_t, a_t, r_t, s_{t+1}')\}$ siendo $L$ la cardinalidad de $\mathcal{T}$.
+El algoritmo de FQI se repite iterativamente hasta que la función de valor de acción converge. En la práctica se definió una métrica de convergencia empírica por $$\Delta = \frac{1}{L}\sum_{l=1}^L |V^{(n)}(s_l,a_l) - V^{(n-1)}(s_l,a_l)|,$${#eq-convergencia} la cual se define sobre $\mathcal{T} \subset \{(s_t, a_t, r_t, s_{t+1}')\}$ siendo $L$ la cardinalidad de $\mathcal{T}$.
 
 Por lo que el algoritmo se detiene hasta que el $\Delta < \epsilon$, es decir, cuando el cambio entre $V^{(n)}$ y $V^{(n-1)}$ sea menor a un umbral predefinido o bien cuando se alcance un número máximo de iteraciones. 
 :::
 
 ## Política óptima y simulación operativa
 ::: {style="text-align: justify"}
-Una vez obtenida la función de valor de acción óptima $V^*$, se deriva la política óptima $\pi^*:\mathcal{S} \to \mathcal{A}$ que asigna a cada estado $s$ la acción $a$ que maximiza el valor de acción $$\pi^*(s) := \arg\max_{a \in \mathcal{A}} V^*(s,a),$${#eq-politica-optima}
+Una vez obtenida la función de valor de acción óptima $V^*,$ se deriva la política óptima $\pi^*:\mathcal{S} \to \mathcal{A}$ que asigna a cada estado $s$ la acción $a$ que maximiza el valor de acción $$\pi^*(s) := \arg\max_{a \in \mathcal{A}} V^*(s,a),$${#eq-politica-optima}
 
 es decir, para cada estado $s$, la política óptima $\pi^*(s)$ indica la acción que se debe tomar para maximizar el valor de acción estimado.
 
