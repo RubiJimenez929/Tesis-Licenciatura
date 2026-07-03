@@ -36,7 +36,7 @@ Una acción denotada por $a = (k_1, k_2)$, representará el nivel de turbinado a
 ### Dinámica de transición $(\mathbb{P})$
 ::: {style="text-align: justify"}
 La ecuación de transición continua tras la operación del sistema se define por $$V_{i,t,q+1} = V_{i,t,q} + W_{i, t, q+1}-k_iu_m, \quad q<23$$ {#eq-transicion}
-donde $V_{i,t,q}$ representa el volumen almacenado en la presa $i$ antes de tomar la acción de turbinado, $W_{i, t,q+1}$ representa el afluente neto (caudal de ingreso) para la presa $i$ en la quincena $q+1$ del año $t$, tales valores serán obtenidos de los datos históricos con los que ya se cuentan. Por último $k_iu_m$, $k_i \in \mathcal{K}_{i,m}$, representa el volumen de agua extraído por la acción de turbinado aplicada en la etapa hidrológica correspondiente a la quincena $q$.
+donde $V_{i,t,q}$ representa el volumen almacenado en la presa $i$ antes de tomar la acción de turbinado, $W_{i, t,q+1}$ representa el afluente neto (caudal de ingreso) para la presa $i$ en la quincena $q+1$ del año $t$, tales valores serán obtenidos de los datos históricos con los que ya se cuentan. Por último $k_iu_m$, $k_i \in \mathcal{K}_{i,m},$ representa el volumen de agua extraído por la acción de turbinado aplicada en la etapa hidrológica correspondiente a la quincena $q$.
 
 Cuando $q=23$, la transición se define por $$V_{i,t+1,0} = V_{i,t,23} + W_{i, t+1, 0}-k_iu_m.$$ {#eq-transicion23}
 
