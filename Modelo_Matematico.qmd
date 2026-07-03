@@ -36,7 +36,7 @@ Una acción denotada por $a = (k_1, k_2)$, representará el nivel de turbinado a
 ### Dinámica de transición $(\mathbb{P})$
 ::: {style="text-align: justify"}
 La ecuación de transición continua tras la operación del sistema se define por $$V_{i,t,q+1} = V_{i,t,q} + W_{i, t, q+1}-k_iu_m, \quad q<23$$ {#eq-transicion}
-donde $V_{i,t,q}$ representa el volumen almacenado en la presa $i$ antes de tomar la acción de turbinado, $W_{i, t,q+1}$ representa el afluente neto (caudal de ingreso) para la presa $i$ en la quincena $q+1$ del año $t$, tales valores serán obtenidos de los datos históricos con los que ya se cuentan y $k_iu_m$ representa el volumen de agua extraído por la acción de turbinado aplicada en la etapa hidrológica correspondiente a la quincena $q$ ($k_i \in \mathcal{K}_{i,m}$).
+donde $V_{i,t,q}$ representa el volumen almacenado en la presa $i$ antes de tomar la acción de turbinado, $W_{i, t,q+1}$ representa el afluente neto (caudal de ingreso) para la presa $i$ en la quincena $q+1$ del año $t$, tales valores serán obtenidos de los datos históricos con los que ya se cuentan. Por último $k_iu_m$, $k_i \in \mathcal{K}_{i,m}$, representa el volumen de agua extraído por la acción de turbinado aplicada en la etapa hidrológica correspondiente a la quincena $q$.
 
 Cuando $q=23$, la transición se define por $$V_{i,t+1,0} = V_{i,t,23} + W_{i, t+1, 0}-k_iu_m.$$ {#eq-transicion23}
 
@@ -82,7 +82,7 @@ En el presente trabajo no se modela una distribución analítica explícita, por
 
 ## Ecuación de optimalidad de Bellman
 ::: {style="text-align: justify"}
-Conforme a la teoría clásica de control estocástico, por ejemplo @puterman1994markov, teorema 6.2.3, en un MDP descontado existe una única función de valor de acción óptima $V^*:\mathcal{S}\times\mathcal{A} \to \mathbb{R}$ que satisface la ecuación de optimalidad de Bellman cuando los conjuntos de estados y acciones son finitos: $$V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \sum_{s'\in \mathcal{S}} P(s'|s,a) \max_{a' \in \mathcal{A}} V^*(s',a').$$ {#eq-bellman}
+Conforme a la teoría clásica de control estocástico, por ejemplo @puterman1994markov, Teorema 6.2.3, en un MDP descontado existe una única función de valor de acción óptima $V^*:\mathcal{S}\times\mathcal{A} \to \mathbb{R}$ que satisface la ecuación de optimalidad de Bellman cuando los conjuntos de estados y acciones son finitos: $$V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \sum_{s'\in \mathcal{S}} P(s'|s,a) \max_{a' \in \mathcal{A}} V^*(s',a').$$ {#eq-bellman}
 
 Dado que en lugar de una función de transición analítica se cuenta con un dataset empírico de trayectorias $(s_t, a_t, r_t, s_{t+1}'),$ para todo $t,$ la ecuación de Bellman se reformula en su versión empírica como $$V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \max_{a' \in \mathcal{A}} V^*(s',a'),$$ {#eq-bellman-empirica}
 
