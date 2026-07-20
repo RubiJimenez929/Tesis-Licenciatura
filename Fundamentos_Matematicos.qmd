@@ -2,7 +2,7 @@
 lang: es
 ---
 
-# Inteligencia Artificial   
+# Fundamentos Matemáticos   
 ::: {style="text-align: justify"}
 La IA es...
 :::

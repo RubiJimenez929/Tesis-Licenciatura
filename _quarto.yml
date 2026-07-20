@@ -47,8 +47,8 @@ book:
 
     - part: "Preliminares"
       chapters:
-        - Inteligencia artificial.qmd
-        - Q-Learning.qmd
+        - Fundamentos_Matematicos.qmd
+        - Fundamentos_Hidraulicos.qmd
       
     - part: "Modelo Matemático"
       chapters:

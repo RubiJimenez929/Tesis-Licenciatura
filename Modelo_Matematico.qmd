@@ -40,7 +40,7 @@ donde $V_{i,t,q}$ representa el volumen almacenado en la presa $i$ antes de toma
 
 Cuando $q=23$, la transición se define por $$V_{i,t+1,0} = V_{i,t,23} + W_{i, t+1, 0}-k_iu_m.$$ {#eq-transicion23}
 
-En ambos casos, el volumen discretizado siguiente se obtiene aplicando el operador de discretización $\mathcal{D}$ al volumen resultante, es decir, $$s_i' = \mathcal{D}(V_{i,t,q+1}, N_i),$$
+En ambos casos, el volumen discretizado de la quincena $q+1$ se obtiene aplicando el operador de discretización $\mathcal{D}$ al volumen resultante, es decir, $$s_i' = \mathcal{D}(V_{i,t,q+1}, N_i),$$
 mientras que la etapa hidrológica evoluciona mediante $m' = (m+1) \mod M$.
 
 Por lo tanto, el estado discreto siguiente está dado por $$s' = (s_1', s_2', m').$$

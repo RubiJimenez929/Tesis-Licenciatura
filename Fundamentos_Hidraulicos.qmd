@@ -2,7 +2,7 @@
 lang: es
 ---
 
-# Q-Learning  
+# Fundamentos Hidráulicos 
 ::: {style="text-align: justify"}
 Algoritmo de aprendizaje por refuerzo...
 :::
