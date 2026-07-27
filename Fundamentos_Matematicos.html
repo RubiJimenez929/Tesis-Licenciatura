@@ -23,7 +23,26 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -388,7 +407,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Tabla de contenidos</h2>
    
   <ul>
-  <li><a href="#machine-learning-aprendizaje-automático" id="toc-machine-learning-aprendizaje-automático" class="nav-link active" data-scroll-target="#machine-learning-aprendizaje-automático"><span class="header-section-number">1.1</span> Machine Learning (Aprendizaje Automático)</a></li>
+  <li><a href="#inteligencia-artificial-ia" id="toc-inteligencia-artificial-ia" class="nav-link active" data-scroll-target="#inteligencia-artificial-ia"><span class="header-section-number">1.1</span> Inteligencia Artificial (IA)</a></li>
+  <li><a href="#aprendizaje-automático" id="toc-aprendizaje-automático" class="nav-link" data-scroll-target="#aprendizaje-automático"><span class="header-section-number">1.1.1</span> Aprendizaje Automático</a></li>
   </ul>
 </nav>
     </div>
@@ -415,24 +435,55 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<div style="text-align: justify">
-<p>La IA es…</p>
-</div>
-<section id="machine-learning-aprendizaje-automático" class="level2" style="text-align: justify" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="machine-learning-aprendizaje-automático"><span class="header-section-number">1.1</span> Machine Learning (Aprendizaje Automático)</h2>
-<p>Disciplina dentro de la IA… Tipos principales</p>
+<section id="inteligencia-artificial-ia" class="level2" style="text-align: justify" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="inteligencia-artificial-ia"><span class="header-section-number">1.1</span> Inteligencia Artificial (IA)</h2>
+<p>La <strong>Inteligencia Artificial (IA)</strong> es un campo de estudio que se centra en la creación de sistemas capaces de realizar tareas que normalmente requieren inteligencia humana. La IA combina diversas disciplinas, incluyendo matemáticas, estadísticas, informática y neurociencia, para desarrollar algoritmos y modelos que permiten a las máquinas aprender, razonar y tomar decisiones de manera autónoma.</p>
+<p>Este campo está dividido en varias subáreas, cada una con su enfoque y aplicaciones específicas. Entre las más destacadas se encuentran el <strong>Aprendizaje Automático (Machine Learning)</strong>, <strong>Aprendizaje Profundo (Deep Learning)</strong>, <strong>Procesamiento del Lenguaje Natural</strong>, <strong>Visión por Computadora</strong>, <strong>Robótica</strong>, entre otras. Cada una de estas subáreas utiliza diferentes técnicas y enfoques para abordar problemas complejos y mejorar la capacidad de las máquinas para interactuar con el mundo que las rodea.</p>
 </section>
+<section id="aprendizaje-automático" class="level3" style="text-align: justify" data-number="1.1.1">
+<h3 data-number="1.1.1" class="anchored" data-anchor-id="aprendizaje-automático"><span class="header-section-number">1.1.1</span> Aprendizaje Automático</h3>
+<p>En este subcampo de la Inteligencia Artificial, las máquinas aprenden a partir de datos, similar a como lo hacemos nosotros, permitiendoles mejorar con la experiencia. El aprendizaje automático se basa en algoritmos que identifican patrones y relaciones en los datos, lo que permite a las máquinas hacer predicciones o tomar decisiones sin ser explícitamente programadas para cada tarea específica. Este enfoque ha revolucionado diversas industrias, desde la medicina hasta la economía, al proporcionar herramientas más eficientes y precisas para el análisis de datos y la toma de decisiones.</p>
+<p>El aprendizaje automático se clasifica en tres categorías principales: <strong>Aprendizaje Supervisado</strong>, <strong>Aprendizaje No Supervisado</strong> y <strong>Aprendizaje por Refuerzo</strong>, cada una con sus propias técnicas y aplicaciones. Estas categorías permiten abordar diferentes tipos de problemas y desafíos, desde la clasificación de datos hasta la optimización de estrategias en entornos dinámicos.</p>
 <div id="def-sub" class="theorem definition" style="text-align: justify">
-<p><span class="theorem-title"><strong>Definición 1.1 (Aprendizaje Supervisado)</strong></span> Se entrena con datos etiquetados…</p>
+<p><span class="theorem-title"><strong>Definición 1.1 (Aprendizaje Supervisado)</strong></span> Esta categoría se basa en utilizar conjuntos de datos etiquetados (datos de entrada con sus correspondientes salidas) para entrenar modelos matemáticos que puedan identificar patrones y a partir de ellos predecir resultados futuros sobre datos nuevos.</p>
+<p>Este tipo de aprendizaje es principalmente utilizado en:</p>
+<ul>
+<li><strong><em>Tareas de clasificación:</em></strong> los modelos predicen la clase a las que pertenece cada dato. Por ejemplo, identificar si un correo electrónico es spam o no.</li>
+<li><strong><em>Regresión:</em></strong> predicen valores numéricos a partir de datos de entrada. Por ejemplo, predecir el precio de una vivienda basado en sus características.</li>
+</ul>
 </div>
 <div id="def-sub" class="theorem definition" style="text-align: justify">
-<p><span class="theorem-title"><strong>Definición 1.2 (Aprendizaje No Supervisado)</strong></span> Se entrena con datos no etiquetados…</p>
+<p><span class="theorem-title"><strong>Definición 1.2 (Aprendizaje No Supervisado)</strong></span> A diferencia del aprendizaje supervisado, en este tipo de aprendizaje no se utilizan datos etiquetados. En su lugar, los algoritmos buscan patrones ocultos o agrupaciones dentro de los datos. Estos modelos son utilizados para tareas especificas como:</p>
+<ul>
+<li><strong><em>Agrupamiento (Clustering):</em></strong> los modelos identifican grupos de datos similares entre sí. Por ejemplo, segmentar clientes en diferentes grupos según sus comportamientos de compra.</li>
+<li><strong><em>Reducción de dimensionalidad:</em></strong> los modelos simplifican los datos manteniendo la mayor cantidad de información posible. Por ejemplo, reducir el número de variables en un conjunto de datos para facilitar su análisis.</li>
+</ul>
 </div>
 <div id="def-sub" class="theorem definition" style="text-align: justify">
-<p><span class="theorem-title"><strong>Definición 1.3 (Aprendizaje por Refuerzo)</strong></span> El agente aprende a través de la interacción con el entorno…</p>
+<p><span class="theorem-title"><strong>Definición 1.3 (Aprendizaje por Refuerzo)</strong></span> En este tipo de aprendizaje automático, los agentes autónomos aprenden a tomar decisiones a partir de la interección con un entorno en el cual reciben recompensas o penalizaciones según sus acciones. A continuación se presentan los conceptos fundamentales de este tipo de aprendizaje</p>
+<ul>
+<li><strong><em>Agente:</em></strong> es el sistema que toma decisiones y aprende de la experiencia.</li>
+<li><strong><em>Entorno:</em></strong> en donde el agente opera y recibe retroalimentación.</li>
+<li><strong><em>Estado:</em></strong> Situación actual del agente en el entorno.</li>
+<li><strong><em>Acción:</em></strong> Decisión que el agente toma en un estado determinado.</li>
+<li><strong><em>Recompensa:</em></strong> Retroalimentación que el agente recibe después de realizar una acción, indicando si fue beneficiosa o no.</li>
+<li><strong><em>Política:</em></strong> Estrategia que el agente sigue para decidir qué acción tomar en cada estado.</li>
+</ul>
+<p>El aprendizaje por refuerzo se centra esencialmente en la relación entre un agente, entorno y el objetivo (lo que se desea lograr). La literatura formula esta relación en términos de un <strong>Proceso de Decisión de Markov (MDP)</strong>.</p>
 </div>
+<p>Véase <span class="citation" data-cites="ibmRL">IBM (<a href="references.html#ref-ibmRL" role="doc-biblioref">2025</a>)</span> para más información sobre estos tipos de aprendizaje y sus aplicaciones.</p>
+</section>
+<section id="q-learning" class="level4" style="text-align: justify" data-number="1.1.1.1">
+<h4 data-number="1.1.1.1" class="anchored" data-anchor-id="q-learning"><span class="header-section-number">1.1.1.1</span> Q-Learning</h4>
+<p>Existen distintos algoritmos de aprendizaje por refuerzo, entre los cuales se encuentra el <strong>Q-Learning</strong>, este permite a un agente aprender a tomar decisiones en un entorno para maximizar una recompensa acumulada a lo largo del tiempo. Este modelo es model-free, es decir, no requiere un modelo del entorno para aprender, sino que se basa en la experiencia directa del agente a través de la exploración y explotación de su entorno.</p>
+</section>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-ibmRL" class="csl-entry" role="listitem">
+IBM. 2025. <span>«¿Qué es el aprendizaje por refuerzo?»</span> IBM. <a href="https://www.ibm.com/mx-es/think/topics/reinforcement-learning?mhsrc=ibmsearch_a&amp;mhq=aprendizaje%20por%20refuerzo">https://www.ibm.com/mx-es/think/topics/reinforcement-learning?mhsrc=ibmsearch_a&amp;mhq=aprendizaje%20por%20refuerzo</a>.
+</div>
+</div>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
