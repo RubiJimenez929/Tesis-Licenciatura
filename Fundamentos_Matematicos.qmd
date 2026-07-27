@@ -4,25 +4,54 @@ lang: es
 
 # Fundamentos Matemáticos   
 ::: {style="text-align: justify"}
-La IA es...
+## Inteligencia Artificial (IA)
+La **Inteligencia Artificial (IA)** es un campo de estudio que se centra en la creación de sistemas capaces de realizar tareas que normalmente requieren inteligencia humana. La IA combina diversas disciplinas, incluyendo matemáticas, estadísticas, informática y neurociencia, para desarrollar algoritmos y modelos que permiten a las máquinas aprender, razonar y tomar decisiones de manera autónoma.
+
+Este campo está dividido en varias subáreas, cada una con su enfoque y aplicaciones específicas. Entre las más destacadas se encuentran el **Aprendizaje Automático (Machine Learning)**, **Aprendizaje Profundo (Deep Learning)**, **Procesamiento del Lenguaje Natural**, **Visión por Computadora**, **Robótica**, entre otras. Cada una de estas subáreas utiliza diferentes técnicas y enfoques para abordar problemas complejos y mejorar la capacidad de las máquinas para interactuar con el mundo que las rodea.
 :::
 
 ::: {style="text-align: justify"}
-## Machine Learning (Aprendizaje Automático)
-Disciplina dentro de la IA... Tipos principales
-:::
+### Aprendizaje Automático
+En este subcampo de la Inteligencia Artificial, las máquinas aprenden a partir de datos, similar a como lo hacemos nosotros, permitiendoles mejorar con la experiencia. El aprendizaje automático se basa en algoritmos que identifican patrones y relaciones en los datos, lo que permite a las máquinas hacer predicciones o tomar decisiones sin ser explícitamente programadas para cada tarea específica. Este enfoque ha revolucionado diversas industrias, desde la medicina hasta la economía, al proporcionar herramientas más eficientes y precisas para el análisis de datos y la toma de decisiones.
+
+El aprendizaje automático se clasifica en tres categorías principales: **Aprendizaje Supervisado**, **Aprendizaje No Supervisado** y **Aprendizaje por Refuerzo**, cada una con sus propias técnicas y aplicaciones. Estas categorías permiten abordar diferentes tipos de problemas y desafíos, desde la clasificación de datos hasta la optimización de estrategias en entornos dinámicos.
+
 
 ::: {#def-sub style="text-align: justify"}
 ### Aprendizaje Supervisado
-Se entrena con datos etiquetados...
+Esta categoría se basa en utilizar conjuntos de datos etiquetados (datos de entrada con sus correspondientes salidas) para entrenar modelos matemáticos que puedan identificar patrones y a partir de ellos predecir resultados futuros sobre datos nuevos.
+
+Este tipo de aprendizaje es principalmente utilizado en:
+
+- ***Tareas de clasificación:*** los modelos predicen la clase a las que pertenece cada dato. Por ejemplo, identificar si un correo electrónico es spam o no.
+- ***Regresión:*** predicen valores numéricos a partir de datos de entrada. Por ejemplo, predecir el precio de una vivienda basado en sus características.
 :::
 
 ::: {#def-sub style="text-align: justify"}
 ### Aprendizaje No Supervisado
-Se entrena con datos no etiquetados...
+A diferencia del aprendizaje supervisado, en este tipo de aprendizaje no se utilizan datos etiquetados. En su lugar, los algoritmos buscan patrones ocultos o agrupaciones dentro de los datos. Estos modelos son utilizados para tareas especificas como: 
+
+- ***Agrupamiento (Clustering):*** los modelos identifican grupos de datos similares entre sí. Por ejemplo, segmentar clientes en diferentes grupos según sus comportamientos de compra.
+- ***Reducción de dimensionalidad:*** los modelos simplifican los datos manteniendo la mayor cantidad de información posible. Por ejemplo, reducir el número de variables en un conjunto de datos para facilitar su análisis.
 :::
 
 ::: {#def-sub style="text-align: justify"}
 ### Aprendizaje por Refuerzo
-El agente aprende a través de la interacción con el entorno...
+En este tipo de aprendizaje automático, los agentes autónomos aprenden a tomar decisiones a partir de la interección con un entorno en el cual reciben recompensas o penalizaciones según sus acciones. A continuación se presentan los conceptos fundamentales de este tipo de aprendizaje
+
+- ***Agente:*** es el sistema que toma decisiones y aprende de la experiencia.
+- ***Entorno:***  en donde el agente opera y recibe retroalimentación.
+- ***Estado:*** Situación actual del agente en el entorno.
+- ***Acción:*** Decisión que el agente toma en un estado determinado.
+- ***Recompensa:*** Retroalimentación que el agente recibe después de realizar una acción, indicando si fue beneficiosa o no.
+- ***Política:*** Estrategia que el agente sigue para decidir qué acción tomar en cada estado.
+
+El aprendizaje por refuerzo se centra esencialmente en la relación entre un agente, entorno y el objetivo (lo que se desea lograr). La literatura formula esta relación en términos de un **Proceso de Decisión de Markov (MDP)**.
+::: 
+Véase @ibmRL para más información sobre estos tipos de aprendizaje y sus aplicaciones.
+:::
+
+::: {style="text-align: justify"}
+#### Q-Learning
+Existen distintos algoritmos de aprendizaje por refuerzo, entre los cuales se encuentra el **Q-Learning**, este permite a un agente aprender a tomar decisiones en un entorno para maximizar una recompensa acumulada a lo largo del tiempo. Este modelo es model-free, es decir, no requiere un modelo del entorno para aprender, sino que se basa en la experiencia directa del agente a través de la exploración y explotación de su entorno.
 :::
