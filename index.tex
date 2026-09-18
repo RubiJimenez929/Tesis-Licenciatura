@@ -93,6 +93,12 @@
 \def\fps@figure{htbp}
 \makeatother
 
+\ifLuaTeX
+  \usepackage{luacolor}
+  \usepackage[soul]{lua-ul}
+\else
+  \usepackage{soul}
+\fi
 
 % definitions for citeproc citations
 \NewDocumentCommand\citeproctext{}{}
@@ -141,6 +147,22 @@
 
 
 \KOMAoption{captions}{tableheading}
+\makeatletter
+\@ifpackageloaded{tcolorbox}{}{\usepackage[skins,breakable]{tcolorbox}}
+\@ifpackageloaded{fontawesome5}{}{\usepackage{fontawesome5}}
+\definecolor{quarto-callout-color}{HTML}{909090}
+\definecolor{quarto-callout-note-color}{HTML}{0758E5}
+\definecolor{quarto-callout-important-color}{HTML}{CC1914}
+\definecolor{quarto-callout-warning-color}{HTML}{EB9113}
+\definecolor{quarto-callout-tip-color}{HTML}{00A047}
+\definecolor{quarto-callout-caution-color}{HTML}{FC5300}
+\definecolor{quarto-callout-color-frame}{HTML}{acacac}
+\definecolor{quarto-callout-note-color-frame}{HTML}{4582ec}
+\definecolor{quarto-callout-important-color-frame}{HTML}{d9534f}
+\definecolor{quarto-callout-warning-color-frame}{HTML}{f0ad4e}
+\definecolor{quarto-callout-tip-color-frame}{HTML}{02b875}
+\definecolor{quarto-callout-caution-color-frame}{HTML}{fd7e14}
+\makeatother
 \makeatletter
 \@ifpackageloaded{bookmark}{}{\usepackage{bookmark}}
 \makeatother
@@ -767,7 +789,7 @@ ecuaciones Equation~\ref{eq-transicion}--Equation~\ref{eq-proyeccion}, y
 Dado que no se dispone de \(\widehat P_m\) en forma cerrada sino de sus
 \(T\) realizaciones muestrales, el algoritmo de FQI (Sec. siguiente)
 trabaja con la versión \textbf{por muestra} de esta ecuación ---el
-objetivo empírico de Bellman, \textbf{?@eq-objetivo-bellman}---,
+objetivo empírico de Bellman, Equation~\ref{eq-objetivo-bellman}---,
 evaluada sobre cada una de las transiciones del conjunto de aprendizaje,
 y no con la esperanza poblacional (Equation~\ref{eq-bellman})
 directamente.
@@ -787,22 +809,359 @@ transiciones muestreadas.
 \subsection{Conjunto de aprendizaje ``parcialmente libre de
 modelo''}\label{sec-conjunto-aprendizaje}
 
+Concretamente, el conjunto de aprendizaje
+\(\mathcal F=\{(x_j, r_j, s'_{1,j}, s'_{2,j}, m'_j)\}_{j=1}^N\) se
+construye enumerando el producto cartesiano de: la grilla de estado
+Equation~\ref{eq-grilla-estado}, la grilla de acción
+Equation~\ref{eq-grilla-accion}, las \(M=6\) etapas, y las \(T=50\)
+realizaciones históricas de afluencia por etapa
+Equation~\ref{eq-afluencia-etapa}. El vector de características de cada
+muestra es
+\begin{equation}\protect\phantomsection\label{eq-caracteristicas}{
+x_j = (s_{1,j}, s_{2,j}, m_j, a_{1,j}, a_{2,j}) \in \mathcal S_1^{\text{grid}}\times\mathcal S_2^{\text{grid}}\times\{0,\dots,5\}\times\mathcal A^{\text{grid}}_{m_j}\times\mathcal A^{\text{grid}}_{m_j},
+}\end{equation} y, para cada combinación de estado-acción-etapa, se
+generan \(T=50\) muestras ---una por cada año histórico \(t\)---
+aplicando Equation~\ref{eq-transicion}, Equation~\ref{eq-proyeccion} y
+Equation~\ref{eq-recompensa} con la afluencia real \(\Xi_{i,t,m_j}\) de
+ese año. El tamaño total del conjunto de aprendizaje es
+\begin{equation}\protect\phantomsection\label{eq-tamano-N}{
+N = M\times|\mathcal S_1^{\text{grid}}|\times|\mathcal S_2^{\text{grid}}|\times|\mathcal A_1^{\text{grid}}|\times|\mathcal A_2^{\text{grid}}|\times T = 6\times9\times9\times9\times9\times50 = 1{,}968{,}300.
+}\end{equation}
+
+Esta receta de muestreo ---barrer exhaustivamente estado y acción sobre
+una grilla, pero conservar \emph{todas} las realizaciones históricas de
+la perturbación en cada punto, sin colapsarlas a una tabla de
+probabilidades ni ajustarles una distribución paramétrica--- es la que
+Castelletti et al. (2010) denominan \textbf{``parcialmente libre de
+modelo''} (\emph{partial model-free}): la dinámica del balance de masa
+sí se modela analíticamente, pero la ley de la afluencia se deja no
+paramétrica.
+
 \subsection{Iteración de Bellman
 empírica}\label{iteraciuxf3n-de-bellman-empuxedrica}
+
+Se inicializa \(Q^{(0)}(s,a) \equiv 0\) para todo \((s,a)\). Para cada
+transición \((x_j,r_j,s'_{1,j},s'_{2,j},m'_j)\in\mathcal F\) del
+conjunto de aprendizaje, se define el \textbf{objetivo de Bellman} de la
+iteración \(n\) por
+\begin{equation}\protect\phantomsection\label{eq-objetivo-bellman}{
+y^{(n)}_j := r_j + \gamma \max_{a'\in\mathcal A_{m_j'}} Q^{(n-1)}(s'_{1,j},s'_{2,j},m_j',a'),
+}\end{equation} que estima el valor-acción óptimo de \(x_j\) combinando
+la recompensa observada \(r_j\) y el mejor valor alcanzable desde el
+estado siguiente, según la aproximación de la iteración anterior. El
+cómputo del máximo sobre \(a'\), dado que \((s'_{1,j},s'_{2,j})\) es en
+general un punto continuo que no coincide con la grilla
+Equation~\ref{eq-grilla-estado}, se describe en la Sec.
+Section~\ref{sec-max-operador}.
 
 \subsection{Aproximación del operador de maximización sobre estados
 continuos}\label{sec-max-operador}
 
+**Esta subsección resuelve un punto que el texto anterior dejaba
+implícito sin justificación: cómo evaluar \(\max_{a'}Q^{(n-1)}(s',a')\)
+cuando \(s'\) es continuo. Evaluarlo por fuerza bruta para cada una de
+las \(N\approx 2\times10^6\) muestras sería prohibitivo, así que el
+algoritmo precomputa, para cada etapa \(m\), una superficie de valor
+máximo sobre la grilla de estado y la interpola:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Evaluación sobre grilla.} Para cada etapa \(m\), se evalúa
+  \(Q^{(n-1)}\) en todo el producto
+  \(\mathcal S_1^{\text{grid}}\times\mathcal S_2^{\text{grid}}\times\{m\}\times\mathcal A_1^{\text{grid}}(m)\times\mathcal A_2^{\text{grid}}(m)\),
+  y se maximiza sobre las dos coordenadas de acción:
+  \begin{equation}\protect\phantomsection\label{eq-maxq-grilla}{
+  \widehat V^{(n-1)}(s_1^{(p)},s_2^{(q)},m) := \max_{a_1,a_2\in\mathcal A_m^{\text{grid}}} Q^{(n-1)}(s_1^{(p)},s_2^{(q)},m,a_1,a_2), \qquad p,q=1,\dots,9,
+  }\end{equation} obteniéndose una matriz \(9\times9\) por etapa.
+\item
+  \textbf{Interpolación bilineal.} Sobre esta matriz se construye un
+  interpolador continuo
+  \(\widetilde V^{(n-1)}(\cdot,\cdot\,;m):\mathbb R^2\to\mathbb R\)
+  (interpolación multilineal sobre grilla regular), con extrapolación
+  lineal fuera de \([0,V_{1,\max}]\times[0,V_{2,\max}]\).
+\item
+  \textbf{Sustitución en el objetivo de Bellman.} El máximo de
+  Equation~\ref{eq-objetivo-bellman} se aproxima evaluando el
+  interpolador de la etapa siguiente en el punto continuo genuinamente
+  alcanzado:
+  \begin{equation}\protect\phantomsection\label{eq-maxq-interp}{
+  \max_{a'\in\mathcal A_{m_j'}} Q^{(n-1)}(s'_{1,j},s'_{2,j},m_j',a') \ \approx\ \widetilde V^{(n-1)}\big(s'_{1,j},s'_{2,j};\,m_j'\big).
+  }\end{equation}
+\end{enumerate}
+
+Esta aproximación reduce el costo de
+\(O(N\times|\mathcal A^{\text{grid}}|^2)\) evaluaciones del regresor a
+\(O\big(M\times|\mathcal S^{\text{grid}}|^2\times|\mathcal A^{\text{grid}}|^2 + N\big)\),
+al reutilizar la misma superficie interpolada para las \(N/M\) muestras
+de cada etapa.
+
 \subsection{Aproximación funcional por regresión no paramétrica
 (ExtraTrees)}\label{aproximaciuxf3n-funcional-por-regresiuxf3n-no-paramuxe9trica-extratrees}
+
+Una vez calculados los objetivos de Bellman \(y^{(n)}\)
+(Equation~\ref{eq-objetivo-bellman}, con el máximo aproximado según
+Equation~\ref{eq-maxq-interp}), se ajusta un aproximador \(Q^{(n)}\) que
+minimiza el error cuadrático entre las predicciones \(Q^{(n)}(x_j)\) y
+los objetivos \(y^{(n)}_j\) sobre todas las transiciones del conjunto de
+aprendizaje. Se utiliza, como propone Ernst et al. (2005), un ensamble
+de \emph{ExtraTrees} (árboles extremadamente aleatorizados), adecuado
+para aproximar funciones de valor en espacios continuos.
+
+\textbf{Hiperparámetros (corregidos respecto de la versión previa):}
+
+\begin{longtable}[]{@{}llll@{}}
+\caption{Hiperparámetros del ensamble de Extra-Trees, según el código,
+frente a lo reportado en la versión previa del
+capítulo.}\label{tbl-hiperparametros}\tabularnewline
+\toprule\noalign{}
+Hiperparámetro & Símbolo & Valor implementado & \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Hiperparámetro & Símbolo & Valor implementado & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Número de árboles & \(M_{\text{tree}}\) & 300 & \\
+Profundidad máxima & --- & \textbf{sin límite}
+(\texttt{max\_depth=None}) & \\
+Muestras mínimas por hoja & \(n_{\min}\) & \textbf{50} (\(=T\)) & \\
+Variables candidatas por corte & \(K\) & \(n=5\)
+(\texttt{max\_features=1.0}) & \\
+\end{longtable}
+
+El valor \(n_{\min}=T=50\) no es arbitrario: al exigir que cada hoja del
+árbol contenga al menos tantas muestras como años históricos de
+afluencia, se favorece que cada hoja agrupe una fracción representativa
+de las \(T\) realizaciones de \(\xi\) asociadas a un mismo \((s,a)\)
+aproximado, de modo que el promedio dentro de la hoja aproxime, por la
+ley (empírica) de los grandes números, la esperanza condicional
+\(\mathbb E_{\xi\sim\widehat P_m}[\cdot]\) que aparece en
+Equation~\ref{eq-bellman}. Cada árbol particiona el espacio
+estado-acción en regiones (hojas) mediante cortes con umbral aleatorio
+(no exhaustivo, a diferencia de CART/Random Forest) sobre las \(K=n=5\)
+variables de entrada, y predice, para un punto de consulta, el promedio
+del objetivo de regresión entre las muestras de entrenamiento de su
+misma hoja. La predicción del ensamble es el promedio de las
+\(M_{\text{tree}}=300\) predicciones individuales.
+
+\begin{quote}
+\textbf{Nota sobre la Figura de árbol de decisión.} La versión previa
+incluía una figura con la leyenda \emph{``Árbol de decisión con
+profundidad máxima de 14 y un mínimo de 5 muestras por hoja''}. Dado que
+el código real no limita la profundidad (\texttt{max\_depth=None}) y usa
+\(n_{\min}=50\), esa leyenda ---y, en la práctica, la figura misma, que
+mostraría un árbol truncado no representativo--- debe corregirse o
+sustituirse por una ilustración esquemática que no afirme una
+profundidad máxima inexistente.
+\end{quote}
+
+El algoritmo repite este procedimiento iterativamente.
 
 \subsection{Criterio de paro basado en desempeño
 simulado}\label{sec-criterio-paro}
 
+Un criterio de convergencia del tipo punto-fijo ---detener cuando
+\(\|Q^{(n)}-Q^{(n-1)}\|\) cae bajo una tolerancia--- \textbf{no es
+aplicable} cuando el aproximador es un ensamble de Extra-Trees: la
+aleatorización propia de la construcción de cada árbol (elección
+aleatoria de umbrales de corte) hace que \(Q^{(n)}\) y \(Q^{(n-1)}\)
+difieran por ruido de ajuste incluso si ya se hubiese alcanzado, en
+esencia, la función de valor-acción óptima; esta distancia no converge a
+cero. Así lo argumentan explícitamente Castelletti et al. (2010), y así
+lo implementa el código, que en su lugar monitorea el \textbf{desempeño
+operativo simulado} de la política inducida en cada iteración.
+
+\textbf{Simulación de la política golosa.} Cada \(\Delta h\) iteraciones
+(en el código, \(\Delta h=4\)), se simula la operación del sistema bajo
+la política golosa de \(Q^{(n)}\) sobre la trayectoria histórica
+completa, en resolución de quincena (Sec. Section~\ref{sec-simulacion}),
+obteniendo energías \(e^{(i)}_{t,q}\), derrames \(\delta^{(i)}_{t,q}\) y
+déficits \(\epsilon^{(i)}_{t,q}\) por presa.
+
+\textbf{Funcional de desempeño.} Se define
+\begin{equation}\protect\phantomsection\label{eq-desempeno-Jn}{
+\widehat J_n := \sum_{t,q}\big(e^{(1)}_{t,q}+e^{(2)}_{t,q}\big) - c_{\text{derr}}\sum_{t,q}\big(\delta^{(1)}_{t,q}+\delta^{(2)}_{t,q}\big) - c_{\text{def}}\sum_{t,q}\big(\epsilon^{(1)}_{t,q}+\epsilon^{(2)}_{t,q}\big),
+}\end{equation} una medida de desempeño agregada, \textbf{no descontada}
+y evaluada con afluencias reales quincenales ---distinta, por tanto, del
+objetivo de ajuste Equation~\ref{eq-objetivo-bellman}, que opera a nivel
+de una transición individual y con descuento \(\gamma\)---.
+
+\textbf{Regla de paro.} Se detiene la iteración la primera vez que se
+observa una caída de \(\widehat J_n\) respecto del checkpoint
+inmediatamente anterior (una ``reversión''):
+\begin{equation}\protect\phantomsection\label{eq-criterio-paro}{
+n^\star := \min\{\, n-\Delta h \ :\ \widehat J_{n} < \widehat J_{n-\Delta h} \,\},
+}\end{equation} interpretando la reversión como evidencia de que, a
+partir de ese punto, predominan las fluctuaciones aleatorias del ajuste
+sobre el aprendizaje genuino (Castelletti et al. (2010)). Si no se
+observa ninguna reversión dentro del número máximo de iteraciones
+permitido, se usa como respaldo el mejor checkpoint observado,
+\(n^\star:=\arg\max_n \widehat J_n\). La aproximación final es
+\(Q^{*}:=Q^{(n^\star)}\), recuperada de una caché de modelos
+serializados guardada en cada punto de verificación (necesaria porque,
+por la aleatorización del ensamble, \(Q^{(n^\star)}\) no podría
+reproducirse exactamente reentrenando desde cero).
+
 \section{Política óptima y simulación operativa}\label{sec-simulacion}
+
+Una vez obtenida \(Q^{*}\), se deriva la política óptima (golosa)
+\(\pi^{*}:\mathcal S\to\mathcal A\),
+\begin{equation}\protect\phantomsection\label{eq-politica-optima}{
+\pi^{*}(s) := \operatorname*{arg\,max}_{a\in\mathcal A_m^{\text{grid}}} Q^{*}(s,a),
+}\end{equation} donde la maximización se realiza, en la práctica,
+mediante búsqueda exhaustiva sobre la grilla de acción de la etapa
+vigente Equation~\ref{eq-grilla-accion} (no sobre el conjunto continuo
+\(\mathcal A_m\)), evaluando \(Q^{*}\) en el estado continuo real ---no
+discretizado--- del sistema.
+
+La política se valida mediante simulación en lazo cerrado sobre la serie
+histórica completa, siguiendo la práctica estándar de validación de
+políticas de control aprendidas documentada en Bertsekas (2019). El
+algoritmo, corregido para ser fiel al código, opera así:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Inicialización:} se fijan los volúmenes iniciales
+  \(V_{1,0}=10{,}000\) Mm³, \(V_{2,0}=6{,}000\) Mm³ (valores del código;
+  no se especificaban antes).
+\item
+  \textbf{Mapeo estacional:} para cada quincena \(q\) (recorriendo
+  \(t=1,\dots,T\) y, dentro de cada año, \(q=0,\dots,23\)), se determina
+  \(m=\mu(q)\) y la grilla de acción \(\mathcal A_m^{\text{grid}}\)
+  vigente.
+\item
+  \st{\textbf{Discretización:} $s_i=\mathcal D(V_i,N_i)$} ---
+  \textbf{paso eliminado}: el estado usado para consultar \(Q^*\) es el
+  volumen continuo real \((V_{1,t,q}, V_{2,t,q})\), sin redondeo a
+  índice alguno.
+\item
+  \textbf{Selección de acción}, por búsqueda exhaustiva sobre la grilla
+  de acción de 9×9 combinaciones de la etapa vigente: \[
+  (a_1^*,a_2^*) = \operatorname*{arg\,max}_{(a_1,a_2)\,\in\,\mathcal A_1^{\text{grid}}(m)\times\mathcal A_2^{\text{grid}}(m)} Q^{*}(V_{1,t,q},V_{2,t,q},m,a_1,a_2).
+  \]
+\item
+  \textbf{Balance hídrico}, con el afluente de la \textbf{misma}
+  quincena \(q\) (corrección respecto de la versión previa, que usaba
+  \(q+1\)): \[
+  V_{i,t,q+1} = V_{i,t,q} + W_{i,t,q} - a_i^*, \qquad i=1,2.
+  \]
+\item
+  \textbf{Proyección física}, incluyendo tanto el derrame como el
+  déficit (la versión previa omitía el déficit): \[
+  V_i^{\text{new}} = \operatorname{proj}_{[0,V_{i,\max}]}(V_{i,t,q+1}), \qquad
+  \text{derrame}_i = (V_{i,t,q+1}-V_{i,\max})^+, \qquad
+  \text{déficit}_i = (-V_{i,t,q+1})^+.
+  \]
+\item
+  \textbf{Cálculo energético}, con la carga continua y las cargas
+  máximas distintas por presa (corrección de Equation~\ref{eq-altura}):
+  \[
+  H_i = H_{i,\max}\cdot\frac{V_{i,t,q}+V_i^{\text{new}}}{2\,V_{i,\max}}, \qquad
+  E_i = \frac{\eta g\, H_i\,(a_i^*\times10^6)}{3600\times10^6}.
+  \]
+\item
+  \textbf{Registro y actualización:} se almacenan energía, derrame,
+  déficit y almacenamiento; el estado se actualiza a
+  \(V_i^{\text{new}}\) para la siguiente quincena.
+\end{enumerate}
 
 \subsection{Métricas de desempeño y validación
 estadística}\label{sec-metricas}
+
+\begin{tcolorbox}[enhanced jigsaw, arc=.35mm, bottomrule=.15mm, bottomtitle=1mm, breakable, colback=white, colbacktitle=quarto-callout-warning-color!10!white, colframe=quarto-callout-warning-color-frame, coltitle=black, left=2mm, leftrule=.75mm, opacityback=0, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-warning-color}{\faExclamationTriangle}\hspace{0.5em}{Cifras pendientes de regenerar}, titlerule=0mm, toprule=.15mm, toptitle=1mm]
+
+Las tablas siguientes (Table~\ref{tbl-desempeno-energetico},
+Table~\ref{tbl-desempeno-hidrico}) y la conclusión que las acompañaba en
+la versión previa reportan un derrame total del sistema de
+\(\approx 34{,}053\) Mm³ y una lectura crítica sobre la mala gestión de
+la política. Esta cifra \textbf{es incompatible con la propia validación
+documentada en el encabezado del script corregido}, que reporta ``0 Mm³
+de derrame y 0 Mm³ de déficit en ambas presas'' al ejecutar exactamente
+el algoritmo aquí descrito. Es decir, las cifras de la versión previa
+corresponden, con alta probabilidad, a una ejecución de una versión
+anterior y no fiel del modelo (la que originó la auditoría documentada
+en el encabezado de \texttt{FQI\_corregido.py}), no a la versión actual.
+No se sustituyen aquí por cifras nuevas para no fabricar resultados: se
+recomienda \textbf{volver a ejecutar el script corregido sobre los datos
+reales} y regenerar ambas tablas, así como reescribir el párrafo de
+interpretación en función de los resultados que se obtengan.
+
+\end{tcolorbox}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\caption{Resumen del desempeño energético del sistema bajo la política
+óptima aprendida mediante FQI (plantilla; valores por regenerar con
+\protect\texttt{simulacion\_FQI\_corregida.csv}).}\label{tbl-desempeno-energetico}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Métrica
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Angostura
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Malpaso
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Sistema Total
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Métrica
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Angostura
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Malpaso
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Sistema Total
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Energía promedio quincenal {[}GWh{]} & \emph{(pendiente)} &
+\emph{(pendiente)} & \emph{(pendiente)} \\
+Energía anual estimada {[}GWh{]} & \emph{(pendiente)} &
+\emph{(pendiente)} & \emph{(pendiente)} \\
+Contribución al sistema {[}\%{]} & \emph{(pendiente)} &
+\emph{(pendiente)} & 100.0 \\
+\end{longtable}
+
+\begin{longtable}[]{@{}llll@{}}
+\caption{Resumen del desempeño hídrico del sistema bajo la política
+óptima aprendida mediante FQI (plantilla; valores por
+regenerar).}\label{tbl-desempeno-hidrico}\tabularnewline
+\toprule\noalign{}
+Métrica & Angostura & Malpaso & Sistema Total \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Métrica & Angostura & Malpaso & Sistema Total \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Derrame total {[}Mm³{]} & \emph{(pendiente)} & \emph{(pendiente)} &
+\emph{(pendiente)} \\
+Déficit total {[}Mm³{]} & \emph{(pendiente)} & \emph{(pendiente)} &
+\emph{(pendiente)} \\
+\end{longtable}
+
+Una vez regeneradas las tablas a partir de una corrida real del script,
+la interpretación debe contrastar específicamente los totales de derrame
+y déficit contra la validación reportada en el propio código (0 Mm³ en
+ambos rubros) antes de emitir un juicio sobre la calidad de la política
+aprendida; de mantenerse una discrepancia con lo documentado en el
+script, ésta debería investigarse como posible diferencia entre el
+entorno de ejecución (datos, semilla aleatoria, versión de librerías) y
+no asumirse automáticamente como una falla de la política.
 
 \section{Conclusiones del capítulo}\label{conclusiones-del-capuxedtulo}
 
@@ -836,6 +1195,10 @@ estadística}\label{sec-metricas}
 
 \protect\phantomsection\label{refs}
 \begin{CSLReferences}{1}{1}
+\bibitem[\citeproctext]{ref-Bertsekas2019}
+Bertsekas, Dimitri P. 2019. \emph{Reinforcement Learning and Optimal
+Control}. Athena Scientific.
+
 \bibitem[\citeproctext]{ref-Castelletti2010}
 Castelletti, A., S. Galelli, M. Restelli, and R. Soncini-Sessa. 2010.
 {``Tree-Based Reinforcement Learning for Optimal Water Reservoir

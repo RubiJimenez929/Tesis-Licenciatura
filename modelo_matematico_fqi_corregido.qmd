@@ -232,26 +232,157 @@ poblacional (@eq-bellman) directamente.
 La Programación Dinámica Estocástica está afectada por la maldición de la dimensionalidad: el costo computacional crece exponencialmente con el número de variables de estado, y requiere además un modelo de transición explícito (@Castelletti2010). Por ello, el presente trabajo aproxima $Q^*$ mediante Fitted Q-Iteration, un algoritmo de aprendizaje por refuerzo *batch* que ajusta iterativamente un aproximador funcional supervisado a partir de un conjunto de transiciones muestreadas.
 :::
 
-
 ### Conjunto de aprendizaje "parcialmente libre de modelo" {#sec-conjunto-aprendizaje}
+::: {style="text-align: justify"}
+Concretamente, el conjunto de aprendizaje $\mathcal F=\{(x_j, r_j, s'_{1,j}, s'_{2,j}, m'_j)\}_{j=1}^N$ se construye enumerando el producto cartesiano de: la grilla de estado @eq-grilla-estado, la grilla de acción @eq-grilla-accion, las $M=6$ etapas, y las $T=50$ realizaciones históricas de afluencia por etapa @eq-afluencia-etapa. El vector de características de cada muestra es
+$$
+x_j = (s_{1,j}, s_{2,j}, m_j, a_{1,j}, a_{2,j}) \in \mathcal S_1^{\text{grid}}\times\mathcal S_2^{\text{grid}}\times\{0,\dots,5\}\times\mathcal A^{\text{grid}}_{m_j}\times\mathcal A^{\text{grid}}_{m_j},
+$$ {#eq-caracteristicas}
+y, para cada combinación de estado-acción-etapa, se generan $T=50$ muestras —una por cada año histórico $t$— aplicando @eq-transicion, @eq-proyeccion y @eq-recompensa con la afluencia real $\Xi_{i,t,m_j}$ de ese año. El tamaño total del conjunto de aprendizaje es
+$$
+N = M\times|\mathcal S_1^{\text{grid}}|\times|\mathcal S_2^{\text{grid}}|\times|\mathcal A_1^{\text{grid}}|\times|\mathcal A_2^{\text{grid}}|\times T = 6\times9\times9\times9\times9\times50 = 1{,}968{,}300.
+$$ {#eq-tamano-N}
 
+Esta receta de muestreo —barrer exhaustivamente estado y acción sobre una grilla, pero conservar *todas* las realizaciones históricas de la perturbación en cada punto, sin colapsarlas a una tabla de probabilidades ni ajustarles una distribución paramétrica— es la que @Castelletti2010 denominan **"parcialmente libre de modelo"** (*partial model-free*): la dinámica del balance de masa sí se modela analíticamente, pero la ley de la afluencia se deja no paramétrica.
+:::
 
 ### Iteración de Bellman empírica
-
+::: {style="text-align: justify"}
+Se inicializa $Q^{(0)}(s,a) \equiv 0$ para todo $(s,a)$. Para cada transición $(x_j,r_j,s'_{1,j},s'_{2,j},m'_j)\in\mathcal F$ del conjunto de aprendizaje, se define el **objetivo de Bellman** de la iteración $n$ por
+$$
+y^{(n)}_j := r_j + \gamma \max_{a'\in\mathcal A_{m_j'}} Q^{(n-1)}(s'_{1,j},s'_{2,j},m_j',a'),
+$$ {#eq-objetivo-bellman}
+que estima el valor-acción óptimo de $x_j$ combinando la recompensa observada $r_j$ y el mejor valor alcanzable desde el estado siguiente, según la aproximación de la iteración anterior. El cómputo del máximo sobre $a'$, dado que $(s'_{1,j},s'_{2,j})$ es en general un punto continuo que no coincide con la grilla @eq-grilla-estado, se describe en la Sec. @sec-max-operador.
+:::
 
 ### Aproximación del operador de maximización sobre estados continuos {#sec-max-operador}
+::: {style="text-align: justify"}
+**Esta subsección resuelve un punto que el texto anterior dejaba implícito sin justificación: cómo evaluar $\max_{a'}Q^{(n-1)}(s',a')$ cuando $s'$ es continuo. Evaluarlo por fuerza bruta para cada una de las $N\approx 2\times10^6$ muestras sería prohibitivo, así que el algoritmo precomputa, para cada etapa $m$, una superficie de valor máximo sobre la grilla de estado y la interpola:
 
+1. **Evaluación sobre grilla.** Para cada etapa $m$, se evalúa $Q^{(n-1)}$ en todo el producto $\mathcal S_1^{\text{grid}}\times\mathcal S_2^{\text{grid}}\times\{m\}\times\mathcal A_1^{\text{grid}}(m)\times\mathcal A_2^{\text{grid}}(m)$, y se maximiza sobre las dos coordenadas de acción:
+$$
+\widehat V^{(n-1)}(s_1^{(p)},s_2^{(q)},m) := \max_{a_1,a_2\in\mathcal A_m^{\text{grid}}} Q^{(n-1)}(s_1^{(p)},s_2^{(q)},m,a_1,a_2), \qquad p,q=1,\dots,9,
+$$ {#eq-maxq-grilla}
+obteniéndose una matriz $9\times9$ por etapa.
+
+2. **Interpolación bilineal.** Sobre esta matriz se construye un interpolador continuo $\widetilde V^{(n-1)}(\cdot,\cdot\,;m):\mathbb R^2\to\mathbb R$ (interpolación multilineal sobre grilla regular), con extrapolación lineal fuera de $[0,V_{1,\max}]\times[0,V_{2,\max}]$.
+
+3. **Sustitución en el objetivo de Bellman.** El máximo de @eq-objetivo-bellman se aproxima evaluando el interpolador de la etapa siguiente en el punto continuo genuinamente alcanzado:
+$$
+\max_{a'\in\mathcal A_{m_j'}} Q^{(n-1)}(s'_{1,j},s'_{2,j},m_j',a') \ \approx\ \widetilde V^{(n-1)}\big(s'_{1,j},s'_{2,j};\,m_j'\big).
+$$ {#eq-maxq-interp}
+
+Esta aproximación reduce el costo de $O(N\times|\mathcal A^{\text{grid}}|^2)$ evaluaciones del regresor a $O\big(M\times|\mathcal S^{\text{grid}}|^2\times|\mathcal A^{\text{grid}}|^2 + N\big)$, al reutilizar la misma superficie interpolada para las $N/M$ muestras de cada etapa.
+:::
 
 ### Aproximación funcional por regresión no paramétrica (ExtraTrees)
+::: {style="text-align: justify"}
+Una vez calculados los objetivos de Bellman $y^{(n)}$ (@eq-objetivo-bellman, con el máximo aproximado según @eq-maxq-interp), se ajusta un aproximador $Q^{(n)}$ que minimiza el error cuadrático entre las predicciones $Q^{(n)}(x_j)$ y los objetivos $y^{(n)}_j$ sobre todas las transiciones del conjunto de aprendizaje. Se utiliza, como propone @Ernst2005, un ensamble de *ExtraTrees* (árboles extremadamente aleatorizados), adecuado para aproximar funciones de valor en espacios continuos.
 
+**Hiperparámetros (corregidos respecto de la versión previa):**
+
+| Hiperparámetro | Símbolo | Valor implementado |
+|---|---|---|---|
+| Número de árboles | $M_{\text{tree}}$ | 300 |
+| Profundidad máxima | — | **sin límite** (`max_depth=None`) |
+| Muestras mínimas por hoja | $n_{\min}$ | **50** ($=T$) |
+| Variables candidatas por corte | $K$ | $n=5$ (`max_features=1.0`) |
+
+: Hiperparámetros del ensamble de Extra-Trees, según el código, frente a lo reportado en la versión previa del capítulo. {#tbl-hiperparametros}
+
+El valor $n_{\min}=T=50$ no es arbitrario: al exigir que cada hoja del árbol contenga al menos tantas muestras como años históricos de afluencia, se favorece que cada hoja agrupe una fracción representativa de las $T$ realizaciones de $\xi$ asociadas a un mismo $(s,a)$ aproximado, de modo que el promedio dentro de la hoja aproxime, por la ley (empírica) de los grandes números, la esperanza condicional $\mathbb E_{\xi\sim\widehat P_m}[\cdot]$ que aparece en @eq-bellman.
+Cada árbol particiona el espacio estado-acción en regiones (hojas) mediante cortes con umbral aleatorio (no exhaustivo, a diferencia de CART/Random Forest) sobre las $K=n=5$ variables de entrada, y predice, para un punto de consulta, el promedio del objetivo de regresión entre las muestras de entrenamiento de su misma hoja. La predicción del ensamble es el promedio de las $M_{\text{tree}}=300$ predicciones individuales.
+
+> **Nota sobre la Figura de árbol de decisión.** La versión previa incluía una figura con la leyenda *"Árbol de decisión con profundidad máxima de 14 y un mínimo de 5 muestras por hoja"*. Dado que el código real no limita la profundidad (`max_depth=None`) y usa $n_{\min}=50$, esa leyenda —y, en la práctica, la figura misma, que mostraría un árbol truncado no representativo— debe corregirse o sustituirse por una ilustración esquemática que no afirme una profundidad máxima inexistente.
+
+El algoritmo repite este procedimiento iterativamente.
+:::
 
 ### Criterio de paro basado en desempeño simulado {#sec-criterio-paro}
+::: {style="text-align: justify"}
+Un criterio de convergencia del tipo punto-fijo —detener cuando $\|Q^{(n)}-Q^{(n-1)}\|$ cae bajo una tolerancia— **no es aplicable** cuando el aproximador es un ensamble de Extra-Trees: la aleatorización propia de la construcción de cada árbol (elección aleatoria de umbrales de corte) hace que $Q^{(n)}$ y $Q^{(n-1)}$ difieran por ruido de ajuste incluso si ya se hubiese alcanzado, en esencia, la función de valor-acción óptima; esta distancia no converge a cero. Así lo argumentan explícitamente @Castelletti2010, y así lo implementa el código, que en su lugar monitorea el **desempeño operativo simulado** de la política inducida en cada iteración.
 
+**Simulación de la política golosa.** Cada $\Delta h$ iteraciones (en el código, $\Delta h=4$), se simula la operación del sistema bajo la política golosa de $Q^{(n)}$ sobre la trayectoria histórica completa, en resolución de quincena (Sec. @sec-simulacion), obteniendo energías $e^{(i)}_{t,q}$, derrames $\delta^{(i)}_{t,q}$ y déficits $\epsilon^{(i)}_{t,q}$ por presa.
+
+**Funcional de desempeño.** Se define
+$$
+\widehat J_n := \sum_{t,q}\big(e^{(1)}_{t,q}+e^{(2)}_{t,q}\big) - c_{\text{derr}}\sum_{t,q}\big(\delta^{(1)}_{t,q}+\delta^{(2)}_{t,q}\big) - c_{\text{def}}\sum_{t,q}\big(\epsilon^{(1)}_{t,q}+\epsilon^{(2)}_{t,q}\big),
+$$ {#eq-desempeno-Jn}
+una medida de desempeño agregada, **no descontada** y evaluada con afluencias reales quincenales —distinta, por tanto, del objetivo de ajuste @eq-objetivo-bellman, que opera a nivel de una transición individual y con descuento $\gamma$—.
+
+**Regla de paro.** Se detiene la iteración la primera vez que se observa una caída de $\widehat J_n$ respecto del checkpoint inmediatamente anterior (una "reversión"):
+$$
+n^\star := \min\{\, n-\Delta h \ :\ \widehat J_{n} < \widehat J_{n-\Delta h} \,\},
+$$ {#eq-criterio-paro}
+interpretando la reversión como evidencia de que, a partir de ese punto, predominan las fluctuaciones aleatorias del ajuste sobre el aprendizaje genuino (@Castelletti2010). Si no se observa ninguna reversión dentro del número máximo de iteraciones permitido, se usa como respaldo el mejor checkpoint observado, $n^\star:=\arg\max_n \widehat J_n$. La aproximación final es $Q^{*}:=Q^{(n^\star)}$, recuperada de una caché de modelos serializados guardada en cada punto de verificación (necesaria porque, por la aleatorización del ensamble, $Q^{(n^\star)}$ no podría reproducirse exactamente reentrenando desde cero).
+
+:::
 
 ## Política óptima y simulación operativa {#sec-simulacion}
+::: {style="text-align: justify"}
+Una vez obtenida $Q^{*}$, se deriva la política óptima (golosa) $\pi^{*}:\mathcal S\to\mathcal A$,
+$$
+\pi^{*}(s) := \operatorname*{arg\,max}_{a\in\mathcal A_m^{\text{grid}}} Q^{*}(s,a),
+$${#eq-politica-optima}
+donde la maximización se realiza, en la práctica, mediante búsqueda exhaustiva sobre la grilla de acción de la etapa vigente @eq-grilla-accion (no sobre el conjunto continuo $\mathcal A_m$), evaluando $Q^{*}$ en el estado continuo real —no discretizado— del sistema.
 
+La política se valida mediante simulación en lazo cerrado sobre la serie histórica completa, siguiendo la práctica estándar de validación de políticas de control aprendidas documentada en @Bertsekas2019. El algoritmo, corregido para ser fiel al código, opera así:
+
+1. **Inicialización:** se fijan los volúmenes iniciales $V_{1,0}=10{,}000$ Mm³, $V_{2,0}=6{,}000$ Mm³ (valores del código; no se especificaban antes).
+
+2. **Mapeo estacional:** para cada quincena $q$ (recorriendo $t=1,\dots,T$ y, dentro de cada año, $q=0,\dots,23$), se determina $m=\mu(q)$ y la grilla de acción $\mathcal A_m^{\text{grid}}$ vigente.
+
+3. ~~**Discretización:** $s_i=\mathcal D(V_i,N_i)$~~ — **paso eliminado**: el estado usado para consultar $Q^*$ es el volumen continuo real $(V_{1,t,q}, V_{2,t,q})$, sin redondeo a índice alguno.
+
+4. **Selección de acción**, por búsqueda exhaustiva sobre la grilla de acción de 9×9 combinaciones de la etapa vigente:
+$$
+(a_1^*,a_2^*) = \operatorname*{arg\,max}_{(a_1,a_2)\,\in\,\mathcal A_1^{\text{grid}}(m)\times\mathcal A_2^{\text{grid}}(m)} Q^{*}(V_{1,t,q},V_{2,t,q},m,a_1,a_2).
+$$
+
+5. **Balance hídrico**, con el afluente de la **misma** quincena $q$ (corrección respecto de la versión previa, que usaba $q+1$):
+$$
+V_{i,t,q+1} = V_{i,t,q} + W_{i,t,q} - a_i^*, \qquad i=1,2.
+$$
+
+6. **Proyección física**, incluyendo tanto el derrame como el déficit (la versión previa omitía el déficit):
+$$
+V_i^{\text{new}} = \operatorname{proj}_{[0,V_{i,\max}]}(V_{i,t,q+1}), \qquad
+\text{derrame}_i = (V_{i,t,q+1}-V_{i,\max})^+, \qquad
+\text{déficit}_i = (-V_{i,t,q+1})^+.
+$$
+
+7. **Cálculo energético**, con la carga continua y las cargas máximas distintas por presa (corrección de @eq-altura):
+$$
+H_i = H_{i,\max}\cdot\frac{V_{i,t,q}+V_i^{\text{new}}}{2\,V_{i,\max}}, \qquad
+E_i = \frac{\eta g\, H_i\,(a_i^*\times10^6)}{3600\times10^6}.
+$$
+
+8. **Registro y actualización:** se almacenan energía, derrame, déficit y almacenamiento; el estado se actualiza a $V_i^{\text{new}}$ para la siguiente quincena.
+:::
 
 ### Métricas de desempeño y validación estadística {#sec-metricas}
+::: {style="text-align: justify"}
+::: {.callout-warning title="Cifras pendientes de regenerar"}
+Las tablas siguientes (@tbl-desempeno-energetico, @tbl-desempeno-hidrico) y la conclusión que las acompañaba en la versión previa reportan un derrame total del sistema de $\approx 34{,}053$ Mm³ y una lectura crítica sobre la mala gestión de la política. Esta cifra **es incompatible con la propia validación documentada en el encabezado del script corregido**, que reporta "0 Mm³ de derrame y 0 Mm³ de déficit en ambas presas" al ejecutar exactamente el algoritmo aquí descrito. Es decir, las cifras de la versión previa corresponden, con alta probabilidad, a una ejecución de una versión anterior y no fiel del modelo (la que originó la auditoría documentada en el encabezado de `FQI_corregido.py`), no a la versión actual. No se sustituyen aquí por cifras nuevas para no fabricar resultados: se recomienda **volver a ejecutar el script corregido sobre los datos reales** y regenerar ambas tablas, así como reescribir el párrafo de interpretación en función de los resultados que se obtengan.
+:::
+
+| Métrica | Angostura | Malpaso | Sistema Total |
+|---|---|---|---|
+| Energía promedio quincenal [GWh] | *(pendiente)* | *(pendiente)* | *(pendiente)* |
+| Energía anual estimada [GWh] | *(pendiente)* | *(pendiente)* | *(pendiente)* |
+| Contribución al sistema [%] | *(pendiente)* | *(pendiente)* | 100.0 |
+
+: Resumen del desempeño energético del sistema bajo la política óptima aprendida mediante FQI (plantilla; valores por regenerar con `simulacion_FQI_corregida.csv`). {#tbl-desempeno-energetico}
+
+| Métrica | Angostura | Malpaso | Sistema Total |
+|---|---|---|---|
+| Derrame total [Mm³] | *(pendiente)* | *(pendiente)* | *(pendiente)* |
+| Déficit total [Mm³] | *(pendiente)* | *(pendiente)* | *(pendiente)* |
+
+: Resumen del desempeño hídrico del sistema bajo la política óptima aprendida mediante FQI (plantilla; valores por regenerar). {#tbl-desempeno-hidrico}
+
+Una vez regeneradas las tablas a partir de una corrida real del script, la interpretación debe contrastar específicamente los totales de derrame y déficit contra la validación reportada en el propio código (0 Mm³ en ambos rubros) antes de emitir un juicio sobre la calidad de la política aprendida; de mantenerse una discrepancia con lo documentado en el script, ésta debería investigarse como posible diferencia entre el entorno de ejecución (datos, semilla aleatoria, versión de librerías) y no asumirse automáticamente como una falla de la política.
+:::
 
 ## Conclusiones del capítulo
 ::: {style="text-align: justify"}
