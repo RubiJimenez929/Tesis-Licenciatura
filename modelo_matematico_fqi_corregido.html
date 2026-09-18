@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; Modelo Matemático para Optimizar la Operación de un Sistema Hidroeléctrico. – Fitted Q-Iteration: Estimación de niveles de presas</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./conclusiones.html" rel="next">
+<link href="./Fundamentos_Hidraulicos.html" rel="prev">
+<link href="./Imagenes/fcfm.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-cad2a2f8a56dfe71ee895a68e79c9b9a.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-70be5ccd51f03de5ce195d75fadf0882.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-cad2a2f8a56dfe71ee895a68e79c9b9a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-e376646338697af8583008ac829f38be.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-65cd1d279db3df99065ad4b96d9d595a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-e376646338697af8583008ac829f38be.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script async="" src="https://hypothes.is/embed.js"></script>
+<script>
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    document.body.classList.add('hypothesis-enabled');
+  });
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./modelo_matematico_fqi_corregido.html">Modelo Matemático</a></li><li class="breadcrumb-item"><a href="./modelo_matematico_fqi_corregido.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelo Matemático para Optimizar la Operación de un Sistema Hidroeléctrico.</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./index.html" class="sidebar-logo-link">
+      <img src="./Imagenes\logos.jpeg" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
+      <img src="./Imagenes\logos.jpeg" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Fitted Q-Iteration: Estimación de niveles de presas</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/RubiJimenez929/Tesis-Licenciatura" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <div class="dropdown">
+      <a href="" title="Download" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Download"><i class="bi bi-download"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="./Fitted-Q-Iteration--Estimación-de-niveles-de-presas.pdf">
+              <i class="bi bi-file-pdf pe-1"></i>
+            Download PDF
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="./Fitted-Q-Iteration--Estimación-de-niveles-de-presas.epub">
+              <i class="bi bi-journal pe-1"></i>
+            Download ePub
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo oscuro"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Resumen</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Preliminares</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Fundamentos_Matematicos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Fundamentos Matemáticos</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Fundamentos_Hidraulicos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Fundamentos Hidráulicos</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Modelo Matemático</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./modelo_matematico_fqi_corregido.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelo Matemático para Optimizar la Operación de un Sistema Hidroeléctrico.</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./conclusiones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">conclusiones.html</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./futuros_trabajos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">futuros_trabajos.html</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referencias</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenidos</h2>
+   
+  <ul>
+  <li><a href="#formulación-como-proceso-de-decisión-de-markov-mdp" id="toc-formulación-como-proceso-de-decisión-de-markov-mdp" class="nav-link active" data-scroll-target="#formulación-como-proceso-de-decisión-de-markov-mdp"><span class="header-section-number">3.1</span> Formulación como Proceso de Decisión de Markov (MDP)</a>
+  <ul class="collapse">
+  <li><a href="#estructura-temporal-t" id="toc-estructura-temporal-t" class="nav-link" data-scroll-target="#estructura-temporal-t"><span class="header-section-number">3.1.1</span> Estructura Temporal <span class="math inline">\((T)\)</span></a></li>
+  <li><a href="#sec-espacio-estados" id="toc-sec-espacio-estados" class="nav-link" data-scroll-target="#sec-espacio-estados"><span class="header-section-number">3.1.2</span> Espacio de estados <span class="math inline">\((\mathcal{S})\)</span></a></li>
+  <li><a href="#sec-espacio-acciones" id="toc-sec-espacio-acciones" class="nav-link" data-scroll-target="#sec-espacio-acciones"><span class="header-section-number">3.1.3</span> Espacio de acciones <span class="math inline">\((\mathcal{A})\)</span></a></li>
+  <li><a href="#dinámica-de-transición-mathbbp" id="toc-dinámica-de-transición-mathbbp" class="nav-link" data-scroll-target="#dinámica-de-transición-mathbbp"><span class="header-section-number">3.1.4</span> Dinámica de transición <span class="math inline">\((\mathbb{P})\)</span></a></li>
+  <li><a href="#sec-recompensa" id="toc-sec-recompensa" class="nav-link" data-scroll-target="#sec-recompensa"><span class="header-section-number">3.1.5</span> Función de recompensa <span class="math inline">\((\mathcal{R})\)</span></a></li>
+  </ul></li>
+  <li><a href="#ecuación-de-optimalidad-de-bellman" id="toc-ecuación-de-optimalidad-de-bellman" class="nav-link" data-scroll-target="#ecuación-de-optimalidad-de-bellman"><span class="header-section-number">3.2</span> Ecuación de optimalidad de Bellman</a></li>
+  <li><a href="#aproximación-numérica-mediante-fitted-q-iteration-fqi" id="toc-aproximación-numérica-mediante-fitted-q-iteration-fqi" class="nav-link" data-scroll-target="#aproximación-numérica-mediante-fitted-q-iteration-fqi"><span class="header-section-number">3.3</span> Aproximación numérica mediante Fitted Q-Iteration (FQI)</a>
+  <ul class="collapse">
+  <li><a href="#sec-conjunto-aprendizaje" id="toc-sec-conjunto-aprendizaje" class="nav-link" data-scroll-target="#sec-conjunto-aprendizaje"><span class="header-section-number">3.3.1</span> Conjunto de aprendizaje “parcialmente libre de modelo”</a></li>
+  <li><a href="#iteración-de-bellman-empírica" id="toc-iteración-de-bellman-empírica" class="nav-link" data-scroll-target="#iteración-de-bellman-empírica"><span class="header-section-number">3.3.2</span> Iteración de Bellman empírica</a></li>
+  <li><a href="#sec-max-operador" id="toc-sec-max-operador" class="nav-link" data-scroll-target="#sec-max-operador"><span class="header-section-number">3.3.3</span> Aproximación del operador de maximización sobre estados continuos</a></li>
+  <li><a href="#aproximación-funcional-por-regresión-no-paramétrica-extratrees" id="toc-aproximación-funcional-por-regresión-no-paramétrica-extratrees" class="nav-link" data-scroll-target="#aproximación-funcional-por-regresión-no-paramétrica-extratrees"><span class="header-section-number">3.3.4</span> Aproximación funcional por regresión no paramétrica (ExtraTrees)</a></li>
+  <li><a href="#sec-criterio-paro" id="toc-sec-criterio-paro" class="nav-link" data-scroll-target="#sec-criterio-paro"><span class="header-section-number">3.3.5</span> Criterio de paro basado en desempeño simulado</a></li>
+  </ul></li>
+  <li><a href="#sec-simulacion" id="toc-sec-simulacion" class="nav-link" data-scroll-target="#sec-simulacion"><span class="header-section-number">3.4</span> Política óptima y simulación operativa</a>
+  <ul class="collapse">
+  <li><a href="#sec-metricas" id="toc-sec-metricas" class="nav-link" data-scroll-target="#sec-metricas"><span class="header-section-number">3.4.1</span> Métricas de desempeño y validación estadística</a></li>
+  </ul></li>
+  <li><a href="#conclusiones-del-capítulo" id="toc-conclusiones-del-capítulo" class="nav-link" data-scroll-target="#conclusiones-del-capítulo"><span class="header-section-number">3.5</span> Conclusiones del capítulo</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./modelo_matematico_fqi_corregido.html">Modelo Matemático</a></li><li class="breadcrumb-item"><a href="./modelo_matematico_fqi_corregido.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelo Matemático para Optimizar la Operación de un Sistema Hidroeléctrico.</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelo Matemático para Optimizar la Operación de un Sistema Hidroeléctrico.</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div style="text-align: justify">
+<p>El objetivo de este capítulo es presentar una formulación rigurosa del problema de optimización de la operación de un sistema hidroeléctrico como un Proceso de Decisión de Markov (MDP), junto con una descripción detallada del algoritmo de Fitted Q-Iteration (FQI) utilizado para aproximar la política óptima. Se enfatizará la conexión entre los elementos matemáticos formales y su implementación numérica, así como la validación operativa mediante simulación en lazo cerrado.</p>
+</div>
+<section id="formulación-como-proceso-de-decisión-de-markov-mdp" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="formulación-como-proceso-de-decisión-de-markov-mdp"><span class="header-section-number">3.1</span> Formulación como Proceso de Decisión de Markov (MDP)</h2>
+<p>Siguiendo la notación de <span class="citation" data-cites="puterman1994markov">Puterman (<a href="references.html#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, se define el MDP como la colección de objetos <span class="math display">\[\{(T, \mathcal{S}, \mathcal{A}, \mathbb{P}, \mathcal{R})\},\]</span> donde cada componente se especifica a continuación.</p>
+<section id="estructura-temporal-t" class="level3" data-number="3.1.1">
+<h3 data-number="3.1.1" class="anchored" data-anchor-id="estructura-temporal-t"><span class="header-section-number">3.1.1</span> Estructura Temporal <span class="math inline">\((T)\)</span></h3>
+<div style="text-align: justify">
+<p>Se considera un horizonte temporal de operación compuesto por <span class="math inline">\(T = 50\)</span> años históricos (periodo 1959–2008), en donde cada uno de ellos se divide en <span class="math inline">\(q = 24\)</span> quincenas. Con el fin de reducir la dimensionalidad temporal y capturar la estacionalidad, las quincenas se agrupan en <span class="math inline">\(M = 6\)</span> etapas hidrológicas mediante la función de agregación <span class="math inline">\(\mu: \{0,\dots,23\} \to \{0,\dots,5\}\)</span> definida por <span id="eq-etapas"><span class="math display">\[\mu(q) = \begin{cases} 0, &amp; 0 \leq q &lt;10\\ 1, &amp; 10 \leq q &lt;14\\ 2, &amp; 14 \leq q &lt; 16\\ 3, &amp; 16 \leq q &lt; 18\\ 4, &amp; 18 \leq q &lt; 20\\ 5, &amp; 20 \leq q \leq 23\\ \end{cases} \tag{3.1}\]</span></span> de modo que <span class="math inline">\(m = \mu(q)\)</span> es la etapa hidrológica correspondiente a la quincena <span class="math inline">\(q\)</span>. Esta partición reproduce exactamente la agrupación implementada en el código (<code>etapas_quinc</code>), verificada como correcta.</p>
+<p><strong>Dos resoluciones temporales distintas.</strong> Es indispensable distinguir, desde ahora, dos usos diferentes de esta estructura temporal: (i) para <strong>construir el conjunto de aprendizaje</strong> del algoritmo de FQI (Sec. <a href="#sec-conjunto-aprendizaje" class="quarto-xref"><span>Sección 3.3.1</span></a>), la afluencia se agrega a nivel de <em>etapa</em> (<span class="math inline">\(M=6\)</span> decisiones por año) y no se recorre la serie quincena por quincena; (ii) para <strong>desplegar y evaluar la política</strong> ya aprendida (Sec. <a href="#sec-simulacion" class="quarto-xref"><span>Sección 3.4</span></a>), la decisión sí se reconsulta en cada una de las 24 quincenas del año, usando en cada una la afluencia real de esa quincena, aunque los parámetros vigentes (capacidad máxima, curva guía, grilla de acción) sean los de la etapa <span class="math inline">\(m=\mu(q)\)</span> que la contiene.</p>
+</div>
+</section>
+<section id="sec-espacio-estados" class="level3" data-number="3.1.2">
+<h3 data-number="3.1.2" class="anchored" data-anchor-id="sec-espacio-estados"><span class="header-section-number">3.1.2</span> Espacio de estados <span class="math inline">\((\mathcal{S})\)</span></h3>
+<div style="text-align: justify">
+<p>El sistema está compuesto por dos presas: <a href="https://maps.app.goo.gl/NHNQdHdfYAoRGxhPA">La Angostura</a> <span class="math inline">\((i = 1)\)</span> y <a href="https://maps.app.goo.gl/acX7hVXswX5uYYUBA">Malpaso</a> <span class="math inline">\((i =2)\)</span>. El volumen almacenado en la presa <span class="math inline">\(i\)</span> en la quincena <span class="math inline">\(q\)</span> del año <span class="math inline">\(t\)</span> se representa por <span class="math inline">\(V_{i,t,q} \in \mathbb{R}_{+} \cup \{0\}\)</span> (millones de metros cúbicos, Mm³).</p>
+<p>A diferencia del enfoque de Programación Dinámica Estocástica (PDE), en el que el almacenamiento se discretiza en celdas y el estado es un índice entero, <strong>en FQI el almacenamiento se mantiene como variable continua</strong>. El parámetro <span class="math inline">\(\Delta = 600\)</span> Mm³ (el cual permite subdividir la capacidad de almacenamiento de cada presa) y los enteros <span class="math inline">\(N_1 = 27\)</span>, <span class="math inline">\(N_2 = 16\)</span> (capacidades discretas máximas de cada presa) —heredados de la discretización de la PDE precedente— no se usan aquí para discretizar el estado, sino únicamente para fijar las <strong>capacidades máximas continuas</strong> de cada presa, <span id="eq-capacidad-maxima"><span class="math display">\[V_{1,\max} := N_1 \Delta = 16{,}200 \ \text{Mm}^3, \qquad V_{2,\max} := N_2 \Delta = 9{,}600\ \text{Mm}^3, \tag{3.2}\]</span></span> y para convertir a volumen la curva guía, definida originalmente en unidades de índice (Sec. <a href="#sec-recompensa" class="quarto-xref"><span>Sección 3.1.5</span></a>).</p>
+<p>El espacio de estados del MDP es entonces <span id="eq-espacio-estados"><span class="math display">\[
+\begin{aligned}
+\mathcal{S}
+&amp;= [0,V_{1,\max}]\times[0,V_{2,\max}]
+   \times\{0,\dots,5\} \\
+&amp;= \left\{s=(s_1,s_2,m):
+s_i\in[0,V_{i,\max}],\ i=1,2,\
+m\in\{0,\dots,5\}\right\}.
+\end{aligned}
+\tag{3.3}\]</span></span></p>
+<p><strong>Grilla gruesa de referencia.</strong> Aunque el estado en sí no se discretiza, tanto la construcción del conjunto de aprendizaje (Sec. <a href="#sec-conjunto-aprendizaje" class="quarto-xref"><span>Sección 3.3.1</span></a>) como la aproximación del operador de maximización (Sec. <a href="#sec-max-operador" class="quarto-xref"><span>Sección 3.3.3</span></a>) requieren evaluar funciones en un conjunto finito y manejable de puntos de almacenamiento. Se define para ello una grilla de referencia de <span class="math inline">\(N_s=9\)</span> puntos equiespaciados por presa, <span id="eq-grilla-estado"><span class="math display">\[
+\mathcal S_i^{\text{grid}} := \Big\{0,\ \tfrac{V_{i,\max}}{8},\ \tfrac{2V_{i,\max}}{8},\ \dots,\ V_{i,\max}\Big\}, \qquad i=1,2,
+\tag{3.4}\]</span></span> con paso <span class="math inline">\(V_{1,\max}/8=2{,}025\)</span> Mm³ y <span class="math inline">\(V_{2,\max}/8=1{,}200\)</span> Mm³ respectivamente. Esta grilla <strong>no es una discretización del MDP</strong>: es un dispositivo de muestreo y de cómputo; la política final se evalúa siempre en el valor continuo real del almacenamiento.</p>
+</div>
+</section>
+<section id="sec-espacio-acciones" class="level3" data-number="3.1.3">
+<h3 data-number="3.1.3" class="anchored" data-anchor-id="sec-espacio-acciones"><span class="header-section-number">3.1.3</span> Espacio de acciones <span class="math inline">\((\mathcal{A})\)</span></h3>
+<div style="text-align: justify">
+<p>Para cada etapa <span class="math inline">\(m\)</span> se define una unidad de extracción de agua <span class="math inline">\(u_m = (100,200,300,300,400,250)\)</span> Mm³, y un conjunto de índices factibles <span class="math inline">\(\mathcal K_{i,m}\)</span> heredado de la grilla de decisión de la PDE: <span class="math display">\[
+\begin{aligned}
+\mathcal{K}_{0} &amp;= \{0,\dots,20\}, &amp;
+\mathcal{K}_{1} &amp;= \{0,\dots,15\}, &amp;
+\mathcal{K}_{2} &amp;= \{0,\dots,7\}, \\
+\mathcal{K}_{3} &amp;= \{0,\dots,9\}, &amp;
+\mathcal{K}_{4} &amp;= \mathcal{K}_{5} = \{0,\dots,12\}.
+\end{aligned}
+\]</span> (idéntico para ambas presas en cada etapa). Estos índices <strong>no enumeran directamente el conjunto de acciones factibles del FQI</strong>: se usan únicamente para obtener la cota superior del turbinado factible en la etapa, <span id="eq-accion-max"><span class="math display">\[
+A_{\max}(m) := u_m \cdot \max(\mathcal K_{m}).
+\tag{3.5}\]</span></span> Por ejemplo, para <span class="math inline">\(m=0\)</span>: <span class="math inline">\(u_0=100\)</span>, <span class="math inline">\(\max(\mathcal K_0)=20\)</span>, de modo que <span class="math inline">\(A_{\max}(0)=2{,}000\)</span> Mm³ (así, un par de índices como <span class="math inline">\((k_1,k_2)=(3,5)\)</span> de la PDE correspondería a turbinar <span class="math inline">\(300\)</span> y <span class="math inline">\(500\)</span> Mm³ respectivamente —dentro de la cota—, pero el FQI no restringe la acción a estos múltiplos enteros de <span class="math inline">\(u_m\)</span>).</p>
+<p>El <strong>espacio de acciones factible</strong> para el MDP continuo es el intervalo <span id="eq-espacio-acciones"><span class="math display">\[
+\mathcal{A}_m := [0,A_{\max}(m)]\times[0,A_{\max}(m)] = \{a=(a_1,a_2)\}
+\tag{3.6}\]</span></span> con <span class="math inline">\(a_i\)</span> el volumen turbinado en la presa <span class="math inline">\(i\)</span>, continuo. Al igual que con el estado, para fines de muestreo (Sec. <a href="#sec-conjunto-aprendizaje" class="quarto-xref"><span>Sección 3.3.1</span></a>) y de maximización aproximada (Sec. <a href="#sec-max-operador" class="quarto-xref"><span>Sección 3.3.3</span></a>) este intervalo se discretiza en una grilla gruesa de <span class="math inline">\(N_a=9\)</span> puntos equiespaciados, <span id="eq-grilla-accion"><span class="math display">\[
+\mathcal A_m^{\text{grid}} := \Big\{0,\ \tfrac{A_{\max}(m)}{8},\ \dots,\ A_{\max}(m)\Big\}, \qquad |\mathcal A_m^{\text{grid}}|=9.
+\tag{3.7}\]</span></span></p>
+<div id="tbl-accion-max" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-accion-max-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla&nbsp;3.1: Capacidad máxima de turbinado por etapa, calculada según <a href="#eq-accion-max" class="quarto-xref">Ecuación&nbsp;<span>3.5</span></a>.
+</figcaption>
+<div aria-describedby="tbl-accion-max-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Etapa <span class="math inline">\(m\)</span></th>
+<th><span class="math inline">\(u_m\)</span> (Mm³)</th>
+<th><span class="math inline">\(\max(\mathcal K_m)\)</span></th>
+<th><span class="math inline">\(A_{\max}(m)\)</span> (Mm³)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>100</td>
+<td>20</td>
+<td>2,000</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>200</td>
+<td>15</td>
+<td>3,000</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>300</td>
+<td>7</td>
+<td>2,100</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>300</td>
+<td>9</td>
+<td>2,700</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>400</td>
+<td>12</td>
+<td>4,800</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>250</td>
+<td>12</td>
+<td>3,000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Los valores de <span class="math inline">\(u_m\)</span> y <span class="math inline">\(\mathcal K_{m}\)</span> se seleccionaron, en el diseño original de la PDE, para que <span class="math inline">\(A_{\max}(m)\)</span> no exceda la capacidad instalada de las plantas ni los caudales históricos máximos registrados; esa cota se conserva íntegramente en el modelo continuo de FQI.</p>
+</div>
+</section>
+<section id="dinámica-de-transición-mathbbp" class="level3" data-number="3.1.4">
+<h3 data-number="3.1.4" class="anchored" data-anchor-id="dinámica-de-transición-mathbbp"><span class="header-section-number">3.1.4</span> Dinámica de transición <span class="math inline">\((\mathbb{P})\)</span></h3>
+<div style="text-align: justify">
+<p><strong>Balance de masa a nivel de etapa (usado para el conjunto de aprendizaje).</strong> Para construir las transiciones de entrenamiento (Sec. <a href="#sec-conjunto-aprendizaje" class="quarto-xref"><span>Sección 3.3.1</span></a>), la afluencia se agrega a nivel de etapa: sea <span id="eq-afluencia-etapa"><span class="math display">\[
+\xi_{i,t,m} := \sum_{q\,:\,\mu(q)=m} W_{i,t,q}
+\tag{3.8}\]</span></span> la afluencia histórica del año <span class="math inline">\(t\)</span> agregada sobre las quincenas de la etapa <span class="math inline">\(m\)</span> (para la presa <span class="math inline">\(i\)</span>), donde <span class="math inline">\(W_{i,t,q}\)</span> es el afluente neto observado en la quincena <span class="math inline">\(q\)</span> del año <span class="math inline">\(t\)</span> (dato histórico). El balance de masa teórico (sin restricción de capacidad) al aplicar la acción <span class="math inline">\(a_i\in\mathcal A_m^{\text{grid}}\)</span> desde un estado de la grilla <span class="math inline">\(s_i\in\mathcal S_i^{\text{grid}}\)</span> es <span id="eq-transicion"><span class="math display">\[
+\tilde s_i := s_i + \xi_{i,t,m} - a_i, \qquad i=1,2.
+\tag{3.9}\]</span></span></p>
+<p><strong>Balance de masa a nivel de quincena (usado en el despliegue de la política).</strong> Al simular la política ya aprendida sobre la trayectoria histórica completa (Sec. <a href="#sec-simulacion" class="quarto-xref"><span>Sección 3.4</span></a>), la decisión se toma en cada quincena <span class="math inline">\(q\)</span>, usando el afluente histórico de esa <strong>misma</strong> quincena: <span id="eq-transicion-quincenal"><span class="math display">\[
+V_{i,t,q+1} = V_{i,t,q} + W_{i,t,q} - a_i, \qquad q=0,\dots,22,
+\tag{3.10}\]</span></span> y, al cerrar el año (<span class="math inline">\(q=23\)</span>), la transición conecta con el primer registro del año siguiente, <span id="eq-transicion23"><span class="math display">\[
+V_{i,t+1,0} = V_{i,t,23} + W_{i,t+1,0} - a_i.
+\tag{3.11}\]</span></span> En ambos casos <span class="math inline">\(a_i\)</span> es el volumen turbinado decidido para la etapa <span class="math inline">\(m=\mu(q)\)</span> vigente en esa quincena (Sec. <a href="#sec-espacio-acciones" class="quarto-xref"><span>Sección 3.1.3</span></a>); <span class="math inline">\(a_i\)</span> no cambia de valor dentro de la misma quincena, pero sí puede cambiar de una quincena a otra dentro de la misma etapa, porque la política se reconsulta con el estado continuo corriente en cada quincena.</p>
+<p><strong>Proyección al conjunto factible.</strong> En ambos regímenes, el volumen teórico <span class="math inline">\(\tilde s_i\)</span> (o <span class="math inline">\(V_{i,t,q+1}\)</span>) puede exceder <span class="math inline">\(V_{i,\max}\)</span> o resultar negativo. El volumen físicamente realizable se obtiene proyectando sobre el intervalo factible, <span id="eq-proyeccion"><span class="math display">\[
+s_i' := \operatorname{proj}_{[0,V_{i,\max}]}(\tilde s_i) = \min\big(\max(\tilde s_i,0),\,V_{i,\max}\big),
+\tag{3.12}\]</span></span> donde <span class="math inline">\(\operatorname{proj}_{[0,V_{i,\max}]}\)</span> denota al operador que da el punto del intervalo <span class="math inline">\([0,V_{i,\max}]\)</span> más cercano a <span class="math inline">\(\tilde s_i\)</span>, y las magnitudes de exceso y faltante se registran como derrame y déficit, respectivamente, <span id="eq-derrame-deficit"><span class="math display">\[
+\text{derrame}_i := (\tilde s_i - V_{i,\max})^+, \qquad \text{déficit}_i := (-\tilde s_i)^+,
+\tag{3.13}\]</span></span> con <span class="math inline">\(x^+:=\max(x,0)\)</span>.</p>
+<p>La etapa evoluciona de manera determinista y cíclica, <span class="math inline">\(m'=(m+1)\bmod M\)</span>, y el estado siguiente es <span class="math inline">\(s'=(s_1',s_2',m')\)</span>.</p>
+<p>Desde la perspectiva de <span class="citation" data-cites="puterman1994markov">Puterman (<a href="references.html#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, la dinámica del MDP se resume en el núcleo de transición <span class="math inline">\(\mathbb P(\cdot\,|\,s,a)\)</span>, que en este modelo <strong>no se especifica en forma analítica cerrada</strong>: toda la incertidumbre proviene de la afluencia histórica <span class="math inline">\(\xi_{i,t,m}\)</span> (o <span class="math inline">\(W_{i,t,q}\)</span>), tratada como una variable aleatoria cuya ley se aproxima por la distribución empírica de las <span class="math inline">\(T=50\)</span> realizaciones históricas disponibles para cada etapa —no por una tabla de probabilidades de transición sobre estados discretos, puesto que <span class="math inline">\(\mathcal S\)</span> es ahora un continuo—.</p>
+</div>
+</section>
+<section id="sec-recompensa" class="level3" data-number="3.1.5">
+<h3 data-number="3.1.5" class="anchored" data-anchor-id="sec-recompensa"><span class="header-section-number">3.1.5</span> Función de recompensa <span class="math inline">\((\mathcal{R})\)</span></h3>
+<section id="modelo-hidráulico-energético-linealizado" class="level4" data-number="3.1.5.1">
+<h4 data-number="3.1.5.1" class="anchored" data-anchor-id="modelo-hidráulico-energético-linealizado"><span class="header-section-number">3.1.5.1</span> Modelo hidráulico-energético linealizado</h4>
+<div style="text-align: justify">
+<p>La energía generada depende del volumen turbinado y de una aproximación lineal de la carga hidráulica. Para cada presa <span class="math inline">\(i\)</span> se define la función de carga <strong>continua</strong> <span id="eq-altura"><span class="math display">\[
+\begin{aligned}
+H_i(s_i,s_i')
+&amp;= H_{i,\max}\cdot
+\frac{s_i+s_i'}{2\,V_{i,\max}}, \\[4pt]
+H_{1,\max} &amp;= 120\ \text{m (Angostura)}, \qquad
+H_{2,\max} = 100\ \text{m (Malpaso)}.
+\end{aligned}
+\tag{3.14}\]</span></span> Es decir, la carga varía linealmente entre <span class="math inline">\(0\)</span> m (presa vacía) y la carga máxima propia de cada presa cuando ésta alcanza su capacidad plena, y se aproxima la carga efectiva durante la etapa/quincena mediante el promedio de la carga al inicio (<span class="math inline">\(s_i\)</span>) y al final (<span class="math inline">\(s_i'\)</span>) del intervalo.</p>
+<p>Sea <span class="math inline">\(\eta = 0.9\)</span> la eficiencia de conversión hidráulica-eléctrica y <span class="math inline">\(g = 9.81\)</span> m/s² la aceleración de la gravedad. La energía generada por la presa <span class="math inline">\(i\)</span> al turbinar <span class="math inline">\(a_i\)</span> (Mm³) bajo la carga <span class="math inline">\(H_i(s_i,s_i')\)</span> es <span id="eq-energia"><span class="math display">\[
+E_i(s,a,s') = \frac{\eta\, g\, H_i(s_i,s_i')\,(a_i\times 10^6)}{3600\times 10^6} \quad [\text{GWh}],
+\tag{3.15}\]</span></span> donde <span class="math inline">\(10^6\)</span> convierte Mm³ a m³ y <span class="math inline">\(3600\times10^6\)</span> convierte julios-equivalentes a GWh (con la densidad del agua <span class="math inline">\(\rho=1000\)</span> kg/m³ absorbida algebraicamente en la constante <span class="math inline">\(3600\)</span>). La energía total generada por el sistema en la etapa/quincena es <span id="eq-energia-total"><span class="math display">\[
+E = E_1+E_2.
+\tag{3.16}\]</span></span></p>
+</div>
+</section>
+<section id="estructura-de-penalizaciones" class="level4" data-number="3.1.5.2">
+<h4 data-number="3.1.5.2" class="anchored" data-anchor-id="estructura-de-penalizaciones"><span class="header-section-number">3.1.5.2</span> Estructura de penalizaciones</h4>
+<div style="text-align: justify">
+<p>La recompensa incorpora penalizaciones lineales, con coeficientes calibrados para actuar como restricciones blandas de tipo <em>big-M</em> (su magnitud domina ampliamente el valor energético del agua, ver ejemplo numérico más abajo). Se definen, por presa <span class="math inline">\(i\)</span>, las siguientes tres penalizaciones:</p>
+<ul>
+<li><p><strong>Derrame</strong> (excedente sobre la capacidad máxima): <span id="eq-penalizacion-derrame"><span class="math display">\[
+\Pi_i^{\text{derr}} = c_{\text{derr}}\cdot(\tilde s_i - V_{i,\max})^+, \qquad c_{\text{derr}} := \frac{C_{\text{derr}}}{\Delta}.
+\tag{3.17}\]</span></span></p></li>
+<li><p><strong>Déficit</strong> (faltante respecto de un balance no negativo). <em>Proporcional a la magnitud del déficit, no una constante fija.</em> <span id="eq-penalizacion-deficit"><span class="math display">\[
+\Pi_i^{\text{def}} = c_{\text{def}}\cdot(-\tilde s_i)^+, \qquad c_{\text{def}} := \frac{C_{\text{def}}}{\Delta}.
+\tag{3.18}\]</span></span></p></li>
+<li><p><strong>Violación de la curva guía</strong>. <em>Se penaliza cuando el almacenamiento proyectado <strong>excede</strong> la curva guía (un techo operativo de resguardo).</em> <span id="eq-penalizacion-curva-guia"><span class="math display">\[
+\Pi_i^{\text{CG}} = c_{\text{CG}}\cdot\big(s_i' - \text{CG}_i(m)\big)^+, \qquad c_{\text{CG}} := \frac{C_{\text{CG}}}{\Delta}.
+\tag{3.19}\]</span></span></p></li>
+</ul>
+<p>con <span class="math inline">\(C_{\text{derr}}=C_{\text{def}}=10{,}000\)</span>, <span class="math inline">\(C_{\text{CG}}=5{,}000\)</span>, de modo que <span class="math inline">\(c_{\text{derr}}=c_{\text{def}}\approx16.67\)</span> y <span class="math inline">\(c_{\text{CG}}\approx8.33\)</span> por Mm³. A modo de referencia de escala: turbinar 1 Mm³ bajo una carga representativa de 100 m genera, por <a href="#eq-energia" class="quarto-xref">Ecuación&nbsp;<span>3.15</span></a>, apenas <span class="math inline">\(\approx0.245\)</span> GWh —es decir, <span class="math inline">\(c_{\text{derr}}\)</span> es unas <span class="math inline">\(68\)</span> veces mayor que el valor energético marginal del mismo volumen, confirmando su papel de penalización dominante y no de costo económico real.</p>
+<p><span class="math inline">\(\text{CG}_i(m)\)</span> es la curva guía de la presa <span class="math inline">\(i\)</span> en la etapa <span class="math inline">\(m\)</span>, definida originalmente en unidades de índice, <span class="math inline">\(\text{CG}_1^{\text{idx}}=(25,22,24,25,26,27)\)</span>, <span class="math inline">\(\text{CG}_2^{\text{idx}}=(16,15,14,14,15,16)\)</span>, y convertida a volumen mediante <span id="eq-curva-guia-vol"><span class="math display">\[
+\text{CG}_i(m) := \Delta\cdot \text{CG}_i^{\text{idx}}(m).
+\tag{3.20}\]</span></span></p>
+<p>La función de recompensa total, sumada sobre ambas presas, es <span id="eq-recompensa"><span class="math display">\[
+\mathcal{R}(s,a,s') = \sum_{i=1}^{2}\Big[E_i - \Pi_i^{\text{derr}} - \Pi_i^{\text{def}} - \Pi_i^{\text{CG}}\Big].
+\tag{3.21}\]</span></span></p>
+<p>En el presente trabajo no se modela una distribución analítica explícita de la afluencia; en su lugar se construye un conjunto de aprendizaje empírico, descrito con precisión en la Sec. <a href="#sec-conjunto-aprendizaje" class="quarto-xref"><span>Sección 3.3.1</span></a> —y que, como ahí se detalla, <strong>no</strong> consiste en recorrer trayectorias históricas de decisiones reales, sino en evaluar la dinámica y la recompensa sobre una malla exhaustiva de pares estado-acción contra la totalidad de las realizaciones históricas de afluencia. Este enfoque se alinea con un esquema de <strong><em>Batch Reinforcement Learning</em></strong> “parcialmente libre de modelo” (<span class="citation" data-cites="Castelletti2010">Castelletti et&nbsp;al. (<a href="references.html#ref-Castelletti2010" role="doc-biblioref">2010</a>)</span>; <span class="citation" data-cites="Ernst2005">Ernst et&nbsp;al. (<a href="references.html#ref-Ernst2005" role="doc-biblioref">2005</a>)</span>).</p>
+</div>
+</section>
+</section>
+</section>
+<section id="ecuación-de-optimalidad-de-bellman" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="ecuación-de-optimalidad-de-bellman"><span class="header-section-number">3.2</span> Ecuación de optimalidad de Bellman</h2>
+<div style="text-align: justify">
+<p>Se adopta la notación <span class="math inline">\(Q^*\)</span> para la función de valor óptima, por ser función del par estado-acción <span class="math inline">\((s,a)\)</span> —lo que la literatura de aprendizaje por refuerzo llama función de valor-acción— y por consistencia con el nombre de la variable en el código (<code>Q</code>).</p>
+<p>Conforme a la teoría clásica de MDPs descontados (<span class="citation" data-cites="puterman1994markov">Puterman (<a href="references.html#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, Teorema 6.2.3), existe una única función de valor-acción óptima <span class="math inline">\(Q^*\)</span> que satisface la ecuación de optimalidad de Bellman. La razón intuitiva es el factor de descuento <span class="math inline">\(\gamma=0.95&lt;1\)</span>: la influencia de una decisión de hoy sobre lo que ocurre dentro de, digamos, 50 etapas está multiplicada por <span class="math inline">\(\gamma^{50}\approx0.08\)</span>, y sigue decayendo geométricamente cuanto más lejos se mire hacia el futuro. Ese decaimiento garantiza que, sin importar con qué aproximación inicial se empiece —incluso <span class="math inline">\(Q^{(0)}\equiv0\)</span>, como hace el algoritmo (Sec. <a href="#sec-conjunto-aprendizaje" class="quarto-xref"><span>Sección 3.3.1</span></a> y siguientes)—, al aplicar la ecuación de Bellman una y otra vez las sucesivas aproximaciones se acercan cada vez más entre sí, hasta converger a una única <span class="math inline">\(Q^*\)</span>. Esto es válido tanto si <span class="math inline">\(\mathcal S\)</span> es finito (el caso clásico de Puterman) como si tiene una componente continua, como en este modelo (Sec. <a href="#sec-espacio-estados" class="quarto-xref"><span>Sección 3.1.2</span></a>). <em>(Formalmente, esta propiedad se conoce como que el operador de Bellman es una contracción, y su justificación rigurosa se apoya en el teorema del punto fijo de Banach; no se desarrolla aquí por no ser el objeto central de este capítulo.)</em></p>
+<p>Dado que la incertidumbre proviene de la afluencia histórica <span class="math inline">\(\xi=(\xi_1,\xi_2)\)</span>, cuya ley se aproxima por su distribución empírica <span class="math inline">\(\widehat P_m\)</span> sobre las <span class="math inline">\(T=50\)</span> realizaciones históricas de la etapa <span class="math inline">\(m\)</span> (Sec. <a href="#sec-conjunto-aprendizaje" class="quarto-xref"><span>Sección 3.3.1</span></a>), la ecuación de optimalidad se escribe como una esperanza sobre dicha distribución empírica —y no como una suma sobre un conjunto discreto de estados siguientes, formalismo que ya no aplica al ser <span class="math inline">\(\mathcal S\)</span> un continuo—: <span id="eq-bellman"><span class="math display">\[
+Q^{*}(s,a) = \mathbb{E}_{\xi\sim\widehat P_m}\Big[\,\mathcal R(s,a,s') + \gamma\max_{a'\in\mathcal A_{m'}} Q^{*}(s',a')\,\Big], \quad s' = f(s,a,\xi),
+\tag{3.22}\]</span></span> con <span class="math inline">\(f\)</span> la función de transición y proyección de las ecuaciones <a href="#eq-transicion" class="quarto-xref">Ecuación&nbsp;<span>3.9</span></a>–<a href="#eq-proyeccion" class="quarto-xref">Ecuación&nbsp;<span>3.12</span></a>, y <span class="math inline">\(m'=(m+1)\bmod M\)</span>.</p>
+<p>Dado que no se dispone de <span class="math inline">\(\widehat P_m\)</span> en forma cerrada sino de sus <span class="math inline">\(T\)</span> realizaciones muestrales, el algoritmo de FQI (Sec. siguiente) trabaja con la versión <strong>por muestra</strong> de esta ecuación —el objetivo empírico de Bellman, <a href="#eq-objetivo-bellman" class="quarto-xref">Ecuación&nbsp;<span>3.25</span></a>—, evaluada sobre cada una de las transiciones del conjunto de aprendizaje, y no con la esperanza poblacional (<a href="#eq-bellman" class="quarto-xref">Ecuación&nbsp;<span>3.22</span></a>) directamente.</p>
+</div>
+</section>
+<section id="aproximación-numérica-mediante-fitted-q-iteration-fqi" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="aproximación-numérica-mediante-fitted-q-iteration-fqi"><span class="header-section-number">3.3</span> Aproximación numérica mediante Fitted Q-Iteration (FQI)</h2>
+<div style="text-align: justify">
+<p>La Programación Dinámica Estocástica está afectada por la maldición de la dimensionalidad: el costo computacional crece exponencialmente con el número de variables de estado, y requiere además un modelo de transición explícito (<span class="citation" data-cites="Castelletti2010">Castelletti et&nbsp;al. (<a href="references.html#ref-Castelletti2010" role="doc-biblioref">2010</a>)</span>). Por ello, el presente trabajo aproxima <span class="math inline">\(Q^*\)</span> mediante Fitted Q-Iteration, un algoritmo de aprendizaje por refuerzo <em>batch</em> que ajusta iterativamente un aproximador funcional supervisado a partir de un conjunto de transiciones muestreadas.</p>
+</div>
+<section id="sec-conjunto-aprendizaje" class="level3" data-number="3.3.1">
+<h3 data-number="3.3.1" class="anchored" data-anchor-id="sec-conjunto-aprendizaje"><span class="header-section-number">3.3.1</span> Conjunto de aprendizaje “parcialmente libre de modelo”</h3>
+<div style="text-align: justify">
+<p>Concretamente, el conjunto de aprendizaje <span class="math inline">\(\mathcal F=\{(x_j, r_j, s'_{1,j}, s'_{2,j}, m'_j)\}_{j=1}^N\)</span> se construye enumerando el producto cartesiano de: la grilla de estado <a href="#eq-grilla-estado" class="quarto-xref">Ecuación&nbsp;<span>3.4</span></a>, la grilla de acción <a href="#eq-grilla-accion" class="quarto-xref">Ecuación&nbsp;<span>3.7</span></a>, las <span class="math inline">\(M=6\)</span> etapas, y las <span class="math inline">\(T=50\)</span> realizaciones históricas de afluencia por etapa <a href="#eq-afluencia-etapa" class="quarto-xref">Ecuación&nbsp;<span>3.8</span></a>. El vector de características de cada muestra es <span id="eq-caracteristicas"><span class="math display">\[
+x_j = (s_{1,j}, s_{2,j}, m_j, a_{1,j}, a_{2,j}) \in \mathcal S_1^{\text{grid}}\times\mathcal S_2^{\text{grid}}\times\{0,\dots,5\}\times\mathcal A^{\text{grid}}_{m_j}\times\mathcal A^{\text{grid}}_{m_j},
+\tag{3.23}\]</span></span> y, para cada combinación de estado-acción-etapa, se generan <span class="math inline">\(T=50\)</span> muestras —una por cada año histórico <span class="math inline">\(t\)</span>— aplicando <a href="#eq-transicion" class="quarto-xref">Ecuación&nbsp;<span>3.9</span></a>, <a href="#eq-proyeccion" class="quarto-xref">Ecuación&nbsp;<span>3.12</span></a> y <a href="#eq-recompensa" class="quarto-xref">Ecuación&nbsp;<span>3.21</span></a> con la afluencia real <span class="math inline">\(\Xi_{i,t,m_j}\)</span> de ese año. El tamaño total del conjunto de aprendizaje es <span id="eq-tamano-N"><span class="math display">\[
+N = M\times|\mathcal S_1^{\text{grid}}|\times|\mathcal S_2^{\text{grid}}|\times|\mathcal A_1^{\text{grid}}|\times|\mathcal A_2^{\text{grid}}|\times T = 6\times9\times9\times9\times9\times50 = 1{,}968{,}300.
+\tag{3.24}\]</span></span></p>
+<p>Esta receta de muestreo —barrer exhaustivamente estado y acción sobre una grilla, pero conservar <em>todas</em> las realizaciones históricas de la perturbación en cada punto, sin colapsarlas a una tabla de probabilidades ni ajustarles una distribución paramétrica— es la que <span class="citation" data-cites="Castelletti2010">Castelletti et&nbsp;al. (<a href="references.html#ref-Castelletti2010" role="doc-biblioref">2010</a>)</span> denominan <strong>“parcialmente libre de modelo”</strong> (<em>partial model-free</em>): la dinámica del balance de masa sí se modela analíticamente, pero la ley de la afluencia se deja no paramétrica.</p>
+</div>
+</section>
+<section id="iteración-de-bellman-empírica" class="level3" data-number="3.3.2">
+<h3 data-number="3.3.2" class="anchored" data-anchor-id="iteración-de-bellman-empírica"><span class="header-section-number">3.3.2</span> Iteración de Bellman empírica</h3>
+<div style="text-align: justify">
+<p>Se inicializa <span class="math inline">\(Q^{(0)}(s,a) \equiv 0\)</span> para todo <span class="math inline">\((s,a)\)</span>. Para cada transición <span class="math inline">\((x_j,r_j,s'_{1,j},s'_{2,j},m'_j)\in\mathcal F\)</span> del conjunto de aprendizaje, se define el <strong>objetivo de Bellman</strong> de la iteración <span class="math inline">\(n\)</span> por <span id="eq-objetivo-bellman"><span class="math display">\[
+y^{(n)}_j := r_j + \gamma \max_{a'\in\mathcal A_{m_j'}} Q^{(n-1)}(s'_{1,j},s'_{2,j},m_j',a'),
+\tag{3.25}\]</span></span> que estima el valor-acción óptimo de <span class="math inline">\(x_j\)</span> combinando la recompensa observada <span class="math inline">\(r_j\)</span> y el mejor valor alcanzable desde el estado siguiente, según la aproximación de la iteración anterior. El cómputo del máximo sobre <span class="math inline">\(a'\)</span>, dado que <span class="math inline">\((s'_{1,j},s'_{2,j})\)</span> es en general un punto continuo que no coincide con la grilla <a href="#eq-grilla-estado" class="quarto-xref">Ecuación&nbsp;<span>3.4</span></a>, se describe en la Sec. <a href="#sec-max-operador" class="quarto-xref"><span>Sección 3.3.3</span></a>.</p>
+</div>
+</section>
+<section id="sec-max-operador" class="level3" data-number="3.3.3">
+<h3 data-number="3.3.3" class="anchored" data-anchor-id="sec-max-operador"><span class="header-section-number">3.3.3</span> Aproximación del operador de maximización sobre estados continuos</h3>
+<div style="text-align: justify">
+<p>**Esta subsección resuelve un punto que el texto anterior dejaba implícito sin justificación: cómo evaluar <span class="math inline">\(\max_{a'}Q^{(n-1)}(s',a')\)</span> cuando <span class="math inline">\(s'\)</span> es continuo. Evaluarlo por fuerza bruta para cada una de las <span class="math inline">\(N\approx 2\times10^6\)</span> muestras sería prohibitivo, así que el algoritmo precomputa, para cada etapa <span class="math inline">\(m\)</span>, una superficie de valor máximo sobre la grilla de estado y la interpola:</p>
+<ol type="1">
+<li><p><strong>Evaluación sobre grilla.</strong> Para cada etapa <span class="math inline">\(m\)</span>, se evalúa <span class="math inline">\(Q^{(n-1)}\)</span> en todo el producto <span class="math inline">\(\mathcal S_1^{\text{grid}}\times\mathcal S_2^{\text{grid}}\times\{m\}\times\mathcal A_1^{\text{grid}}(m)\times\mathcal A_2^{\text{grid}}(m)\)</span>, y se maximiza sobre las dos coordenadas de acción: <span id="eq-maxq-grilla"><span class="math display">\[
+\widehat V^{(n-1)}(s_1^{(p)},s_2^{(q)},m) := \max_{a_1,a_2\in\mathcal A_m^{\text{grid}}} Q^{(n-1)}(s_1^{(p)},s_2^{(q)},m,a_1,a_2), \qquad p,q=1,\dots,9,
+\tag{3.26}\]</span></span> obteniéndose una matriz <span class="math inline">\(9\times9\)</span> por etapa.</p></li>
+<li><p><strong>Interpolación bilineal.</strong> Sobre esta matriz se construye un interpolador continuo <span class="math inline">\(\widetilde V^{(n-1)}(\cdot,\cdot\,;m):\mathbb R^2\to\mathbb R\)</span> (interpolación multilineal sobre grilla regular), con extrapolación lineal fuera de <span class="math inline">\([0,V_{1,\max}]\times[0,V_{2,\max}]\)</span>.</p></li>
+<li><p><strong>Sustitución en el objetivo de Bellman.</strong> El máximo de <a href="#eq-objetivo-bellman" class="quarto-xref">Ecuación&nbsp;<span>3.25</span></a> se aproxima evaluando el interpolador de la etapa siguiente en el punto continuo genuinamente alcanzado: <span id="eq-maxq-interp"><span class="math display">\[
+\max_{a'\in\mathcal A_{m_j'}} Q^{(n-1)}(s'_{1,j},s'_{2,j},m_j',a') \ \approx\ \widetilde V^{(n-1)}\big(s'_{1,j},s'_{2,j};\,m_j'\big).
+\tag{3.27}\]</span></span></p></li>
+</ol>
+<p>Esta aproximación reduce el costo de <span class="math inline">\(O(N\times|\mathcal A^{\text{grid}}|^2)\)</span> evaluaciones del regresor a <span class="math inline">\(O\big(M\times|\mathcal S^{\text{grid}}|^2\times|\mathcal A^{\text{grid}}|^2 + N\big)\)</span>, al reutilizar la misma superficie interpolada para las <span class="math inline">\(N/M\)</span> muestras de cada etapa.</p>
+</div>
+</section>
+<section id="aproximación-funcional-por-regresión-no-paramétrica-extratrees" class="level3" data-number="3.3.4">
+<h3 data-number="3.3.4" class="anchored" data-anchor-id="aproximación-funcional-por-regresión-no-paramétrica-extratrees"><span class="header-section-number">3.3.4</span> Aproximación funcional por regresión no paramétrica (ExtraTrees)</h3>
+<div style="text-align: justify">
+<p>Una vez calculados los objetivos de Bellman <span class="math inline">\(y^{(n)}\)</span> (<a href="#eq-objetivo-bellman" class="quarto-xref">Ecuación&nbsp;<span>3.25</span></a>, con el máximo aproximado según <a href="#eq-maxq-interp" class="quarto-xref">Ecuación&nbsp;<span>3.27</span></a>), se ajusta un aproximador <span class="math inline">\(Q^{(n)}\)</span> que minimiza el error cuadrático entre las predicciones <span class="math inline">\(Q^{(n)}(x_j)\)</span> y los objetivos <span class="math inline">\(y^{(n)}_j\)</span> sobre todas las transiciones del conjunto de aprendizaje. Se utiliza, como propone <span class="citation" data-cites="Ernst2005">Ernst et&nbsp;al. (<a href="references.html#ref-Ernst2005" role="doc-biblioref">2005</a>)</span>, un ensamble de <em>ExtraTrees</em> (árboles extremadamente aleatorizados), adecuado para aproximar funciones de valor en espacios continuos.</p>
+<p><strong>Hiperparámetros (corregidos respecto de la versión previa):</strong></p>
+<div id="tbl-hiperparametros" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-hiperparametros-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla&nbsp;3.2: Hiperparámetros del ensamble de Extra-Trees, según el código, frente a lo reportado en la versión previa del capítulo.
+</figcaption>
+<div aria-describedby="tbl-hiperparametros-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Hiperparámetro</th>
+<th>Símbolo</th>
+<th>Valor implementado</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Número de árboles</td>
+<td><span class="math inline">\(M_{\text{tree}}\)</span></td>
+<td>300</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Profundidad máxima</td>
+<td>—</td>
+<td><strong>sin límite</strong> (<code>max_depth=None</code>)</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Muestras mínimas por hoja</td>
+<td><span class="math inline">\(n_{\min}\)</span></td>
+<td><strong>50</strong> (<span class="math inline">\(=T\)</span>)</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Variables candidatas por corte</td>
+<td><span class="math inline">\(K\)</span></td>
+<td><span class="math inline">\(n=5\)</span> (<code>max_features=1.0</code>)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>El valor <span class="math inline">\(n_{\min}=T=50\)</span> no es arbitrario: al exigir que cada hoja del árbol contenga al menos tantas muestras como años históricos de afluencia, se favorece que cada hoja agrupe una fracción representativa de las <span class="math inline">\(T\)</span> realizaciones de <span class="math inline">\(\xi\)</span> asociadas a un mismo <span class="math inline">\((s,a)\)</span> aproximado, de modo que el promedio dentro de la hoja aproxime, por la ley (empírica) de los grandes números, la esperanza condicional <span class="math inline">\(\mathbb E_{\xi\sim\widehat P_m}[\cdot]\)</span> que aparece en <a href="#eq-bellman" class="quarto-xref">Ecuación&nbsp;<span>3.22</span></a>. Cada árbol particiona el espacio estado-acción en regiones (hojas) mediante cortes con umbral aleatorio (no exhaustivo, a diferencia de CART/Random Forest) sobre las <span class="math inline">\(K=n=5\)</span> variables de entrada, y predice, para un punto de consulta, el promedio del objetivo de regresión entre las muestras de entrenamiento de su misma hoja. La predicción del ensamble es el promedio de las <span class="math inline">\(M_{\text{tree}}=300\)</span> predicciones individuales.</p>
+<blockquote class="blockquote">
+<p><strong>Nota sobre la Figura de árbol de decisión.</strong> La versión previa incluía una figura con la leyenda <em>“Árbol de decisión con profundidad máxima de 14 y un mínimo de 5 muestras por hoja”</em>. Dado que el código real no limita la profundidad (<code>max_depth=None</code>) y usa <span class="math inline">\(n_{\min}=50\)</span>, esa leyenda —y, en la práctica, la figura misma, que mostraría un árbol truncado no representativo— debe corregirse o sustituirse por una ilustración esquemática que no afirme una profundidad máxima inexistente.</p>
+</blockquote>
+<p>El algoritmo repite este procedimiento iterativamente.</p>
+</div>
+</section>
+<section id="sec-criterio-paro" class="level3" data-number="3.3.5">
+<h3 data-number="3.3.5" class="anchored" data-anchor-id="sec-criterio-paro"><span class="header-section-number">3.3.5</span> Criterio de paro basado en desempeño simulado</h3>
+<div style="text-align: justify">
+<p>Un criterio de convergencia del tipo punto-fijo —detener cuando <span class="math inline">\(\|Q^{(n)}-Q^{(n-1)}\|\)</span> cae bajo una tolerancia— <strong>no es aplicable</strong> cuando el aproximador es un ensamble de Extra-Trees: la aleatorización propia de la construcción de cada árbol (elección aleatoria de umbrales de corte) hace que <span class="math inline">\(Q^{(n)}\)</span> y <span class="math inline">\(Q^{(n-1)}\)</span> difieran por ruido de ajuste incluso si ya se hubiese alcanzado, en esencia, la función de valor-acción óptima; esta distancia no converge a cero. Así lo argumentan explícitamente <span class="citation" data-cites="Castelletti2010">Castelletti et&nbsp;al. (<a href="references.html#ref-Castelletti2010" role="doc-biblioref">2010</a>)</span>, y así lo implementa el código, que en su lugar monitorea el <strong>desempeño operativo simulado</strong> de la política inducida en cada iteración.</p>
+<p><strong>Simulación de la política golosa.</strong> Cada <span class="math inline">\(\Delta h\)</span> iteraciones (en el código, <span class="math inline">\(\Delta h=4\)</span>), se simula la operación del sistema bajo la política golosa de <span class="math inline">\(Q^{(n)}\)</span> sobre la trayectoria histórica completa, en resolución de quincena (Sec. <a href="#sec-simulacion" class="quarto-xref"><span>Sección 3.4</span></a>), obteniendo energías <span class="math inline">\(e^{(i)}_{t,q}\)</span>, derrames <span class="math inline">\(\delta^{(i)}_{t,q}\)</span> y déficits <span class="math inline">\(\epsilon^{(i)}_{t,q}\)</span> por presa.</p>
+<p><strong>Funcional de desempeño.</strong> Se define <span id="eq-desempeno-Jn"><span class="math display">\[
+\widehat J_n := \sum_{t,q}\big(e^{(1)}_{t,q}+e^{(2)}_{t,q}\big) - c_{\text{derr}}\sum_{t,q}\big(\delta^{(1)}_{t,q}+\delta^{(2)}_{t,q}\big) - c_{\text{def}}\sum_{t,q}\big(\epsilon^{(1)}_{t,q}+\epsilon^{(2)}_{t,q}\big),
+\tag{3.28}\]</span></span> una medida de desempeño agregada, <strong>no descontada</strong> y evaluada con afluencias reales quincenales —distinta, por tanto, del objetivo de ajuste <a href="#eq-objetivo-bellman" class="quarto-xref">Ecuación&nbsp;<span>3.25</span></a>, que opera a nivel de una transición individual y con descuento <span class="math inline">\(\gamma\)</span>—.</p>
+<p><strong>Regla de paro.</strong> Se detiene la iteración la primera vez que se observa una caída de <span class="math inline">\(\widehat J_n\)</span> respecto del checkpoint inmediatamente anterior (una “reversión”): <span id="eq-criterio-paro"><span class="math display">\[
+n^\star := \min\{\, n-\Delta h \ :\ \widehat J_{n} &lt; \widehat J_{n-\Delta h} \,\},
+\tag{3.29}\]</span></span> interpretando la reversión como evidencia de que, a partir de ese punto, predominan las fluctuaciones aleatorias del ajuste sobre el aprendizaje genuino (<span class="citation" data-cites="Castelletti2010">Castelletti et&nbsp;al. (<a href="references.html#ref-Castelletti2010" role="doc-biblioref">2010</a>)</span>). Si no se observa ninguna reversión dentro del número máximo de iteraciones permitido, se usa como respaldo el mejor checkpoint observado, <span class="math inline">\(n^\star:=\arg\max_n \widehat J_n\)</span>. La aproximación final es <span class="math inline">\(Q^{*}:=Q^{(n^\star)}\)</span>, recuperada de una caché de modelos serializados guardada en cada punto de verificación (necesaria porque, por la aleatorización del ensamble, <span class="math inline">\(Q^{(n^\star)}\)</span> no podría reproducirse exactamente reentrenando desde cero).</p>
+</div>
+</section>
+</section>
+<section id="sec-simulacion" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="sec-simulacion"><span class="header-section-number">3.4</span> Política óptima y simulación operativa</h2>
+<div style="text-align: justify">
+<p>Una vez obtenida <span class="math inline">\(Q^{*}\)</span>, se deriva la política óptima (golosa) <span class="math inline">\(\pi^{*}:\mathcal S\to\mathcal A\)</span>, <span id="eq-politica-optima"><span class="math display">\[
+\pi^{*}(s) := \operatorname*{arg\,max}_{a\in\mathcal A_m^{\text{grid}}} Q^{*}(s,a),
+\tag{3.30}\]</span></span> donde la maximización se realiza, en la práctica, mediante búsqueda exhaustiva sobre la grilla de acción de la etapa vigente <a href="#eq-grilla-accion" class="quarto-xref">Ecuación&nbsp;<span>3.7</span></a> (no sobre el conjunto continuo <span class="math inline">\(\mathcal A_m\)</span>), evaluando <span class="math inline">\(Q^{*}\)</span> en el estado continuo real —no discretizado— del sistema.</p>
+<p>La política se valida mediante simulación en lazo cerrado sobre la serie histórica completa, siguiendo la práctica estándar de validación de políticas de control aprendidas documentada en <span class="citation" data-cites="Bertsekas2019">Bertsekas (<a href="references.html#ref-Bertsekas2019" role="doc-biblioref">2019</a>)</span>. El algoritmo, corregido para ser fiel al código, opera así:</p>
+<ol type="1">
+<li><p><strong>Inicialización:</strong> se fijan los volúmenes iniciales <span class="math inline">\(V_{1,0}=10{,}000\)</span> Mm³, <span class="math inline">\(V_{2,0}=6{,}000\)</span> Mm³ (valores del código; no se especificaban antes).</p></li>
+<li><p><strong>Mapeo estacional:</strong> para cada quincena <span class="math inline">\(q\)</span> (recorriendo <span class="math inline">\(t=1,\dots,T\)</span> y, dentro de cada año, <span class="math inline">\(q=0,\dots,23\)</span>), se determina <span class="math inline">\(m=\mu(q)\)</span> y la grilla de acción <span class="math inline">\(\mathcal A_m^{\text{grid}}\)</span> vigente.</p></li>
+<li><p><del><strong>Discretización:</strong> <span class="math inline">\(s_i=\mathcal D(V_i,N_i)\)</span></del> — <strong>paso eliminado</strong>: el estado usado para consultar <span class="math inline">\(Q^*\)</span> es el volumen continuo real <span class="math inline">\((V_{1,t,q}, V_{2,t,q})\)</span>, sin redondeo a índice alguno.</p></li>
+<li><p><strong>Selección de acción</strong>, por búsqueda exhaustiva sobre la grilla de acción de 9×9 combinaciones de la etapa vigente: <span class="math display">\[
+(a_1^*,a_2^*) = \operatorname*{arg\,max}_{(a_1,a_2)\,\in\,\mathcal A_1^{\text{grid}}(m)\times\mathcal A_2^{\text{grid}}(m)} Q^{*}(V_{1,t,q},V_{2,t,q},m,a_1,a_2).
+\]</span></p></li>
+<li><p><strong>Balance hídrico</strong>, con el afluente de la <strong>misma</strong> quincena <span class="math inline">\(q\)</span> (corrección respecto de la versión previa, que usaba <span class="math inline">\(q+1\)</span>): <span class="math display">\[
+V_{i,t,q+1} = V_{i,t,q} + W_{i,t,q} - a_i^*, \qquad i=1,2.
+\]</span></p></li>
+<li><p><strong>Proyección física</strong>, incluyendo tanto el derrame como el déficit (la versión previa omitía el déficit): <span class="math display">\[
+V_i^{\text{new}} = \operatorname{proj}_{[0,V_{i,\max}]}(V_{i,t,q+1}), \qquad
+\text{derrame}_i = (V_{i,t,q+1}-V_{i,\max})^+, \qquad
+\text{déficit}_i = (-V_{i,t,q+1})^+.
+\]</span></p></li>
+<li><p><strong>Cálculo energético</strong>, con la carga continua y las cargas máximas distintas por presa (corrección de <a href="#eq-altura" class="quarto-xref">Ecuación&nbsp;<span>3.14</span></a>): <span class="math display">\[
+H_i = H_{i,\max}\cdot\frac{V_{i,t,q}+V_i^{\text{new}}}{2\,V_{i,\max}}, \qquad
+E_i = \frac{\eta g\, H_i\,(a_i^*\times10^6)}{3600\times10^6}.
+\]</span></p></li>
+<li><p><strong>Registro y actualización:</strong> se almacenan energía, derrame, déficit y almacenamiento; el estado se actualiza a <span class="math inline">\(V_i^{\text{new}}\)</span> para la siguiente quincena.</p></li>
+</ol>
+</div>
+<section id="sec-metricas" class="level3" data-number="3.4.1">
+<h3 data-number="3.4.1" class="anchored" data-anchor-id="sec-metricas"><span class="header-section-number">3.4.1</span> Métricas de desempeño y validación estadística</h3>
+<div style="text-align: justify">
+<div class="callout callout-style-default callout-warning callout-titled" title="Cifras pendientes de regenerar">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Advertencia</span>Cifras pendientes de regenerar
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Las tablas siguientes (<a href="#tbl-desempeno-energetico" class="quarto-xref">Tabla&nbsp;<span>3.3</span></a>, <a href="#tbl-desempeno-hidrico" class="quarto-xref">Tabla&nbsp;<span>3.4</span></a>) y la conclusión que las acompañaba en la versión previa reportan un derrame total del sistema de <span class="math inline">\(\approx 34{,}053\)</span> Mm³ y una lectura crítica sobre la mala gestión de la política. Esta cifra <strong>es incompatible con la propia validación documentada en el encabezado del script corregido</strong>, que reporta “0 Mm³ de derrame y 0 Mm³ de déficit en ambas presas” al ejecutar exactamente el algoritmo aquí descrito. Es decir, las cifras de la versión previa corresponden, con alta probabilidad, a una ejecución de una versión anterior y no fiel del modelo (la que originó la auditoría documentada en el encabezado de <code>FQI_corregido.py</code>), no a la versión actual. No se sustituyen aquí por cifras nuevas para no fabricar resultados: se recomienda <strong>volver a ejecutar el script corregido sobre los datos reales</strong> y regenerar ambas tablas, así como reescribir el párrafo de interpretación en función de los resultados que se obtengan.</p>
+</div>
+</div>
+<div id="tbl-desempeno-energetico" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-desempeno-energetico-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla&nbsp;3.3: Resumen del desempeño energético del sistema bajo la política óptima aprendida mediante FQI (plantilla; valores por regenerar con <code>simulacion_FQI_corregida.csv</code>).
+</figcaption>
+<div aria-describedby="tbl-desempeno-energetico-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Métrica</th>
+<th>Angostura</th>
+<th>Malpaso</th>
+<th>Sistema Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Energía promedio quincenal [GWh]</td>
+<td><em>(pendiente)</em></td>
+<td><em>(pendiente)</em></td>
+<td><em>(pendiente)</em></td>
+</tr>
+<tr class="even">
+<td>Energía anual estimada [GWh]</td>
+<td><em>(pendiente)</em></td>
+<td><em>(pendiente)</em></td>
+<td><em>(pendiente)</em></td>
+</tr>
+<tr class="odd">
+<td>Contribución al sistema [%]</td>
+<td><em>(pendiente)</em></td>
+<td><em>(pendiente)</em></td>
+<td>100.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div id="tbl-desempeno-hidrico" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-desempeno-hidrico-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla&nbsp;3.4: Resumen del desempeño hídrico del sistema bajo la política óptima aprendida mediante FQI (plantilla; valores por regenerar).
+</figcaption>
+<div aria-describedby="tbl-desempeno-hidrico-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Métrica</th>
+<th>Angostura</th>
+<th>Malpaso</th>
+<th>Sistema Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Derrame total [Mm³]</td>
+<td><em>(pendiente)</em></td>
+<td><em>(pendiente)</em></td>
+<td><em>(pendiente)</em></td>
+</tr>
+<tr class="even">
+<td>Déficit total [Mm³]</td>
+<td><em>(pendiente)</em></td>
+<td><em>(pendiente)</em></td>
+<td><em>(pendiente)</em></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Una vez regeneradas las tablas a partir de una corrida real del script, la interpretación debe contrastar específicamente los totales de derrame y déficit contra la validación reportada en el propio código (0 Mm³ en ambos rubros) antes de emitir un juicio sobre la calidad de la política aprendida; de mantenerse una discrepancia con lo documentado en el script, ésta debería investigarse como posible diferencia entre el entorno de ejecución (datos, semilla aleatoria, versión de librerías) y no asumirse automáticamente como una falla de la política.</p>
+</div>
+</section>
+</section>
+<section id="conclusiones-del-capítulo" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="conclusiones-del-capítulo"><span class="header-section-number">3.5</span> Conclusiones del capítulo</h2>
+<div style="text-align: justify">
+<ul>
+<li>Síntesis de contribuciones matemáticas y numéricas.</li>
+<li>Reafirmación de la coherencia entre formulación teórica, implementación algorítmica y validación operativa —pendiente de completar una vez regeneradas las métricas de la Sec. <a href="#sec-metricas" class="quarto-xref"><span>Sección 3.4.1</span></a>—.</li>
+<li>Declaración de cierre alineada con los objetivos de la tesis.</li>
+</ul>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-Bertsekas2019" class="csl-entry" role="listitem">
+Bertsekas, Dimitri P. 2019. <em>Reinforcement Learning and Optimal Control</em>. Athena Scientific.
+</div>
+<div id="ref-Castelletti2010" class="csl-entry" role="listitem">
+Castelletti, A., S. Galelli, M. Restelli, y R. Soncini-Sessa. 2010. <span>«Tree-based reinforcement learning for optimal water reservoir operation»</span>. <em>Water Resources Research</em> 46: W09507. <a href="https://doi.org/10.1029/2009WR008898">https://doi.org/10.1029/2009WR008898</a>.
+</div>
+<div id="ref-Ernst2005" class="csl-entry" role="listitem">
+Ernst, Damien, Pierre Geurts, y Louis Wehenkel. 2005. <span>«Tree-Based Batch Mode Reinforcement Learning»</span>. <em>Journal of Machine Learning Research</em> 6: 503-56. <a href="http://www.jmlr.org/papers/volume6/ernst05a/ernst05a.pdf">http://www.jmlr.org/papers/volume6/ernst05a/ernst05a.pdf</a>.
+</div>
+<div id="ref-puterman1994markov" class="csl-entry" role="listitem">
+Puterman, Martin L. 1994. <em>Markov Decision Processes: Discrete Stochastic Dynamic Programming</em>. Wiley Series en Probability y Statistics. John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9780470316887">https://doi.org/10.1002/9780470316887</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./Fundamentos_Hidraulicos.html" class="pagination-link" aria-label="Fundamentos Hidráulicos">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Fundamentos Hidráulicos</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./conclusiones.html" class="pagination-link" aria-label="conclusiones.html">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">conclusiones.html</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
