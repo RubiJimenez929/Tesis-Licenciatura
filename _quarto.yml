@@ -52,7 +52,7 @@ book:
       
     - part: "Modelo Matemático"
       chapters:
-        - Modelo_Matematico.qmd
+        - modelo_matematico_fqi_corregido.qmd
 
 
     - conclusiones.qmd
