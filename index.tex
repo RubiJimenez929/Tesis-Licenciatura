@@ -1,0 +1,1724 @@
+% Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  letterpaper,
+  DIV=11,
+  numbers=noendperiod]{scrreprt}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+
+\usepackage{longtable,booktabs,array}
+\newcounter{none} % for unnumbered tables
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+\ifLuaTeX
+  \usepackage{luacolor}
+  \usepackage[soul]{lua-ul}
+\else
+  \usepackage{soul}
+\fi
+
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+ 
+
+
+\KOMAoption{captions}{tableheading}
+\makeatletter
+\@ifpackageloaded{tcolorbox}{}{\usepackage[skins,breakable]{tcolorbox}}
+\@ifpackageloaded{fontawesome5}{}{\usepackage{fontawesome5}}
+\definecolor{quarto-callout-color}{HTML}{909090}
+\definecolor{quarto-callout-note-color}{HTML}{0758E5}
+\definecolor{quarto-callout-important-color}{HTML}{CC1914}
+\definecolor{quarto-callout-warning-color}{HTML}{EB9113}
+\definecolor{quarto-callout-tip-color}{HTML}{00A047}
+\definecolor{quarto-callout-caution-color}{HTML}{FC5300}
+\definecolor{quarto-callout-color-frame}{HTML}{acacac}
+\definecolor{quarto-callout-note-color-frame}{HTML}{4582ec}
+\definecolor{quarto-callout-important-color-frame}{HTML}{d9534f}
+\definecolor{quarto-callout-warning-color-frame}{HTML}{f0ad4e}
+\definecolor{quarto-callout-tip-color-frame}{HTML}{02b875}
+\definecolor{quarto-callout-caution-color-frame}{HTML}{fd7e14}
+\makeatother
+\makeatletter
+\@ifpackageloaded{bookmark}{}{\usepackage{bookmark}}
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[chapter]
+\theoremstyle{remark}
+\AtBeginDocument{\renewcommand*{\proofname}{Proof}}
+\newtheorem*{remark}{Remark}
+\newtheorem*{solution}{Solution}
+\newtheorem{refremark}{Remark}[chapter]
+\newtheorem{refsolution}{Solution}[chapter]
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Fitted Q-Iteration: Estimación de niveles de presas},
+  pdfauthor={Erika Rubí Jiménez Guzmán; Asesor: Dr.~Yofre Hernán García Gómez},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\title{Fitted Q-Iteration: Estimación de niveles de presas}
+\author{Erika Rubí Jiménez Guzmán \and Asesor: Dr.~Yofre Hernán García
+Gómez}
+\date{2026-09-25}
+\begin{document}
+\maketitle
+
+\renewcommand*\contentsname{Table of contents}
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+
+\bookmarksetup{startatroot}
+
+\chapter*{Resumen}\label{resumen}
+\addcontentsline{toc}{chapter}{Resumen}
+
+\markboth{Resumen}{Resumen}
+
+Aquí pondré un resumen de mi tesis, que se llama ``Fitted Q-Iteration:
+Estimación de niveles de presas''.
+
+\bookmarksetup{startatroot}
+
+\chapter*{Introduction}\label{introduction}
+\addcontentsline{toc}{chapter}{Introduction}
+
+\markboth{Introduction}{Introduction}
+
+Esta será la introducción.
+
+ejemplo de una cita Puterman (1994).
+
+\part{Preliminares}
+
+\chapter{Fundamentos Matemáticos}\label{fundamentos-matemuxe1ticos}
+
+\section{Inteligencia Artificial (IA)}\label{inteligencia-artificial-ia}
+
+La \textbf{Inteligencia Artificial (IA)} es un campo de estudio que se
+centra en la creación de sistemas capaces de realizar tareas que
+normalmente requieren inteligencia humana. La IA combina diversas
+disciplinas, incluyendo matemáticas, estadísticas, informática y
+neurociencia, para desarrollar algoritmos y modelos que permiten a las
+máquinas aprender, razonar y tomar decisiones de manera autónoma.
+
+Este campo está dividido en varias subáreas, cada una con su enfoque y
+aplicaciones específicas. Entre las más destacadas se encuentran el
+\textbf{Aprendizaje Automático (Machine Learning)}, \textbf{Aprendizaje
+Profundo (Deep Learning)}, \textbf{Procesamiento del Lenguaje Natural},
+\textbf{Visión por Computadora}, \textbf{Robótica}, entre otras. Cada
+una de estas subáreas utiliza diferentes técnicas y enfoques para
+abordar problemas complejos y mejorar la capacidad de las máquinas para
+interactuar con el mundo que las rodea.
+
+\subsection{Aprendizaje Automático}\label{aprendizaje-automuxe1tico}
+
+En este subcampo de la Inteligencia Artificial, las máquinas aprenden a
+partir de datos, similar a como lo hacemos nosotros, permitiendoles
+mejorar con la experiencia. El aprendizaje automático se basa en
+algoritmos que identifican patrones y relaciones en los datos, lo que
+permite a las máquinas hacer predicciones o tomar decisiones sin ser
+explícitamente programadas para cada tarea específica. Este enfoque ha
+revolucionado diversas industrias, desde la medicina hasta la economía,
+al proporcionar herramientas más eficientes y precisas para el análisis
+de datos y la toma de decisiones.
+
+El aprendizaje automático se clasifica en tres categorías principales:
+\textbf{Aprendizaje Supervisado}, \textbf{Aprendizaje No Supervisado} y
+\textbf{Aprendizaje por Refuerzo}, cada una con sus propias técnicas y
+aplicaciones. Estas categorías permiten abordar diferentes tipos de
+problemas y desafíos, desde la clasificación de datos hasta la
+optimización de estrategias en entornos dinámicos.
+
+\begin{definition}[Aprendizaje
+Supervisado]\protect\hypertarget{def-sub}{}\label{def-sub}
+
+Esta categoría se basa en utilizar conjuntos de datos etiquetados (datos
+de entrada con sus correspondientes salidas) para entrenar modelos
+matemáticos que puedan identificar patrones y a partir de ellos predecir
+resultados futuros sobre datos nuevos.
+
+Este tipo de aprendizaje es principalmente utilizado en:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\emph{Tareas de clasificación:}} los modelos predicen la clase
+  a las que pertenece cada dato. Por ejemplo, identificar si un correo
+  electrónico es spam o no.
+\item
+  \textbf{\emph{Regresión:}} predicen valores numéricos a partir de
+  datos de entrada. Por ejemplo, predecir el precio de una vivienda
+  basado en sus características.
+\end{itemize}
+
+\end{definition}
+
+\begin{definition}[Aprendizaje No
+Supervisado]\protect\hypertarget{def-sub}{}\label{def-sub}
+
+A diferencia del aprendizaje supervisado, en este tipo de aprendizaje no
+se utilizan datos etiquetados. En su lugar, los algoritmos buscan
+patrones ocultos o agrupaciones dentro de los datos. Estos modelos son
+utilizados para tareas especificas como:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\emph{Agrupamiento (Clustering):}} los modelos identifican
+  grupos de datos similares entre sí. Por ejemplo, segmentar clientes en
+  diferentes grupos según sus comportamientos de compra.
+\item
+  \textbf{\emph{Reducción de dimensionalidad:}} los modelos simplifican
+  los datos manteniendo la mayor cantidad de información posible. Por
+  ejemplo, reducir el número de variables en un conjunto de datos para
+  facilitar su análisis.
+\end{itemize}
+
+\end{definition}
+
+\begin{definition}[Aprendizaje por
+Refuerzo]\protect\hypertarget{def-sub}{}\label{def-sub}
+
+En este tipo de aprendizaje automático, los agentes autónomos aprenden a
+tomar decisiones a partir de la interección con un entorno en el cual
+reciben recompensas o penalizaciones según sus acciones. A continuación
+se presentan los conceptos fundamentales de este tipo de aprendizaje
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\emph{Agente:}} es el sistema que toma decisiones y aprende de
+  la experiencia.
+\item
+  \textbf{\emph{Entorno:}} en donde el agente opera y recibe
+  retroalimentación.
+\item
+  \textbf{\emph{Estado:}} Situación actual del agente en el entorno.
+\item
+  \textbf{\emph{Acción:}} Decisión que el agente toma en un estado
+  determinado.
+\item
+  \textbf{\emph{Recompensa:}} Retroalimentación que el agente recibe
+  después de realizar una acción, indicando si fue beneficiosa o no.
+\item
+  \textbf{\emph{Política:}} Estrategia que el agente sigue para decidir
+  qué acción tomar en cada estado.
+\end{itemize}
+
+El aprendizaje por refuerzo se centra esencialmente en la relación entre
+un agente, entorno y el objetivo (lo que se desea lograr). La literatura
+formula esta relación en términos de un \textbf{Proceso de Decisión de
+Markov (MDP)}.
+
+\end{definition}
+
+Véase IBM (2025) para más información sobre estos tipos de aprendizaje y
+sus aplicaciones.
+
+\subsubsection{Q-Learning}\label{q-learning}
+
+Existen distintos algoritmos de aprendizaje por refuerzo, entre los
+cuales se encuentra el \textbf{Q-Learning}, este permite a un agente
+aprender a tomar decisiones en un entorno para maximizar una recompensa
+acumulada a lo largo del tiempo. Este modelo es model-free, es decir, no
+requiere un modelo del entorno para aprender, sino que se basa en la
+experiencia directa del agente a través de la exploración y explotación
+de su entorno.
+
+\chapter{Fundamentos Hidráulicos}\label{fundamentos-hidruxe1ulicos}
+
+Algoritmo de aprendizaje por refuerzo\ldots{}
+
+\begin{definition}[Fitted
+Q-Iteration]\protect\hypertarget{def-sub}{}\label{def-sub}
+
+Algoritmo Offline (aprende analizando el historial de
+experiencias)\ldots{}
+
+\end{definition}
+
+\part{Modelo Matemático}
+
+\chapter{Modelo Matemático de Programación Dinámica Estocástica para
+Optimizar la Operación de un Sistema
+Hidroeléctrico.}\label{modelo-matemuxe1tico-de-programaciuxf3n-dinuxe1mica-estocuxe1stica-para-optimizar-la-operaciuxf3n-de-un-sistema-hidroeluxe9ctrico.}
+
+En este capítulo se presenta una formulación del problema de
+optimización de la operación de un sistema hidroeléctrico mediante un
+Proceso de Decisión de Markov (MDP), usando Programación Dinámica
+Estocástica (PDE) con el fin de obtener la política óptima de operación
+tomando en cuenta el concepto de curva guía. Lo anterior se propone tal
+y como lo describe Díaz (2010), quien aplica la PDE para optimizar la
+operación del sistema hidroeléctrico del río Grijalva. Se enfatiza la
+conexión entre los elementos matemáticos formales y su implementación
+numérica.
+
+\section{Datos históricos}\label{datos-histuxf3ricos}
+
+Sea \(T = 50\) los años históricos disponibles \((1959–2008)\),
+indexados por \(t \in \{0,\dots,T-1\}\). Cada uno de ellos se
+subdividieron en \(q = 24\) quincenas (correspondientes a las columnas
+de los datos históricos proporcionados por Díaz (2010)).
+
+El sistema está compuesto por dos presas:
+\href{https://maps.app.goo.gl/NHNQdHdfYAoRGxhPA}{La Angostura}
+\((i = 1)\) y \href{https://maps.app.goo.gl/acX7hVXswX5uYYUBA}{Malpaso}
+\((i =2)\). El volumen de almacenamiento de cada una de ellas en la
+quincena \(q\) del año \(t\) se representará por
+\(V_{i,t,q} \in \mathbb{R}_{+} \cup \{0\}\) (Millones de metros
+cúbicos-\(Mm^3\)).
+
+\section{Formulación del Proceso de Decisión de Markov
+(MDP)}\label{formulaciuxf3n-del-proceso-de-decisiuxf3n-de-markov-mdp}
+
+Conforme a Puterman (1994), se define el MDP como la colección de
+objetos \[\{(T, \mathcal{S}, \mathcal{A}, \mathbb{P}, \mathcal{R})\},\]
+donde cada componente se describe a continuación.
+
+\subsection{Estructura temporal: quincenas y etapas
+hidrológicas}\label{estructura-temporal-quincenas-y-etapas-hidroluxf3gicas}
+
+Para reducir la dimensionalidad temporal del problema y poder capturar
+la estacionalidad, las \(24\) quincenas se agrupan en \(M = 6\) etapas
+hidrológicas (segmentación temporal del año) mediante la siguiente
+función de agregación \(\mu: \{0,\dots,q-1\} \to \{0,\dots,M-1\}\)
+definida por
+\begin{equation}\protect\phantomsection\label{eq-etapas}{\mu(q) = \begin{cases} 0, & 0 \leq q <10 & \text{Ene-Mayo}\\ 1, & 10 \leq q <14 & \text{Jun-Jul}\\ 2, & 14 \leq q < 16 & \text{Agosto}\\ 3, & 16 \leq q < 18 & \text{Septiembre}\\ 4, & 18 \leq q < 20 & \text{Octubre}\\ 5, & 20 \leq q \leq 23 & \text{Nov-Dic}\\ \end{cases}}\end{equation}
+así, la variable \(m = \mu(q)\) representará la etapa hidrológica
+correspondiente a la quincena \(q\).
+
+\subsection{\texorpdfstring{Espacio de estados y operador de
+discretización
+\((\mathcal{S})\)}{Espacio de estados y operador de discretización (\textbackslash mathcal\{S\})}}\label{espacio-de-estados-y-operador-de-discretizaciuxf3n-mathcals}
+
+Se introduce un operador de discretización uniforme \(\mathcal{D}\) del
+espacio de estados \(\mathcal{S}\) mediante el parámetro
+\(\Delta = 600\) \(Mm^3\) (paso de discretización). Dicha unidad permite
+discretizar el volumen almacenado y la afluencia agregada por etapa, así
+como también, subdividir la capacidad de almacenamiento de cada presa en
+un número manejable de estados. Para un volumen continuo \(V_{i,t,q},\)
+se define el operador de discretización
+\(\mathcal{D}: \mathbb{R} \times \mathbb{N} \longrightarrow \{0,\dots,N-1\}\)
+dado por
+\begin{equation}\protect\phantomsection\label{eq-discretizacion}{s_i = \mathcal{D}(V_{i,t,q}, N_i) := \min \left(\max\left(\left\lfloor \frac{V_{i,t,q}}{\Delta} + \frac{1}{2}\right\rfloor, 0\right), N_i-1\right),}\end{equation}
+donde \(N_1 = 27\) y \(N_2 = 16\) son las capacidades discretas máximas
+de cada presa. El volumen máximo representado en rejilla discreta es
+\begin{equation}\protect\phantomsection\label{eq-volumen-maximo}{V_{i,\max} = N_i \Delta,}\end{equation}
+\(16,200\) \(Mm^3\) para Angostura y \(9,600\) \(Mm^3\) para Malpaso.
+
+Así, el espacio de estados se define como
+\[\mathcal{S} = \mathcal{S}_1 \times \mathcal{S}_2 \times \{0,...,5\} = \{s = (s_1,s_2,m)\},\]
+en donde \((s_1,s_2,m)\) representa el volumen discretizado de
+Angostura, el volumen discretizado de Malpaso y la etapa hidrológica
+correspondiente a la quincena \(q\).
+
+\subsection{\texorpdfstring{Espacio de acciones
+\((\mathcal{A})\)}{Espacio de acciones (\textbackslash mathcal\{A\})}}\label{espacio-de-acciones-mathcala}
+
+Para cada etapa \(m\), se define una unidad de extracción de agua
+\(u_m = \{100, 200, 300, 300, 400, 250\}\), así la decisión de operación
+en la etapa \(m\) corresponderá a los niveles de turbinado \(k_1, k_2\).
+Cada nivel de turbinado se multiplica por la unidad de extracción
+\(u_m\), la cual está en \(Mm^3,\) para obtener el volumen de agua
+extraído en cada presa. Por lo tanto, el espacio de acciones se define
+como \[\mathcal{A}_m = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m},\]
+donde \(\mathcal{K}_{1,m} = \mathcal{K}_{2,m}\) representan el conjunto
+de niveles de turbinado disponibles para ambas presas en la etapa
+hidrológica \(m\). En la práctica, tanto la Angostura como Malpaso
+tienen el mismo conjunto de niveles de turbinado y mismas unidades de
+extracción por etapa.
+
+Una acción denotada por \(a = (k_1, k_2)\), produce el volumen real
+turbinado \(k_i\cdot u_m\) aplicado simultaneamente en ambas presas. Por
+ejemplo, suponga que \(m = 0\) entonces
+\[u_0 = 100 \quad \text{y} \quad \mathcal{K}_{1,0}, \mathcal{K}_{2,0} = \{0,1,...,20\},\]
+y así \(a = (3,5)\) significaría que Angostura turbina
+\(3\times 100 = 300\) \(Mm^3\) de agua y Malpaso turbina
+\(5\times 100 = 500\) \(Mm^3\) de agua. Cabe mencionar que Los valores
+de \(u_m\) y \(\mathcal{K}_{i,m}\) se seleccionaron para que el
+turbinado máximo por etapa hidrológica \(k_{i} \cdot u_m\) no exceda la
+capacidad instalada de las plantas ni los caudales históricos máximos
+registrados, garantizando la factibilidad física de todas las acciones
+evaluadas.
+
+\subsection{\texorpdfstring{Dinámica de transición
+\((\mathbb{P})\)}{Dinámica de transición (\textbackslash mathbb\{P\})}}\label{dinuxe1mica-de-transiciuxf3n-mathbbp}
+
+La ecuación de transición continua tras la operación del sistema se
+define por
+\begin{equation}\protect\phantomsection\label{eq-transicion}{V_{i,t,q+1} = V_{i,t,q} + W_{i, t, q+1}-k_iu_m, \quad q<23}\end{equation}
+donde \(V_{i,t,q}\) representa el volumen almacenado en la presa \(i\)
+antes de tomar la acción de turbinado, \(W_{i, t,q+1}\) representa el
+afluente neto (caudal de ingreso) para la presa \(i\) en la quincena
+\(q+1\) del año \(t\), tales valores serán obtenidos de los datos
+históricos con los que ya se cuentan. Por último \(k_iu_m\),
+\(k_i \in \mathcal{K}_{i,m},\) representa el volumen de agua extraído
+por la acción de turbinado aplicada en la etapa hidrológica
+correspondiente a la quincena \(q\).
+
+Cuando \(q=23\), la transición se define por
+\begin{equation}\protect\phantomsection\label{eq-transicion23}{V_{i,t+1,0} = V_{i,t,23} + W_{i, t+1, 0}-k_iu_m.}\end{equation}
+
+En ambos casos, el volumen discretizado de la quincena \(q+1\) se
+obtiene aplicando el operador de discretización \(\mathcal{D}\) al
+volumen resultante, es decir, \[s_i' = \mathcal{D}(V_{i,t,q+1}, N_i),\]
+mientras que la etapa hidrológica evoluciona mediante
+\(m' = (m+1) \mod M\).
+
+Por lo tanto, el estado discreto siguiente está dado por
+\[s' = (s_1', s_2', m').\]
+
+Desde el punto de vista de Puterman (1994), la transición de MDP se
+define mediante una función de probabilidad condicional
+\begin{equation}\protect\phantomsection\label{eq-transicion}{\mathbb{P}(s'|s,a),}\end{equation}
+la cual especifica la probabilidad de transicionar al estado \(s'\) dado
+que se tomó la acción \(a\) en el estado \(s\).
+
+\subsection{\texorpdfstring{Función de recompensa
+\((\mathcal{R})\)}{Función de recompensa (\textbackslash mathcal\{R\})}}\label{funciuxf3n-de-recompensa-mathcalr}
+
+\subsubsection{Modelo hidráulico-energético
+linealizado}\label{modelo-hidruxe1ulico-energuxe9tico-linealizado}
+
+La energía generada depende del volumen de agua turbinado y una
+aproximación lineal de la altura hidraúlica. Para cada presa \(i\), se
+define la función de altura
+\begin{equation}\protect\phantomsection\label{eq-altura}{H_i (s_i,s'_i) =\frac{20(s_i + s_i'+2)}{2} =10 (s_i + s_i'+2).}\end{equation}
+Tal expresión corresponde a un modelo lineal basado en estados
+discretizados, el término \(+2\) se introdujo para evitar alturas nulas
+en estados con bajo volumen y el término \(20\) como intercepto que
+representa la altura hidráulica mínima mientras que como pendiente
+representa cuántos metros de altura se ganan por cada incremento en el
+estado discretizado, es decir, la ganancia por cada incremento de
+\(\Delta\) en el volumen de agua almacenado.
+
+Sea \(\eta = 0.9\) eficiencia de conversión hidráulica a eléctrica, y
+\(g = 9.81\) \(m/s^2\) aceleración de la gravedad, entonces la energía
+generada por la presa \(i\) al tomar la acción \(a\) en el estado \(s\)
+y transicionar a \(s'\) se define por
+\begin{equation}\protect\phantomsection\label{eq-energia}{E_i(s,a,s') = \frac{\eta g  H_i(s_i,s'_i) (k_iu_m\times 10^6)}{3600\times 10^6},}\end{equation}
+donde \(10^6\) representa la conversión de \(Mm^3\) a \(m^3\) y
+\(3600\times 10^6\) la conversión de \(kWh\) a \(GWh\).
+
+Por lo tanto la energía total generada por el sistema es
+\begin{equation}\protect\phantomsection\label{eq-energia-total}{E = E_1+E_2.}\end{equation}
+
+\subsubsection{Estructura de
+penalizaciones}\label{estructura-de-penalizaciones}
+
+La recompensa incorpora penalizaciones para garantizar el cumplimiento
+de restricciones operativas. Se definen las siguientes penalizaciones:
+
+\begin{itemize}
+\item
+  Penalización por derrame: si \(V_{i,t,q+1} > N_i \Delta\) se aplica
+  \begin{equation}\protect\phantomsection\label{eq-penalizacion-derrame}{\Pi_{derr} = C_{derr}\cdot\left(\frac{V_{i,t,q+1}-N_i \Delta}{\Delta}\right)}\end{equation}
+\item
+  Penalización por déficit de agua: si \(V_{i,t,q+1} < 0\) se aplica
+  \begin{equation}\protect\phantomsection\label{eq-penalizacion-deficit}{\Pi_{def} = C_{def}}\end{equation}
+\item
+  Penalización por violación de curva guía: si \(s_i' < \text{CG}_i(m)\)
+  se aplica
+  \begin{equation}\protect\phantomsection\label{eq-penalizacion-curva-guia}{\Pi_{CG} = C_{CG}\cdot(s_i'- \text{CG}_i(m))}\end{equation}
+\item
+  Penalización por niveles críticos (casi desbordamiento): si
+  \(s_i' \geq N_i-1\) se aplica
+  \begin{equation}\protect\phantomsection\label{eq-penalizacion-niveles-criticos}{\Pi_{crit} = C_{crit}}\end{equation}
+\end{itemize}
+
+donde \(C_{derr}, C_{def}, C_{CG}, C_{crit}\) son constantes de
+penalización ajustadas empíricamente con valores
+\(10000, 10000, 5000, 20000\) respectivamente y \(\text{CG}_i(m)\)
+representa la curva guía para la presa \(i\) en la etapa \(m\).
+
+La función de recompensa total se define finalmente por
+\begin{equation}\protect\phantomsection\label{eq-recompensa}{\mathcal{R}(s,a,s') = E - \Pi_{derr} - \Pi_{def} - \Pi_{CG} - \Pi_{crit}.}\end{equation}
+
+En el presente trabajo no se modela una distribución analítica
+explícita, por lo que en la práctica se construye un dataset empírico
+basado en datos históricos. La dinámica se construye a partir de
+trayectorias históricas \[(s_t, a_t, r_t, s_{t+1}')\] en donde cada una
+de ellas representa una experiencia de transición observada en los datos
+históricos, siendo \(r_t\) el valor obtenido de la
+Equation~\ref{eq-recompensa}, representando la recompensa obtenida al
+tomar la acción \(a_t\) en el estado \(s_t\) y transicionar a
+\(s_{t+1}'\). Este enfoque se alinea con un esquema de
+\textbf{\emph{Batch Reinforcement Learning.}}
+
+\section{Ecuación de optimalidad de
+Bellman}\label{ecuaciuxf3n-de-optimalidad-de-bellman}
+
+Conforme a la teoría clásica de control estocástico, por ejemplo
+Puterman (1994), Teorema 6.2.3, en un MDP descontado existe una única
+función de valor de acción óptima
+\(V^*:\mathcal{S}\times\mathcal{A} \to \mathbb{R}\) que satisface la
+ecuación de optimalidad de Bellman cuando los conjuntos de estados y
+acciones son finitos:
+\begin{equation}\protect\phantomsection\label{eq-bellman}{V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \sum_{s'\in \mathcal{S}} P(s'|s,a) \max_{a' \in \mathcal{A}} V^*(s',a').}\end{equation}
+
+Dado que en lugar de una función de transición analítica se cuenta con
+un dataset empírico de trayectorias \((s_t, a_t, r_t, s_{t+1}'),\) para
+todo \(t,\) la ecuación de Bellman se reformula en su versión empírica
+como
+\begin{equation}\protect\phantomsection\label{eq-bellman-empirica}{V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \max_{a' \in \mathcal{A}} V^*(s',a'),}\end{equation}
+
+para más detalles consultar Ernst et al. (2005).
+
+\section{Aproximación numérica mediante Fitted Q-Iteration
+(FQI)}\label{aproximaciuxf3n-numuxe9rica-mediante-fitted-q-iteration-fqi}
+
+Si bien es sabido que la programación dinámica estocástica está afectada
+por la maldición de la dimensionalidad, Castelletti et al. (2010),
+mientras más variables de estado hayan, el requisito computacional crece
+exponencialmente, además de que se debe contar con un modelo de
+transición del sistema explícito, por ello el presente trabajo se basa
+en un enfoque de aproximación funcional mediante Fitted Q-Iteration
+(FQI), el cual es un algoritmo de aprendizaje por refuerzo que permite
+aproximar la función de valor de acción óptima \(V^*\) a partir de un
+conjunto de transiciones empíricas.
+
+\subsection{Iteración de Bellman
+empírica}\label{iteraciuxf3n-de-bellman-empuxedrica}
+
+Al principio, se supone una función de valor de acción inicial
+\(V^{(0)}\) (\(V^{(0)}(s,a) = 0\) para todo \((s,a)\)). Luego,
+sucesivamente se generan nuevas aproximaciones para cada iteración
+\(n\), actualizando la función de valor de acción mediante la ecuación
+de Bellman empírica. Para cada transición observada
+\((s_t, a_t, r_t, s_{t+1}')\) en el dataset, se define el
+\textbf{objetivo de Bellman} por
+\begin{equation}\protect\phantomsection\label{eq-objetivo-bellman}{y^{(n)} := r + \gamma \max_{a' \in \mathcal{A}} V^{(n-1)}(s',a'),}\end{equation}
+el cual representa una estimación del valor de acción óptimo asociado al
+par \((s,a)\) basada en la recompensa obtenida \(r\) y el valor de
+acción máximo en el estado siguiente \(s'\) según la función de valor de
+acción de la iteración anterior \(V^{(n-1)}\).
+
+\subsection{Aproximación funcional por regresión no paramétrica
+(ExtraTrees)}\label{aproximaciuxf3n-funcional-por-regresiuxf3n-no-paramuxe9trica-extratrees}
+
+Una vez calculados los objetivos de Bellman \(y^{(n)}\)
+Equation~\ref{eq-objetivo-bellman}, se ajusta una función de valor de
+acción \(V^{(n)}\) que aproxime la relación entre los pares \((s,a)\) y
+los valores objetivos \(y^{(n)}\), dicha función se obtiene resolviendo
+un problema de aprendizaje supervisado que se explicó en la sección
+(pendiente).
+
+El procedimiento se formula como un problema de regresión no
+paramétrica, en donde se busca encontrar una función \(V^{(n)}\) que
+minimice el error entre las predicciones \(V^{(n)}(s,a)\) y los
+objetivos \(y^{(n)}\) para todas las transiciones
+\((s_t, a_t, r_t, s_{t+1}')\) en el dataset. En la práctica, se utiliza
+el algoritmo de \emph{ExtraTrees}, que como propone Ernst et al. (2005),
+el cual argumenta que ofrece gran flexibilidad para aproximar funciones
+de valor en espacios continuos o de alta dimensionalidad.
+
+La modelación mediante ExtraTrees compuesto por \(300\) árboles de
+decisión, con una profundidad máxima de \(14\) y un mínimo de \(5\)
+muestras por hoja. Cada árbol de decisión particiona el espacio
+estado-acción en regiones homogéneas, (grupo de \((s,a)\) similares) y
+proporciona una estimación local de la función de valor. La predicción
+final corresponde al promedio de las predicciones individuales de todos
+los árboles de decisión.
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{Imagenes/arbol-decision.png}
+
+}
+
+\caption{\label{fig-arbol}Árbol de decisión con profundidad máxima de 14
+y un mínimo de 5 muestras por hoja.}
+
+\end{figure}%
+
+El algoritmo de FQI se repite iterativamente hasta que la función de
+valor de acción converge. En la práctica se definió una métrica de
+convergencia empírica por
+\begin{equation}\protect\phantomsection\label{eq-convergencia}{\Delta = \frac{1}{L}\sum_{l=1}^L |V^{(n)}(s_l,a_l) - V^{(n-1)}(s_l,a_l)|,}\end{equation}
+la cual se define sobre
+\(\mathcal{T} \subset \{(s_t, a_t, r_t, s_{t+1}')\}\) siendo \(L\) la
+cardinalidad de \(\mathcal{T}\).
+
+Por lo que el algoritmo se detiene hasta que el \(\Delta < \epsilon\),
+es decir, cuando el cambio entre \(V^{(n)}\) y \(V^{(n-1)}\) sea menor a
+un umbral predefinido o bien cuando se alcance un número máximo de
+iteraciones.
+
+\section{Política óptima y simulación
+operativa}\label{poluxedtica-uxf3ptima-y-simulaciuxf3n-operativa}
+
+Una vez obtenida la función de valor de acción óptima \(V^*,\) se deriva
+la política óptima \(\pi^*:\mathcal{S} \to \mathcal{A}\) que asigna a
+cada estado \(s\) la acción \(a\) que maximiza el valor de acción
+\begin{equation}\protect\phantomsection\label{eq-politica-optima}{\pi^*(s) := \arg\max_{a \in \mathcal{A}} V^*(s,a),}\end{equation}
+
+es decir, para cada estado \(s\), la política óptima \(\pi^*(s)\) indica
+la acción que se debe tomar para maximizar el valor de acción estimado.
+
+Finalmente, se valida la política óptima \(\pi^*\) mediante simulación
+en lazo cerrado, es decir, se simula la operación del sistema
+hidroeléctrico utilizando la política \(\pi^*\) para tomar decisiones de
+turbinado en cada estado observado durante las trayectorias históricas.
+
+La evaluación de la política se realiza mediante un recorrido
+determinista sobre la serie histórica completa. El algoritmo opera de la
+siguiente manera:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Inicialización:} Se fijan los volúmenes iniciales \(V_{1,0}\)
+  y \(V_{2,0}\).
+\item
+  \textbf{Mapeo estacional:} Para cada quincena \(q\), se determina
+  \(m = \mu(q)\) y la unidad de extracción \(u_m\).
+\item
+  \textbf{Discretización:}
+
+  \[
+  s_i = \mathcal{D}(V_i,N_i),
+  \quad i\in\{1,2\}.
+  \]
+\item
+  \textbf{Selección de acción:}
+
+  \[
+  (k_1^*,k_2^*)
+  =
+  \arg\max_{k_1,k_2}\hat{V}^{*}(s,a),
+  \]
+
+  donde
+
+  \[
+  (s,a)=(s_1,s_2,m,k_1,k_2).
+  \]
+\item
+  \textbf{Balance hídrico:}
+
+  \[
+  V_{i,t,q+1}
+  =
+  V_{i,t,q}
+  +
+  W_{i,t,q+1}
+  -
+  k_i^*u_m.
+  \]
+\item
+  \textbf{Proyección física:}
+
+  \[
+  V_i^{\text{new}}
+  =
+  \min\{V_{i,t,q+1},N_i\Delta V\},
+  \]
+
+  \[
+  \text{derrame}_i
+  =
+  \max\{0,V_{i,t,q+1}-N_i\Delta V\}.
+  \]
+\item
+  \textbf{Cálculo energético:}
+
+  \[
+  H_i
+  =
+  10\left(s_i+\mathcal{D}(V_{i,t,q+1},N_i)+2\right),
+  \]
+
+  \[
+  E_i(s,a,s')
+  =
+  \frac{\eta g H_i(s_i,s'_i)\left(k_i^*u_m\times10^6\right)}
+       {3600\times10^6}.
+  \]
+\item
+  \textbf{Registro y actualización:} Se almacenan métricas de energía,
+  derrames y volúmenes, y se actualiza el estado para la siguiente
+  iteración.
+\end{enumerate}
+
+La metodología sigue la práctica estándar en aprendizaje por refuerzo
+aplicado a sistemas de control documentado en Bertsekas (2019), en el
+cual la política aprendida se valida mediante una simulación en lazo
+cerrado sobre trayectorias históricas.
+
+\subsection{Métricas de desempeño y validación
+estadística}\label{muxe9tricas-de-desempeuxf1o-y-validaciuxf3n-estaduxedstica}
+
+Una vez obtenidos los resultados de la simulación en lazo cerrado, se
+evalúa el desempeño de la política óptima \(\pi^*\) utilizando métricas
+clave como las siguientes:
+
+\begin{longtable}[]{@{}llll@{}}
+\caption{Resumen del desempeño energético del sistema bajo la política
+óptima aprendida mediante FQI. Los valores corresponden al promedio
+sobre el periodo de simulación
+1959--2008.}\label{tbl-desempeno-energetico}\tabularnewline
+\toprule\noalign{}
+Métrica & Angostura & Malpaso & Sistema Total \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Métrica & Angostura & Malpaso & Sistema Total \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Energía promedio quincenal {[}GWh{]} & 242.85 & 139.92 & 382.78 \\
+Energía anual estimada {[}GWh{]} & 4,857 & 2,798 & 7,656 \\
+Contribución al sistema {[}\%{]} & 63.4 & 36.6 & 100.0 \\
+\end{longtable}
+
+Por otro lado, los derrames promedio quincenales y anuales se presentan
+en la siguiente tabla:
+
+\begin{longtable}[]{@{}llll@{}}
+\caption{Resumen del desempeño hídrico del sistema bajo la política
+óptima aprendida mediante FQI. Los valores corresponden al promedio
+sobre el periodo de simulación
+1959--2008.}\label{tbl-desempeno-hidrico}\tabularnewline
+\toprule\noalign{}
+Métrica & Angostura & Malpaso & Sistema Total \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Métrica & Angostura & Malpaso & Sistema Total \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Derrame total {[}Mm\^{}3{]} & 7,722.10 & 26,330.80 & 34,052.90 \\
+Derrame promedio Anual {[}Mm\^{}3{]} & 154.44 & 526.62 & 681.06 \\
+\end{longtable}
+
+De acuerdo con los resultados obtenidos y con la información obtenida de
+Díaz (2010), se observa que la política no está gestionando
+adecuadamente los recursos hídricos, ya que el volumen de agua derramada
+es considerablemente alto, lo que sugiere que la política aprendida no
+está optimizando eficientemente el uso del agua disponible para
+generación energética. Además, la contribución energética de cada presa
+al sistema total no refleja un balance adecuado, lo que podría indicar
+que la política está favoreciendo excesivamente una presa sobre la otra,
+lo que no es deseable desde el punto de vista de la gestión integrada
+del sistema hidroeléctrico. Estos resultados sugieren que la política
+óptima aprendida mediante FQI no está logrando un equilibrio adecuado
+entre la generación de energía y la gestión eficiente del recurso
+hídrico, lo que podría requerir una revisión de la formulación del
+problema, la función de recompensa o la metodología de aprendizaje
+utilizada para mejorar el desempeño del sistema en términos de ambos
+objetivos.
+
+\section{Conclusiones del capítulo}\label{conclusiones-del-capuxedtulo}
+
+\begin{itemize}
+\tightlist
+\item
+  Síntesis de contribuciones matemáticas y numéricas.
+\item
+  Reafirmación de la coherencia entre formulación teórica,
+  implementación algorítmica y validación operativa.
+\item
+  Declaración de cierre alineada con los objetivos de la tesis.
+\end{itemize}
+
+\chapter{Modelo Matemático Fitted Q-Iteration para Optimizar la
+Operación de un Sistema
+Hidroeléctrico.}\label{modelo-matemuxe1tico-fitted-q-iteration-para-optimizar-la-operaciuxf3n-de-un-sistema-hidroeluxe9ctrico.}
+
+El objetivo de este capítulo es presentar una formulación rigurosa del
+problema de optimización de la operación de un sistema hidroeléctrico
+como un Proceso de Decisión de Markov (MDP), junto con una descripción
+detallada del algoritmo de Fitted Q-Iteration (FQI) utilizado para
+aproximar la política óptima. Se enfatizará la conexión entre los
+elementos matemáticos formales y su implementación numérica, así como la
+validación operativa mediante simulación en lazo cerrado.
+
+\section{Formulación como Proceso de Decisión de Markov
+(MDP)}\label{formulaciuxf3n-como-proceso-de-decisiuxf3n-de-markov-mdp}
+
+Siguiendo la notación de Puterman (1994), se define el MDP como la
+colección de objetos
+\[\{(T, \mathcal{S}, \mathcal{A}, \mathbb{P}, \mathcal{R})\},\] donde
+cada componente se especifica a continuación.
+
+\subsection{\texorpdfstring{Estructura Temporal
+\((T)\)}{Estructura Temporal (T)}}\label{estructura-temporal-t}
+
+Se considera un horizonte temporal de operación compuesto por \(T = 50\)
+años históricos (periodo 1959--2008), en donde cada uno de ellos se
+divide en \(q = 24\) quincenas. Con el fin de reducir la dimensionalidad
+temporal y capturar la estacionalidad, las quincenas se agrupan en
+\(M = 6\) etapas hidrológicas mediante la función de agregación
+\(\mu: \{0,\dots,23\} \to \{0,\dots,5\}\) definida por
+\begin{equation}\protect\phantomsection\label{eq-etapas}{\mu(q) = \begin{cases} 0, & 0 \leq q <10\\ 1, & 10 \leq q <14\\ 2, & 14 \leq q < 16\\ 3, & 16 \leq q < 18\\ 4, & 18 \leq q < 20\\ 5, & 20 \leq q \leq 23\\ \end{cases}}\end{equation}
+de modo que \(m = \mu(q)\) es la etapa hidrológica correspondiente a la
+quincena \(q.\) Esta partición reproduce exactamente la agrupación
+implementada en el código (\texttt{etapas\_quinc}), verificada como
+correcta.
+
+\textbf{Dos resoluciones temporales distintas.} Es indispensable
+distinguir, desde ahora, dos usos diferentes de esta estructura
+temporal: (i) para \textbf{construir el conjunto de aprendizaje} del
+algoritmo de FQI (Section~\ref{sec-conjunto-aprendizaje}), la afluencia
+se agrega a nivel de \emph{etapa} (\(M=6\) decisiones por año) y no se
+recorre la serie quincena por quincena; (ii) para \textbf{desplegar y
+evaluar la política} ya aprendida (Section~\ref{sec-simulacion}), la
+decisión sí se reconsulta en cada una de las 24 quincenas del año,
+usando en cada una la afluencia real de esa quincena, aunque los
+parámetros vigentes (capacidad máxima, curva guía, grilla de acción)
+sean los de la etapa \(m=\mu(q)\) que la contiene.
+
+\subsection{\texorpdfstring{Espacio de estados
+\((\mathcal{S})\)}{Espacio de estados (\textbackslash mathcal\{S\})}}\label{sec-espacio-estados}
+
+El sistema está compuesto por dos presas:
+\href{https://maps.app.goo.gl/NHNQdHdfYAoRGxhPA}{La Angostura}
+\((i = 1)\) y \href{https://maps.app.goo.gl/acX7hVXswX5uYYUBA}{Malpaso}
+\((i =2)\). El volumen almacenado en la presa \(i\) en la quincena \(q\)
+del año \(t\) se representa por
+\(V_{i,t,q} \in \mathbb{R}_{+} \cup \{0\}\) (millones de metros cúbicos,
+Mm³).
+
+A diferencia del enfoque de Programación Dinámica Estocástica (PDE), en
+el que el almacenamiento se discretiza en celdas y el estado es un
+índice entero, \textbf{en FQI el almacenamiento se mantiene como
+variable continua}. El parámetro \(\Delta = 600\) Mm³ (el cual permite
+subdividir la capacidad de almacenamiento de cada presa) y los enteros
+\(N_1 = 27\), \(N_2 = 16\) (capacidades discretas máximas de cada presa)
+heredados de la discretización de la PDE precedente, no se usan aquí
+para discretizar el estado, sino únicamente para fijar las
+\textbf{capacidades máximas continuas} de cada presa,
+\begin{equation}\protect\phantomsection\label{eq-capacidad-maxima}{V_{1,\max} := N_1 \Delta = 16{,}200  \text{Mm}^3, \quad V_{2,\max} := N_2 \Delta = 9{,}600 \text{Mm}^3,}\end{equation}
+y para convertir a volumen la curva guía, definida originalmente en
+unidades de índice (Section~\ref{sec-recompensa}).
+
+El espacio de estados del MDP es entonces
+\begin{equation}\protect\phantomsection\label{eq-espacio-estados}{
+\begin{aligned}
+\mathcal{S}
+&= [0,V_{1,\max}]\times[0,V_{2,\max}]
+   \times\{0,\dots,5\} = \{s=(s_1,s_2,m)\},
+\end{aligned}
+}\end{equation} donde \[s_i\in[0,V_{i,\max}],\ i=1,2,\ 
+m\in\{0,\dots,5\}.\]
+
+\textbf{Grilla gruesa de referencia.} Aunque el estado en sí no se
+discretiza, tanto la construcción del conjunto de aprendizaje
+(Section~\ref{sec-conjunto-aprendizaje}) como la aproximación del
+operador de maximización (Section~\ref{sec-max-operador}) requieren
+evaluar funciones en un conjunto finito y manejable de puntos de
+almacenamiento. Se define para ello una grilla de referencia de
+\(N_s=9\) puntos equiespaciados por presa,
+\begin{equation}\protect\phantomsection\label{eq-grilla-estado}{
+\mathcal S_i^{\text{grid}} := \Big\{0,\ \tfrac{V_{i,\max}}{8},\ \tfrac{2V_{i,\max}}{8},\ \dots,\ V_{i,\max}\Big\}, \qquad i=1,2,
+}\end{equation} con paso \(V_{1,\max}/8=2{,}025\) Mm³ y
+\(V_{2,\max}/8=1{,}200\) Mm³ respectivamente. Esta grilla \textbf{no es
+una discretización del MDP}: es un dispositivo de muestreo y de cómputo;
+la política final se evalúa siempre en el valor continuo real del
+almacenamiento.
+
+\subsection{\texorpdfstring{Espacio de acciones
+\((\mathcal{A})\)}{Espacio de acciones (\textbackslash mathcal\{A\})}}\label{sec-espacio-acciones}
+
+Para cada etapa \(m\) se define una unidad de extracción de agua
+\(u_m = (100,200,300,300,400,250)\) Mm³, y un conjunto de índices
+factibles \(\mathcal K_{i,m}\) heredado de la grilla de decisión de la
+PDE: \[
+\begin{aligned}
+\mathcal{K}_{0} &= \{0,\dots,20\}, &
+\mathcal{K}_{1} &= \{0,\dots,15\}, &
+\mathcal{K}_{2} &= \{0,\dots,7\}, \\
+\mathcal{K}_{3} &= \{0,\dots,9\}, &
+\mathcal{K}_{4} &= \mathcal{K}_{5} = \{0,\dots,12\}.
+\end{aligned}
+\] (idéntico para ambas presas en cada etapa, es decir,
+\(\mathcal K_{1,m} = \mathcal K_{2,m} = \mathcal K_{m}\)). Estos índices
+\textbf{no enumeran directamente el conjunto de acciones factibles del
+FQI}: se usan únicamente para obtener la cota superior del turbinado
+factible en la etapa,
+\begin{equation}\protect\phantomsection\label{eq-accion-max}{
+A_{\max}(m) := u_m \cdot \max(\mathcal K_{m}).
+}\end{equation} Por ejemplo, para \(m=0\): \(u_0=100\),
+\(\max(\mathcal K_0)=20\), de modo que \(A_{\max}(0)=2{,}000\) Mm³ (así,
+un par de índices como \((k_1,k_2)=(3,5)\) de la PDE correspondería a
+turbinar \(300\) y \(500\) Mm³ respectivamente, dentro de la cota, pero
+el FQI no restringe la acción a estos múltiplos enteros de \(u_m\)).
+
+El \textbf{espacio de acciones factible} para el MDP continuo es el
+intervalo
+\begin{equation}\protect\phantomsection\label{eq-espacio-acciones}{
+\mathcal{A}_m := [0,A_{\max}(m)]\times[0,A_{\max}(m)] = \{a=(a_1,a_2)\}
+}\end{equation} con \(a_i\) el volumen turbinado en la presa \(i\),
+continuo. Al igual que con el estado, para fines de muestreo
+(Section~\ref{sec-conjunto-aprendizaje}) y de maximización aproximada
+(Section~\ref{sec-max-operador}) este intervalo se discretiza en una
+grilla gruesa de \(N_a=9\) puntos equiespaciados,
+\begin{equation}\protect\phantomsection\label{eq-grilla-accion}{
+\mathcal A_m^{\text{grid}} := \Big\{0,\ \tfrac{A_{\max}(m)}{8},\ \dots,\ A_{\max}(m)\Big\}, \qquad |\mathcal A_m^{\text{grid}}|=9.
+}\end{equation}
+
+\begin{longtable}[]{@{}llll@{}}
+\caption{Capacidad máxima de turbinado por etapa, calculada según
+Equation~\ref{eq-accion-max}.}\label{tbl-accion-max}\tabularnewline
+\toprule\noalign{}
+Etapa \(m\) & \(u_m\) (Mm³) & \(\max(\mathcal K_m)\) & \(A_{\max}(m)\)
+(Mm³) \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Etapa \(m\) & \(u_m\) (Mm³) & \(\max(\mathcal K_m)\) & \(A_{\max}(m)\)
+(Mm³) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 100 & 20 & 2,000 \\
+1 & 200 & 15 & 3,000 \\
+2 & 300 & 7 & 2,100 \\
+3 & 300 & 9 & 2,700 \\
+4 & 400 & 12 & 4,800 \\
+5 & 250 & 12 & 3,000 \\
+\end{longtable}
+
+Los valores de \(u_m\) y \(\mathcal K_{m}\) se seleccionaron, en el
+diseño original de la PDE, para que \(A_{\max}(m)\) no exceda la
+capacidad instalada de las plantas ni los caudales históricos máximos
+registrados; esa cota se conserva íntegramente en el modelo continuo de
+FQI.
+
+\subsection{\texorpdfstring{Dinámica de transición
+\((\mathbb{P})\)}{Dinámica de transición (\textbackslash mathbb\{P\})}}\label{dinuxe1mica-de-transiciuxf3n-mathbbp-1}
+
+\textbf{Balance de masa a nivel de etapa (usado para el conjunto de
+aprendizaje).} Para construir las transiciones de entrenamiento
+(Section~\ref{sec-conjunto-aprendizaje}), la afluencia se agrega a nivel
+de etapa: sea
+\begin{equation}\protect\phantomsection\label{eq-afluencia-etapa}{
+\xi_{i,t,m} := \sum_{q\,:\,\mu(q)=m} W_{i,t,q}
+}\end{equation} la afluencia histórica del año \(t\) agregada sobre las
+quincenas de la etapa \(m\) (para la presa \(i\)), donde \(W_{i,t,q}\)
+es el afluente neto observado en la quincena \(q\) del año \(t\) (dato
+histórico). El balance de masa teórico (sin restricción de capacidad) al
+aplicar la acción \(a_i\in\mathcal A_m^{\text{grid}}\) desde un estado
+de la grilla \(s_i\in\mathcal S_i^{\text{grid}}\) es
+\begin{equation}\protect\phantomsection\label{eq-transicion}{
+\tilde s_i := s_i + \xi_{i,t,m} - a_i, \qquad i=1,2.
+}\end{equation}
+
+\textbf{Balance de masa a nivel de quincena (usado en el despliegue de
+la política).} Al simular la política ya aprendida sobre la trayectoria
+histórica completa (Section~\ref{sec-simulacion}), la decisión se toma
+en cada quincena \(q\), usando el afluente histórico de esa
+\textbf{misma} quincena:
+\begin{equation}\protect\phantomsection\label{eq-transicion-quincenal}{
+V_{i,t,q+1} = V_{i,t,q} + W_{i,t,q} - a_i, \qquad q=0,\dots,22,
+}\end{equation} con manejo de frontera anual, si \(q=23\), entonces\\
+\begin{equation}\protect\phantomsection\label{eq-transicion23}{
+V_{i,t+1,0} = V_{i,t,23} + W_{i,t,23} - a_i.
+}\end{equation}
+
+En ambos casos \(a_i\) es el volumen turbinado decidido para la etapa
+\(m=\mu(q)\) vigente en esa quincena
+(Section~\ref{sec-espacio-acciones}); \(a_i\) no cambia de valor dentro
+de la misma quincena, pero sí puede cambiar de una quincena a otra
+dentro de la misma etapa, porque la política se reconsulta con el estado
+continuo corriente en cada quincena.
+
+\textbf{Proyección al conjunto factible.} En ambos regímenes, el volumen
+teórico \(\tilde s_i\) (o \(V_{i,t,q+1}\)) puede exceder \(V_{i,\max}\)
+o resultar negativo. El volumen físicamente realizable se obtiene
+proyectando sobre el intervalo factible,
+\begin{equation}\protect\phantomsection\label{eq-proyeccion}{
+s_i' := \operatorname{proj}_{[0,V_{i,\max}]}(\tilde s_i) = \min\big(\max(\tilde s_i,0),\,V_{i,\max}\big),
+}\end{equation} donde \(\operatorname{proj}_{[0,V_{i,\max}]}\) denota al
+operador que da el punto del intervalo \([0,V_{i,\max}]\) más cercano a
+\(\tilde s_i\), y las magnitudes de exceso y faltante se registran como
+derrame y déficit, respectivamente,
+\begin{equation}\protect\phantomsection\label{eq-derrame-deficit}{
+\text{derrame}_i := (\tilde s_i - V_{i,\max})^+, \qquad \text{déficit}_i := (-\tilde s_i)^+,
+}\end{equation} con \(x^+:=\max(x,0)\).
+
+La etapa evoluciona de manera determinista y cíclica,
+\(m'=(m+1)\bmod M\), y el estado siguiente es \(s'=(s_1',s_2',m')\).
+
+Desde el punto de vista de Puterman (1994), la dinámica del MDP se
+resume en el núcleo de transición \(\mathbb P(\cdot\,|\,s,a)\), que en
+este modelo \textbf{no se especifica en forma analítica cerrada}: toda
+la incertidumbre proviene de la afluencia histórica \(\xi_{i,t,m}\) (o
+\(W_{i,t,q}\)), tratada como una variable aleatoria cuya ley se aproxima
+por la distribución empírica de las \(T=50\) realizaciones históricas
+disponibles para cada etapa, no por una tabla de probabilidades de
+transición sobre estados discretos, puesto que \(\mathcal S\) es ahora
+un continuo.
+
+\subsection{\texorpdfstring{Función de recompensa
+\((\mathcal{R})\)}{Función de recompensa (\textbackslash mathcal\{R\})}}\label{sec-recompensa}
+
+\subsubsection{Modelo hidráulico-energético
+linealizado}\label{modelo-hidruxe1ulico-energuxe9tico-linealizado-1}
+
+La energía generada depende del volumen turbinado y de una aproximación
+lineal de la carga hidráulica. Para cada presa \(i\) se define la
+función de carga \textbf{continua}
+\begin{equation}\protect\phantomsection\label{eq-altura}{
+\begin{aligned}
+H_i(s_i,s_i')
+&= H_{i,\max}\cdot
+\frac{s_i+s_i'}{2\,V_{i,\max}}, \\[4pt]
+H_{1,\max} &= 120\ \text{m (Angostura)}, \qquad
+H_{2,\max} = 100\ \text{m (Malpaso)}.
+\end{aligned}
+}\end{equation} Es decir, la carga varía linealmente entre \(0\) m
+(presa vacía) y la carga máxima propia de cada presa cuando ésta alcanza
+su capacidad plena, y se aproxima la carga efectiva durante la
+etapa/quincena mediante el promedio de la carga al inicio (\(s_i\)) y al
+final (\(s_i'\)) del intervalo.
+
+Sea \(\eta = 0.9\) la eficiencia de conversión hidráulica-eléctrica y
+\(g = 9.81\) m/s² la aceleración de la gravedad. La energía generada por
+la presa \(i\) al turbinar \(a_i\) (Mm³) bajo la carga \(H_i(s_i,s_i')\)
+es \begin{equation}\protect\phantomsection\label{eq-energia}{
+E_i(s,a,s') = \frac{\eta\, g\, H_i(s_i,s_i')\,(a_i\times 10^6)}{3600\times 10^6} \quad [\text{GWh}],
+}\end{equation} donde \(10^6\) convierte Mm³ a m³ y \(3600\times10^6\)
+convierte julios-equivalentes a GWh (con la densidad del agua
+\(\rho=1000\) kg/m³ absorbida algebraicamente en la constante \(3600\)).
+La energía total generada por el sistema en la etapa/quincena es
+\begin{equation}\protect\phantomsection\label{eq-energia-total}{
+E = E_1+E_2.
+}\end{equation}
+
+\subsubsection{Estructura de
+penalizaciones}\label{estructura-de-penalizaciones-1}
+
+La recompensa incorpora penalizaciones lineales, con coeficientes
+calibrados para actuar como restricciones blandas de tipo \emph{big-M}
+(su magnitud domina ampliamente el valor energético del agua, ver
+ejemplo numérico más abajo). Se definen, por presa \(i\), las siguientes
+tres penalizaciones:
+
+\begin{itemize}
+\item
+  \textbf{Derrame} (excedente sobre la capacidad máxima):
+  \begin{equation}\protect\phantomsection\label{eq-penalizacion-derrame}{
+  \Pi_i^{\text{derr}} = c_{\text{derr}}\cdot(\tilde s_i - V_{i,\max})^+, \qquad c_{\text{derr}} := \frac{C_{\text{derr}}}{\Delta}.
+  }\end{equation}
+\item
+  \textbf{Déficit} (faltante respecto de un balance no negativo).
+  \emph{Proporcional a la magnitud del déficit, no una constante fija.}
+  \begin{equation}\protect\phantomsection\label{eq-penalizacion-deficit}{
+  \Pi_i^{\text{def}} = c_{\text{def}}\cdot(-\tilde s_i)^+, \qquad c_{\text{def}} := \frac{C_{\text{def}}}{\Delta}.
+  }\end{equation}
+\item
+  \textbf{Violación de la curva guía}. \emph{Se penaliza cuando el
+  almacenamiento proyectado \textbf{excede} la curva guía (un techo
+  operativo de resguardo).}
+  \begin{equation}\protect\phantomsection\label{eq-penalizacion-curva-guia}{
+  \Pi_i^{\text{CG}} = c_{\text{CG}}\cdot\big(s_i' - \text{CG}_i(m)\big)^+, \qquad c_{\text{CG}} := \frac{C_{\text{CG}}}{\Delta}.
+  }\end{equation}
+\end{itemize}
+
+con \(C_{\text{derr}}=C_{\text{def}}=10{,}000\),
+\(C_{\text{CG}}=5{,}000\), de modo que
+\(c_{\text{derr}}=c_{\text{def}}\approx16.67\) y
+\(c_{\text{CG}}\approx8.33\) por Mm³. A modo de referencia de escala:
+turbinar 1 Mm³ bajo una carga representativa de 100 m genera, por
+Equation~\ref{eq-energia}, apenas \(\approx0.245\) GWh ---es decir,
+\(c_{\text{derr}}\) es unas \(68\) veces mayor que el valor energético
+marginal del mismo volumen, confirmando su papel de penalización
+dominante y no de costo económico real.
+
+\(\text{CG}_i(m)\) es la curva guía de la presa \(i\) en la etapa \(m\),
+definida originalmente en unidades de índice,
+\(\text{CG}_1^{\text{idx}}=(25,22,24,25,26,27)\),
+\(\text{CG}_2^{\text{idx}}=(16,15,14,14,15,16)\), y convertida a volumen
+mediante
+\begin{equation}\protect\phantomsection\label{eq-curva-guia-vol}{
+\text{CG}_i(m) := \Delta\cdot \text{CG}_i^{\text{idx}}(m).
+}\end{equation}
+
+La función de recompensa total, sumada sobre ambas presas, es
+\begin{equation}\protect\phantomsection\label{eq-recompensa}{
+\mathcal{R}(s,a,s') = \sum_{i=1}^{2}\Big[E_i - \Pi_i^{\text{derr}} - \Pi_i^{\text{def}} - \Pi_i^{\text{CG}}\Big].
+}\end{equation}
+
+En el presente trabajo no se modela una distribución analítica explícita
+de la afluencia; en su lugar se construye un conjunto de aprendizaje
+empírico, descrito con precisión en la Sec.
+Section~\ref{sec-conjunto-aprendizaje} ---y que, como ahí se detalla,
+\textbf{no} consiste en recorrer trayectorias históricas de decisiones
+reales, sino en evaluar la dinámica y la recompensa sobre una malla
+exhaustiva de pares estado-acción contra la totalidad de las
+realizaciones históricas de afluencia. Este enfoque se alinea con un
+esquema de \textbf{\emph{Batch Reinforcement Learning}} ``parcialmente
+libre de modelo'' (Castelletti et al. (2010); Ernst et al. (2005)).
+
+\section{Ecuación de optimalidad de
+Bellman}\label{ecuaciuxf3n-de-optimalidad-de-bellman-1}
+
+Se adopta la notación \(Q^*\) para la función de valor óptima, por ser
+función del par estado-acción \((s,a)\) ---lo que la literatura de
+aprendizaje por refuerzo llama función de valor-acción--- y por
+consistencia con el nombre de la variable en el código (\texttt{Q}).
+
+Conforme a la teoría clásica de MDPs descontados (Puterman (1994),
+Teorema 6.2.3), existe una única función de valor-acción óptima \(Q^*\)
+que satisface la ecuación de optimalidad de Bellman. La razón intuitiva
+es el factor de descuento \(\gamma=0.95<1\): la influencia de una
+decisión de hoy sobre lo que ocurre dentro de, digamos, 50 etapas está
+multiplicada por \(\gamma^{50}\approx0.08\), y sigue decayendo
+geométricamente cuanto más lejos se mire hacia el futuro. Ese
+decaimiento garantiza que, sin importar con qué aproximación inicial se
+empiece ---incluso \(Q^{(0)}\equiv0\), como hace el algoritmo (Sec.
+Section~\ref{sec-conjunto-aprendizaje} y siguientes)---, al aplicar la
+ecuación de Bellman una y otra vez las sucesivas aproximaciones se
+acercan cada vez más entre sí, hasta converger a una única \(Q^*\). Esto
+es válido tanto si \(\mathcal S\) es finito (el caso clásico de
+Puterman) como si tiene una componente continua, como en este modelo
+(Sec. Section~\ref{sec-espacio-estados}). \emph{(Formalmente, esta
+propiedad se conoce como que el operador de Bellman es una contracción,
+y su justificación rigurosa se apoya en el teorema del punto fijo de
+Banach; no se desarrolla aquí por no ser el objeto central de este
+capítulo.)}
+
+Dado que la incertidumbre proviene de la afluencia histórica
+\(\xi=(\xi_1,\xi_2)\), cuya ley se aproxima por su distribución empírica
+\(\widehat P_m\) sobre las \(T=50\) realizaciones históricas de la etapa
+\(m\) (Sec. Section~\ref{sec-conjunto-aprendizaje}), la ecuación de
+optimalidad se escribe como una esperanza sobre dicha distribución
+empírica ---y no como una suma sobre un conjunto discreto de estados
+siguientes, formalismo que ya no aplica al ser \(\mathcal S\) un
+continuo---: \begin{equation}\protect\phantomsection\label{eq-bellman}{
+Q^{*}(s,a) = \mathbb{E}_{\xi\sim\widehat P_m}\Big[\,\mathcal R(s,a,s') + \gamma\max_{a'\in\mathcal A_{m'}} Q^{*}(s',a')\,\Big], \quad s' = f(s,a,\xi),
+}\end{equation} con \(f\) la función de transición y proyección de las
+ecuaciones Equation~\ref{eq-transicion}--Equation~\ref{eq-proyeccion}, y
+\(m'=(m+1)\bmod M\).
+
+Dado que no se dispone de \(\widehat P_m\) en forma cerrada sino de sus
+\(T\) realizaciones muestrales, el algoritmo de FQI (Sec. siguiente)
+trabaja con la versión \textbf{por muestra} de esta ecuación ---el
+objetivo empírico de Bellman, Equation~\ref{eq-objetivo-bellman}---,
+evaluada sobre cada una de las transiciones del conjunto de aprendizaje,
+y no con la esperanza poblacional (Equation~\ref{eq-bellman})
+directamente.
+
+\section{Aproximación numérica mediante Fitted Q-Iteration
+(FQI)}\label{aproximaciuxf3n-numuxe9rica-mediante-fitted-q-iteration-fqi-1}
+
+La Programación Dinámica Estocástica está afectada por la maldición de
+la dimensionalidad: el costo computacional crece exponencialmente con el
+número de variables de estado, y requiere además un modelo de transición
+explícito (Castelletti et al. (2010)). Por ello, el presente trabajo
+aproxima \(Q^*\) mediante Fitted Q-Iteration, un algoritmo de
+aprendizaje por refuerzo \emph{batch} que ajusta iterativamente un
+aproximador funcional supervisado a partir de un conjunto de
+transiciones muestreadas.
+
+\subsection{Conjunto de aprendizaje ``parcialmente libre de
+modelo''}\label{sec-conjunto-aprendizaje}
+
+Concretamente, el conjunto de aprendizaje
+\(\mathcal F=\{(x_j, r_j, s'_{1,j}, s'_{2,j}, m'_j)\}_{j=1}^N\) se
+construye enumerando el producto cartesiano de: la grilla de estado
+Equation~\ref{eq-grilla-estado}, la grilla de acción
+Equation~\ref{eq-grilla-accion}, las \(M=6\) etapas, y las \(T=50\)
+realizaciones históricas de afluencia por etapa
+Equation~\ref{eq-afluencia-etapa}. El vector de características de cada
+muestra es
+\begin{equation}\protect\phantomsection\label{eq-caracteristicas}{
+x_j = (s_{1,j}, s_{2,j}, m_j, a_{1,j}, a_{2,j}) \in \mathcal S_1^{\text{grid}}\times\mathcal S_2^{\text{grid}}\times\{0,\dots,5\}\times\mathcal A^{\text{grid}}_{m_j}\times\mathcal A^{\text{grid}}_{m_j},
+}\end{equation} y, para cada combinación de estado-acción-etapa, se
+generan \(T=50\) muestras ---una por cada año histórico \(t\)---
+aplicando Equation~\ref{eq-transicion}, Equation~\ref{eq-proyeccion} y
+Equation~\ref{eq-recompensa} con la afluencia real \(\Xi_{i,t,m_j}\) de
+ese año. El tamaño total del conjunto de aprendizaje es
+\begin{equation}\protect\phantomsection\label{eq-tamano-N}{
+N = M\times|\mathcal S_1^{\text{grid}}|\times|\mathcal S_2^{\text{grid}}|\times|\mathcal A_1^{\text{grid}}|\times|\mathcal A_2^{\text{grid}}|\times T = 6\times9\times9\times9\times9\times50 = 1{,}968{,}300.
+}\end{equation}
+
+Esta receta de muestreo ---barrer exhaustivamente estado y acción sobre
+una grilla, pero conservar \emph{todas} las realizaciones históricas de
+la perturbación en cada punto, sin colapsarlas a una tabla de
+probabilidades ni ajustarles una distribución paramétrica--- es la que
+Castelletti et al. (2010) denominan \textbf{``parcialmente libre de
+modelo''} (\emph{partial model-free}): la dinámica del balance de masa
+sí se modela analíticamente, pero la ley de la afluencia se deja no
+paramétrica.
+
+\subsection{Iteración de Bellman
+empírica}\label{iteraciuxf3n-de-bellman-empuxedrica-1}
+
+Se inicializa \(Q^{(0)}(s,a) \equiv 0\) para todo \((s,a)\). Para cada
+transición \((x_j,r_j,s'_{1,j},s'_{2,j},m'_j)\in\mathcal F\) del
+conjunto de aprendizaje, se define el \textbf{objetivo de Bellman} de la
+iteración \(n\) por
+\begin{equation}\protect\phantomsection\label{eq-objetivo-bellman}{
+y^{(n)}_j := r_j + \gamma \max_{a'\in\mathcal A_{m_j'}} Q^{(n-1)}(s'_{1,j},s'_{2,j},m_j',a'),
+}\end{equation} que estima el valor-acción óptimo de \(x_j\) combinando
+la recompensa observada \(r_j\) y el mejor valor alcanzable desde el
+estado siguiente, según la aproximación de la iteración anterior. El
+cómputo del máximo sobre \(a'\), dado que \((s'_{1,j},s'_{2,j})\) es en
+general un punto continuo que no coincide con la grilla
+Equation~\ref{eq-grilla-estado}, se describe en la Sec.
+Section~\ref{sec-max-operador}.
+
+\subsection{Aproximación del operador de maximización sobre estados
+continuos}\label{sec-max-operador}
+
+**Esta subsección resuelve un punto que el texto anterior dejaba
+implícito sin justificación: cómo evaluar \(\max_{a'}Q^{(n-1)}(s',a')\)
+cuando \(s'\) es continuo. Evaluarlo por fuerza bruta para cada una de
+las \(N\approx 2\times10^6\) muestras sería prohibitivo, así que el
+algoritmo precomputa, para cada etapa \(m\), una superficie de valor
+máximo sobre la grilla de estado y la interpola:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Evaluación sobre grilla.} Para cada etapa \(m\), se evalúa
+  \(Q^{(n-1)}\) en todo el producto
+  \(\mathcal S_1^{\text{grid}}\times\mathcal S_2^{\text{grid}}\times\{m\}\times\mathcal A_1^{\text{grid}}(m)\times\mathcal A_2^{\text{grid}}(m)\),
+  y se maximiza sobre las dos coordenadas de acción:
+  \begin{equation}\protect\phantomsection\label{eq-maxq-grilla}{
+  \widehat V^{(n-1)}(s_1^{(p)},s_2^{(q)},m) := \max_{a_1,a_2\in\mathcal A_m^{\text{grid}}} Q^{(n-1)}(s_1^{(p)},s_2^{(q)},m,a_1,a_2), \qquad p,q=1,\dots,9,
+  }\end{equation} obteniéndose una matriz \(9\times9\) por etapa.
+\item
+  \textbf{Interpolación bilineal.} Sobre esta matriz se construye un
+  interpolador continuo
+  \(\widetilde V^{(n-1)}(\cdot,\cdot\,;m):\mathbb R^2\to\mathbb R\)
+  (interpolación multilineal sobre grilla regular), con extrapolación
+  lineal fuera de \([0,V_{1,\max}]\times[0,V_{2,\max}]\).
+\item
+  \textbf{Sustitución en el objetivo de Bellman.} El máximo de
+  Equation~\ref{eq-objetivo-bellman} se aproxima evaluando el
+  interpolador de la etapa siguiente en el punto continuo genuinamente
+  alcanzado:
+  \begin{equation}\protect\phantomsection\label{eq-maxq-interp}{
+  \max_{a'\in\mathcal A_{m_j'}} Q^{(n-1)}(s'_{1,j},s'_{2,j},m_j',a') \ \approx\ \widetilde V^{(n-1)}\big(s'_{1,j},s'_{2,j};\,m_j'\big).
+  }\end{equation}
+\end{enumerate}
+
+Esta aproximación reduce el costo de
+\(O(N\times|\mathcal A^{\text{grid}}|^2)\) evaluaciones del regresor a
+\(O\big(M\times|\mathcal S^{\text{grid}}|^2\times|\mathcal A^{\text{grid}}|^2 + N\big)\),
+al reutilizar la misma superficie interpolada para las \(N/M\) muestras
+de cada etapa.
+
+\subsection{Aproximación funcional por regresión no paramétrica
+(ExtraTrees)}\label{aproximaciuxf3n-funcional-por-regresiuxf3n-no-paramuxe9trica-extratrees-1}
+
+Una vez calculados los objetivos de Bellman \(y^{(n)}\)
+(Equation~\ref{eq-objetivo-bellman}, con el máximo aproximado según
+Equation~\ref{eq-maxq-interp}), se ajusta un aproximador \(Q^{(n)}\) que
+minimiza el error cuadrático entre las predicciones \(Q^{(n)}(x_j)\) y
+los objetivos \(y^{(n)}_j\) sobre todas las transiciones del conjunto de
+aprendizaje. Se utiliza, como propone Ernst et al. (2005), un ensamble
+de \emph{ExtraTrees} (árboles extremadamente aleatorizados), adecuado
+para aproximar funciones de valor en espacios continuos.
+
+\textbf{Hiperparámetros (corregidos respecto de la versión previa):}
+
+\begin{longtable}[]{@{}llll@{}}
+\caption{Hiperparámetros del ensamble de Extra-Trees, según el código,
+frente a lo reportado en la versión previa del
+capítulo.}\label{tbl-hiperparametros}\tabularnewline
+\toprule\noalign{}
+Hiperparámetro & Símbolo & Valor implementado & \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Hiperparámetro & Símbolo & Valor implementado & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Número de árboles & \(M_{\text{tree}}\) & 300 & \\
+Profundidad máxima & --- & \textbf{sin límite}
+(\texttt{max\_depth=None}) & \\
+Muestras mínimas por hoja & \(n_{\min}\) & \textbf{50} (\(=T\)) & \\
+Variables candidatas por corte & \(K\) & \(n=5\)
+(\texttt{max\_features=1.0}) & \\
+\end{longtable}
+
+El valor \(n_{\min}=T=50\) no es arbitrario: al exigir que cada hoja del
+árbol contenga al menos tantas muestras como años históricos de
+afluencia, se favorece que cada hoja agrupe una fracción representativa
+de las \(T\) realizaciones de \(\xi\) asociadas a un mismo \((s,a)\)
+aproximado, de modo que el promedio dentro de la hoja aproxime, por la
+ley (empírica) de los grandes números, la esperanza condicional
+\(\mathbb E_{\xi\sim\widehat P_m}[\cdot]\) que aparece en
+Equation~\ref{eq-bellman}. Cada árbol particiona el espacio
+estado-acción en regiones (hojas) mediante cortes con umbral aleatorio
+(no exhaustivo, a diferencia de CART/Random Forest) sobre las \(K=n=5\)
+variables de entrada, y predice, para un punto de consulta, el promedio
+del objetivo de regresión entre las muestras de entrenamiento de su
+misma hoja. La predicción del ensamble es el promedio de las
+\(M_{\text{tree}}=300\) predicciones individuales.
+
+\begin{quote}
+\textbf{Nota sobre la Figura de árbol de decisión.} La versión previa
+incluía una figura con la leyenda \emph{``Árbol de decisión con
+profundidad máxima de 14 y un mínimo de 5 muestras por hoja''}. Dado que
+el código real no limita la profundidad (\texttt{max\_depth=None}) y usa
+\(n_{\min}=50\), esa leyenda ---y, en la práctica, la figura misma, que
+mostraría un árbol truncado no representativo--- debe corregirse o
+sustituirse por una ilustración esquemática que no afirme una
+profundidad máxima inexistente.
+\end{quote}
+
+El algoritmo repite este procedimiento iterativamente.
+
+\subsection{Criterio de paro basado en desempeño
+simulado}\label{sec-criterio-paro}
+
+Un criterio de convergencia del tipo punto-fijo ---detener cuando
+\(\|Q^{(n)}-Q^{(n-1)}\|\) cae bajo una tolerancia--- \textbf{no es
+aplicable} cuando el aproximador es un ensamble de Extra-Trees: la
+aleatorización propia de la construcción de cada árbol (elección
+aleatoria de umbrales de corte) hace que \(Q^{(n)}\) y \(Q^{(n-1)}\)
+difieran por ruido de ajuste incluso si ya se hubiese alcanzado, en
+esencia, la función de valor-acción óptima; esta distancia no converge a
+cero. Así lo argumentan explícitamente Castelletti et al. (2010), y así
+lo implementa el código, que en su lugar monitorea el \textbf{desempeño
+operativo simulado} de la política inducida en cada iteración.
+
+\textbf{Simulación de la política golosa.} Cada \(\Delta h\) iteraciones
+(en el código, \(\Delta h=4\)), se simula la operación del sistema bajo
+la política golosa de \(Q^{(n)}\) sobre la trayectoria histórica
+completa, en resolución de quincena (Sec. Section~\ref{sec-simulacion}),
+obteniendo energías \(e^{(i)}_{t,q}\), derrames \(\delta^{(i)}_{t,q}\) y
+déficits \(\epsilon^{(i)}_{t,q}\) por presa.
+
+\textbf{Funcional de desempeño.} Se define
+\begin{equation}\protect\phantomsection\label{eq-desempeno-Jn}{
+\widehat J_n := \sum_{t,q}\big(e^{(1)}_{t,q}+e^{(2)}_{t,q}\big) - c_{\text{derr}}\sum_{t,q}\big(\delta^{(1)}_{t,q}+\delta^{(2)}_{t,q}\big) - c_{\text{def}}\sum_{t,q}\big(\epsilon^{(1)}_{t,q}+\epsilon^{(2)}_{t,q}\big),
+}\end{equation} una medida de desempeño agregada, \textbf{no descontada}
+y evaluada con afluencias reales quincenales ---distinta, por tanto, del
+objetivo de ajuste Equation~\ref{eq-objetivo-bellman}, que opera a nivel
+de una transición individual y con descuento \(\gamma\)---.
+
+\textbf{Regla de paro.} Se detiene la iteración la primera vez que se
+observa una caída de \(\widehat J_n\) respecto del checkpoint
+inmediatamente anterior (una ``reversión''):
+\begin{equation}\protect\phantomsection\label{eq-criterio-paro}{
+n^\star := \min\{\, n-\Delta h \ :\ \widehat J_{n} < \widehat J_{n-\Delta h} \,\},
+}\end{equation} interpretando la reversión como evidencia de que, a
+partir de ese punto, predominan las fluctuaciones aleatorias del ajuste
+sobre el aprendizaje genuino (Castelletti et al. (2010)). Si no se
+observa ninguna reversión dentro del número máximo de iteraciones
+permitido, se usa como respaldo el mejor checkpoint observado,
+\(n^\star:=\arg\max_n \widehat J_n\). La aproximación final es
+\(Q^{*}:=Q^{(n^\star)}\), recuperada de una caché de modelos
+serializados guardada en cada punto de verificación (necesaria porque,
+por la aleatorización del ensamble, \(Q^{(n^\star)}\) no podría
+reproducirse exactamente reentrenando desde cero).
+
+\section{Política óptima y simulación operativa}\label{sec-simulacion}
+
+Una vez obtenida \(Q^{*}\), se deriva la política óptima (golosa)
+\(\pi^{*}:\mathcal S\to\mathcal A\),
+\begin{equation}\protect\phantomsection\label{eq-politica-optima}{
+\pi^{*}(s) := \operatorname*{arg\,max}_{a\in\mathcal A_m^{\text{grid}}} Q^{*}(s,a),
+}\end{equation} donde la maximización se realiza, en la práctica,
+mediante búsqueda exhaustiva sobre la grilla de acción de la etapa
+vigente Equation~\ref{eq-grilla-accion} (no sobre el conjunto continuo
+\(\mathcal A_m\)), evaluando \(Q^{*}\) en el estado continuo real ---no
+discretizado--- del sistema.
+
+La política se valida mediante simulación en lazo cerrado sobre la serie
+histórica completa, siguiendo la práctica estándar de validación de
+políticas de control aprendidas documentada en Bertsekas (2019). El
+algoritmo, corregido para ser fiel al código, opera así:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Inicialización:} se fijan los volúmenes iniciales
+  \(V_{1,0}=10{,}000\) Mm³, \(V_{2,0}=6{,}000\) Mm³ (valores del código;
+  no se especificaban antes).
+\item
+  \textbf{Mapeo estacional:} para cada quincena \(q\) (recorriendo
+  \(t=1,\dots,T\) y, dentro de cada año, \(q=0,\dots,23\)), se determina
+  \(m=\mu(q)\) y la grilla de acción \(\mathcal A_m^{\text{grid}}\)
+  vigente.
+\item
+  \st{\textbf{Discretización:} $s_i=\mathcal D(V_i,N_i)$} ---
+  \textbf{paso eliminado}: el estado usado para consultar \(Q^*\) es el
+  volumen continuo real \((V_{1,t,q}, V_{2,t,q})\), sin redondeo a
+  índice alguno.
+\item
+  \textbf{Selección de acción}, por búsqueda exhaustiva sobre la grilla
+  de acción de 9×9 combinaciones de la etapa vigente: \[
+  (a_1^*,a_2^*) = \operatorname*{arg\,max}_{(a_1,a_2)\,\in\,\mathcal A_1^{\text{grid}}(m)\times\mathcal A_2^{\text{grid}}(m)} Q^{*}(V_{1,t,q},V_{2,t,q},m,a_1,a_2).
+  \]
+\item
+  \textbf{Balance hídrico}, con el afluente de la \textbf{misma}
+  quincena \(q\) (corrección respecto de la versión previa, que usaba
+  \(q+1\)): \[
+  V_{i,t,q+1} = V_{i,t,q} + W_{i,t,q} - a_i^*, \qquad i=1,2.
+  \]
+\item
+  \textbf{Proyección física}, incluyendo tanto el derrame como el
+  déficit (la versión previa omitía el déficit): \[
+  V_i^{\text{new}} = \operatorname{proj}_{[0,V_{i,\max}]}(V_{i,t,q+1}), \qquad
+  \text{derrame}_i = (V_{i,t,q+1}-V_{i,\max})^+, \qquad
+  \text{déficit}_i = (-V_{i,t,q+1})^+.
+  \]
+\item
+  \textbf{Cálculo energético}, con la carga continua y las cargas
+  máximas distintas por presa (corrección de Equation~\ref{eq-altura}):
+  \[
+  H_i = H_{i,\max}\cdot\frac{V_{i,t,q}+V_i^{\text{new}}}{2\,V_{i,\max}}, \qquad
+  E_i = \frac{\eta g\, H_i\,(a_i^*\times10^6)}{3600\times10^6}.
+  \]
+\item
+  \textbf{Registro y actualización:} se almacenan energía, derrame,
+  déficit y almacenamiento; el estado se actualiza a
+  \(V_i^{\text{new}}\) para la siguiente quincena.
+\end{enumerate}
+
+\subsection{Métricas de desempeño y validación
+estadística}\label{sec-metricas}
+
+\begin{tcolorbox}[enhanced jigsaw, arc=.35mm, bottomrule=.15mm, bottomtitle=1mm, breakable, colback=white, colbacktitle=quarto-callout-warning-color!10!white, colframe=quarto-callout-warning-color-frame, coltitle=black, left=2mm, leftrule=.75mm, opacityback=0, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-warning-color}{\faExclamationTriangle}\hspace{0.5em}{Cifras pendientes de regenerar}, titlerule=0mm, toprule=.15mm, toptitle=1mm]
+
+Las tablas siguientes (Table~\ref{tbl-desempeno-energetico},
+Table~\ref{tbl-desempeno-hidrico}) y la conclusión que las acompañaba en
+la versión previa reportan un derrame total del sistema de
+\(\approx 34{,}053\) Mm³ y una lectura crítica sobre la mala gestión de
+la política. Esta cifra \textbf{es incompatible con la propia validación
+documentada en el encabezado del script corregido}, que reporta ``0 Mm³
+de derrame y 0 Mm³ de déficit en ambas presas'' al ejecutar exactamente
+el algoritmo aquí descrito. Es decir, las cifras de la versión previa
+corresponden, con alta probabilidad, a una ejecución de una versión
+anterior y no fiel del modelo (la que originó la auditoría documentada
+en el encabezado de \texttt{FQI\_corregido.py}), no a la versión actual.
+No se sustituyen aquí por cifras nuevas para no fabricar resultados: se
+recomienda \textbf{volver a ejecutar el script corregido sobre los datos
+reales} y regenerar ambas tablas, así como reescribir el párrafo de
+interpretación en función de los resultados que se obtengan.
+
+\end{tcolorbox}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\caption{Resumen del desempeño energético del sistema bajo la política
+óptima aprendida mediante FQI (plantilla; valores por regenerar con
+\protect\texttt{simulacion\_FQI\_corregida.csv}).}\label{tbl-desempeno-energetico}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Métrica
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Angostura
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Malpaso
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Sistema Total
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Métrica
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Angostura
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Malpaso
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Sistema Total
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Energía promedio quincenal {[}GWh{]} & \emph{(pendiente)} &
+\emph{(pendiente)} & \emph{(pendiente)} \\
+Energía anual estimada {[}GWh{]} & \emph{(pendiente)} &
+\emph{(pendiente)} & \emph{(pendiente)} \\
+Contribución al sistema {[}\%{]} & \emph{(pendiente)} &
+\emph{(pendiente)} & 100.0 \\
+\end{longtable}
+
+\begin{longtable}[]{@{}llll@{}}
+\caption{Resumen del desempeño hídrico del sistema bajo la política
+óptima aprendida mediante FQI (plantilla; valores por
+regenerar).}\label{tbl-desempeno-hidrico}\tabularnewline
+\toprule\noalign{}
+Métrica & Angostura & Malpaso & Sistema Total \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Métrica & Angostura & Malpaso & Sistema Total \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Derrame total {[}Mm³{]} & \emph{(pendiente)} & \emph{(pendiente)} &
+\emph{(pendiente)} \\
+Déficit total {[}Mm³{]} & \emph{(pendiente)} & \emph{(pendiente)} &
+\emph{(pendiente)} \\
+\end{longtable}
+
+Una vez regeneradas las tablas a partir de una corrida real del script,
+la interpretación debe contrastar específicamente los totales de derrame
+y déficit contra la validación reportada en el propio código (0 Mm³ en
+ambos rubros) antes de emitir un juicio sobre la calidad de la política
+aprendida; de mantenerse una discrepancia con lo documentado en el
+script, ésta debería investigarse como posible diferencia entre el
+entorno de ejecución (datos, semilla aleatoria, versión de librerías) y
+no asumirse automáticamente como una falla de la política.
+
+\section{Conclusiones del
+capítulo}\label{conclusiones-del-capuxedtulo-1}
+
+\begin{itemize}
+\tightlist
+\item
+  Síntesis de contribuciones matemáticas y numéricas.
+\item
+  Reafirmación de la coherencia entre formulación teórica,
+  implementación algorítmica y validación operativa ---pendiente de
+  completar una vez regeneradas las métricas de la Sec.
+  Section~\ref{sec-metricas}---.
+\item
+  Declaración de cierre alineada con los objetivos de la tesis.
+\end{itemize}
+
+\bookmarksetup{startatroot}
+
+\chapter{}\label{section}
+
+\bookmarksetup{startatroot}
+
+\chapter{}\label{section-1}
+
+\bookmarksetup{startatroot}
+
+\chapter*{Referencias}\label{referencias}
+\addcontentsline{toc}{chapter}{Referencias}
+
+\markboth{Referencias}{Referencias}
+
+\protect\phantomsection\label{refs}
+\begin{CSLReferences}{1}{1}
+\bibitem[\citeproctext]{ref-Bertsekas2019}
+Bertsekas, Dimitri P. 2019. \emph{Reinforcement Learning and Optimal
+Control}. Athena Scientific.
+
+\bibitem[\citeproctext]{ref-Castelletti2010}
+Castelletti, A., S. Galelli, M. Restelli, and R. Soncini-Sessa. 2010.
+{``Tree-Based Reinforcement Learning for Optimal Water Reservoir
+Operation.''} \emph{Water Resources Research} 46: W09507.
+\url{https://doi.org/10.1029/2009WR008898}.
+
+\bibitem[\citeproctext]{ref-Alegria2010}
+Díaz, Arallely Alegría. 2010. {``Política de Operación Óptima Del
+Sistema de Presas Del Río Grijalva. Efectos de La Curva Guía.''} Tesis
+de Maestría en Ingeniería Civil -\/- Hidráulica, Universidad Nacional
+Autónoma de México, Facultad de Ingeniería.
+
+\bibitem[\citeproctext]{ref-Ernst2005}
+Ernst, Damien, Pierre Geurts, and Louis Wehenkel. 2005. {``Tree-Based
+Batch Mode Reinforcement Learning.''} \emph{Journal of Machine Learning
+Research} 6: 503--56.
+\url{http://www.jmlr.org/papers/volume6/ernst05a/ernst05a.pdf}.
+
+\bibitem[\citeproctext]{ref-ibmRL}
+IBM. 2025. {``¿Qué es el aprendizaje por refuerzo?''} IBM.
+\url{https://www.ibm.com/mx-es/think/topics/reinforcement-learning?mhsrc=ibmsearch_a&mhq=aprendizaje\%20por\%20refuerzo}.
+
+\bibitem[\citeproctext]{ref-puterman1994markov}
+Puterman, Martin L. 1994. \emph{Markov Decision Processes: Discrete
+Stochastic Dynamic Programming}. Wiley Series in Probability and
+Statistics. John Wiley \& Sons.
+\url{https://doi.org/10.1002/9780470316887}.
+
+\end{CSLReferences}
+
+
+
+
+\end{document}
