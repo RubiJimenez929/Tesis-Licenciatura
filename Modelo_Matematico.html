@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; Modelo Matemático de Programación Dinámica Estocástica para Optimizar la Operación de un Sistema Hidroeléctrico. – Fitted Q-Iteration: Estimación de niveles de presas</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./modelo_matematico_fqi_corregido.html" rel="next">
+<link href="./Fundamentos_Hidraulicos.html" rel="prev">
+<link href="./Imagenes/fcfm.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-cad2a2f8a56dfe71ee895a68e79c9b9a.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-70be5ccd51f03de5ce195d75fadf0882.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-cad2a2f8a56dfe71ee895a68e79c9b9a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-e376646338697af8583008ac829f38be.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-65cd1d279db3df99065ad4b96d9d595a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-e376646338697af8583008ac829f38be.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script async="" src="https://hypothes.is/embed.js"></script>
+<script>
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    document.body.classList.add('hypothesis-enabled');
+  });
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Modelo_Matematico.html">Modelo Matemático</a></li><li class="breadcrumb-item"><a href="./Modelo_Matematico.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelo Matemático de Programación Dinámica Estocástica para Optimizar la Operación de un Sistema Hidroeléctrico.</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./index.html" class="sidebar-logo-link">
+      <img src="./Imagenes\logos.jpeg" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
+      <img src="./Imagenes\logos.jpeg" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Fitted Q-Iteration: Estimación de niveles de presas</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/RubiJimenez929/Tesis-Licenciatura" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <div class="dropdown">
+      <a href="" title="Download" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Download"><i class="bi bi-download"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="./Fitted-Q-Iteration--Estimación-de-niveles-de-presas.pdf">
+              <i class="bi bi-file-pdf pe-1"></i>
+            Download PDF
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="./Fitted-Q-Iteration--Estimación-de-niveles-de-presas.epub">
+              <i class="bi bi-journal pe-1"></i>
+            Download ePub
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo oscuro"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Resumen</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Preliminares</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Fundamentos_Matematicos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Fundamentos Matemáticos</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Fundamentos_Hidraulicos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Fundamentos Hidráulicos</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Modelo Matemático</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Modelo_Matematico.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelo Matemático de Programación Dinámica Estocástica para Optimizar la Operación de un Sistema Hidroeléctrico.</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./modelo_matematico_fqi_corregido.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Modelo Matemático Fitted Q-Iteration para Optimizar la Operación de un Sistema Hidroeléctrico.</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./conclusiones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">conclusiones.html</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./futuros_trabajos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">futuros_trabajos.html</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referencias</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenidos</h2>
+   
+  <ul>
+  <li><a href="#datos-históricos" id="toc-datos-históricos" class="nav-link active" data-scroll-target="#datos-históricos"><span class="header-section-number">3.1</span> Datos históricos</a>
+  <ul class="collapse">
+  <li><a href="#estructura-temporal-quincenas-y-etapas-hidrológicas" id="toc-estructura-temporal-quincenas-y-etapas-hidrológicas" class="nav-link" data-scroll-target="#estructura-temporal-quincenas-y-etapas-hidrológicas"><span class="header-section-number">3.2.1</span> Estructura temporal: quincenas y etapas hidrológicas</a></li>
+  <li><a href="#espacio-de-estados-y-operador-de-discretización-mathcals" id="toc-espacio-de-estados-y-operador-de-discretización-mathcals" class="nav-link" data-scroll-target="#espacio-de-estados-y-operador-de-discretización-mathcals"><span class="header-section-number">3.2.2</span> Espacio de estados y operador de discretización <span class="math inline">\((\mathcal{S})\)</span></a></li>
+  <li><a href="#espacio-de-acciones-mathcala" id="toc-espacio-de-acciones-mathcala" class="nav-link" data-scroll-target="#espacio-de-acciones-mathcala"><span class="header-section-number">3.2.3</span> Espacio de acciones <span class="math inline">\((\mathcal{A})\)</span></a></li>
+  <li><a href="#dinámica-de-transición-mathbbp" id="toc-dinámica-de-transición-mathbbp" class="nav-link" data-scroll-target="#dinámica-de-transición-mathbbp"><span class="header-section-number">3.2.4</span> Dinámica de transición <span class="math inline">\((\mathbb{P})\)</span></a></li>
+  <li><a href="#función-de-recompensa-mathcalr" id="toc-función-de-recompensa-mathcalr" class="nav-link" data-scroll-target="#función-de-recompensa-mathcalr"><span class="header-section-number">3.2.5</span> Función de recompensa <span class="math inline">\((\mathcal{R})\)</span></a></li>
+  </ul></li>
+  <li><a href="#ecuación-de-optimalidad-de-bellman" id="toc-ecuación-de-optimalidad-de-bellman" class="nav-link" data-scroll-target="#ecuación-de-optimalidad-de-bellman"><span class="header-section-number">3.3</span> Ecuación de optimalidad de Bellman</a></li>
+  <li><a href="#aproximación-numérica-mediante-fitted-q-iteration-fqi" id="toc-aproximación-numérica-mediante-fitted-q-iteration-fqi" class="nav-link" data-scroll-target="#aproximación-numérica-mediante-fitted-q-iteration-fqi"><span class="header-section-number">3.4</span> Aproximación numérica mediante Fitted Q-Iteration (FQI)</a>
+  <ul class="collapse">
+  <li><a href="#iteración-de-bellman-empírica" id="toc-iteración-de-bellman-empírica" class="nav-link" data-scroll-target="#iteración-de-bellman-empírica"><span class="header-section-number">3.4.1</span> Iteración de Bellman empírica</a></li>
+  <li><a href="#aproximación-funcional-por-regresión-no-paramétrica-extratrees" id="toc-aproximación-funcional-por-regresión-no-paramétrica-extratrees" class="nav-link" data-scroll-target="#aproximación-funcional-por-regresión-no-paramétrica-extratrees"><span class="header-section-number">3.4.2</span> Aproximación funcional por regresión no paramétrica (ExtraTrees)</a></li>
+  </ul></li>
+  <li><a href="#política-óptima-y-simulación-operativa" id="toc-política-óptima-y-simulación-operativa" class="nav-link" data-scroll-target="#política-óptima-y-simulación-operativa"><span class="header-section-number">3.5</span> Política óptima y simulación operativa</a>
+  <ul class="collapse">
+  <li><a href="#métricas-de-desempeño-y-validación-estadística" id="toc-métricas-de-desempeño-y-validación-estadística" class="nav-link" data-scroll-target="#métricas-de-desempeño-y-validación-estadística"><span class="header-section-number">3.5.1</span> Métricas de desempeño y validación estadística</a></li>
+  </ul></li>
+  <li><a href="#conclusiones-del-capítulo" id="toc-conclusiones-del-capítulo" class="nav-link" data-scroll-target="#conclusiones-del-capítulo"><span class="header-section-number">3.6</span> Conclusiones del capítulo</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Modelo_Matematico.html">Modelo Matemático</a></li><li class="breadcrumb-item"><a href="./Modelo_Matematico.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelo Matemático de Programación Dinámica Estocástica para Optimizar la Operación de un Sistema Hidroeléctrico.</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modelo Matemático de Programación Dinámica Estocástica para Optimizar la Operación de un Sistema Hidroeléctrico.</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div style="text-align: justify">
+<p>En este capítulo se presenta una formulación del problema de optimización de la operación de un sistema hidroeléctrico mediante un Proceso de Decisión de Markov (MDP), usando Programación Dinámica Estocástica (PDE) con el fin de obtener la política óptima de operación tomando en cuenta el concepto de curva guía. Lo anterior se propone tal y como lo describe <span class="citation" data-cites="Alegria2010">Díaz (<a href="references.html#ref-Alegria2010" role="doc-biblioref">2010</a>)</span>, quien aplica la PDE para optimizar la operación del sistema hidroeléctrico del río Grijalva. Se enfatiza la conexión entre los elementos matemáticos formales y su implementación numérica.</p>
+</div>
+<section id="datos-históricos" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="datos-históricos"><span class="header-section-number">3.1</span> Datos históricos</h2>
+<div style="text-align: justify">
+<p>Sea <span class="math inline">\(T = 50\)</span> los años históricos disponibles <span class="math inline">\((1959–2008)\)</span>, indexados por <span class="math inline">\(t \in \{0,\dots,T-1\}\)</span>. Cada uno de ellos se subdividieron en <span class="math inline">\(q = 24\)</span> quincenas (correspondientes a las columnas de los datos históricos proporcionados por <span class="citation" data-cites="Alegria2010">Díaz (<a href="references.html#ref-Alegria2010" role="doc-biblioref">2010</a>)</span>).</p>
+<p>El sistema está compuesto por dos presas: <a href="https://maps.app.goo.gl/NHNQdHdfYAoRGxhPA">La Angostura</a> <span class="math inline">\((i = 1)\)</span> y <a href="https://maps.app.goo.gl/acX7hVXswX5uYYUBA">Malpaso</a> <span class="math inline">\((i =2)\)</span>. El volumen de almacenamiento de cada una de ellas en la quincena <span class="math inline">\(q\)</span> del año <span class="math inline">\(t\)</span> se representará por <span class="math inline">\(V_{i,t,q} \in \mathbb{R}_{+} \cup \{0\}\)</span> (Millones de metros cúbicos-<span class="math inline">\(Mm^3\)</span>).</p>
+<section id="formulación-del-proceso-de-decisión-de-markov-mdp" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="formulación-del-proceso-de-decisión-de-markov-mdp"><span class="header-section-number">3.2</span> Formulación del Proceso de Decisión de Markov (MDP)</h2>
+<p>Conforme a <span class="citation" data-cites="puterman1994markov">Puterman (<a href="references.html#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, se define el MDP como la colección de objetos <span class="math display">\[\{(T, \mathcal{S}, \mathcal{A}, \mathbb{P}, \mathcal{R})\},\]</span> donde cada componente se describe a continuación.</p>
+</section>
+</div>
+<section id="estructura-temporal-quincenas-y-etapas-hidrológicas" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="estructura-temporal-quincenas-y-etapas-hidrológicas"><span class="header-section-number">3.2.1</span> Estructura temporal: quincenas y etapas hidrológicas</h3>
+<div style="text-align: justify">
+<p>Para reducir la dimensionalidad temporal del problema y poder capturar la estacionalidad, las <span class="math inline">\(24\)</span> quincenas se agrupan en <span class="math inline">\(M = 6\)</span> etapas hidrológicas (segmentación temporal del año) mediante la siguiente función de agregación <span class="math inline">\(\mu: \{0,\dots,q-1\} \to \{0,\dots,M-1\}\)</span> definida por <span id="eq-etapas"><span class="math display">\[\mu(q)=
+\begin{cases}
+0, &amp; 0\le q&lt;10 \quad(\text{Ene–May})\\
+1, &amp; 10\le q&lt;14 \quad(\text{Jun–Jul})\\
+2, &amp; 14\le q&lt;16 \quad(\text{Ago})\\
+3, &amp; 16\le q&lt;18 \quad(\text{Sep})\\
+4, &amp; 18\le q&lt;20 \quad(\text{Oct})\\
+5, &amp; 20\le q\le 23 \quad(\text{Nov–Dic})
+\end{cases} \tag{3.1}\]</span></span> así, la variable <span class="math inline">\(m = \mu(q)\)</span> representará la etapa hidrológica correspondiente a la quincena <span class="math inline">\(q\)</span>.</p>
+</div>
+</section>
+<section id="espacio-de-estados-y-operador-de-discretización-mathcals" class="level3" data-number="3.2.2">
+<h3 data-number="3.2.2" class="anchored" data-anchor-id="espacio-de-estados-y-operador-de-discretización-mathcals"><span class="header-section-number">3.2.2</span> Espacio de estados y operador de discretización <span class="math inline">\((\mathcal{S})\)</span></h3>
+<div style="text-align: justify">
+<p>Se introduce un operador de discretización uniforme <span class="math inline">\(\mathcal{D}\)</span> del espacio de estados <span class="math inline">\(\mathcal{S}\)</span> mediante el parámetro <span class="math inline">\(\Delta = 600\)</span> <span class="math inline">\(Mm^3\)</span> (paso de discretización). Dicha unidad permite discretizar el volumen almacenado y la afluencia agregada por etapa, así como también, subdividir la capacidad de almacenamiento de cada presa en un número manejable de estados. Para un volumen continuo <span class="math inline">\(V_{i,t,q},\)</span> se define el operador de discretización <span class="math inline">\(\mathcal{D}: \mathbb{R} \times \mathbb{N} \longrightarrow \{0,\dots,N-1\}\)</span> dado por <span id="eq-discretizacion"><span class="math display">\[s_i = \mathcal{D}(V_{i,t,q}, N_i) := \min \left(\max\left(\left\lfloor \frac{V_{i,t,q}}{\Delta} + \frac{1}{2}\right\rfloor, 0\right), N_i-1\right), \tag{3.2}\]</span></span> donde <span class="math inline">\(N_1 = 27\)</span> y <span class="math inline">\(N_2 = 16\)</span> son las capacidades discretas máximas de cada presa. El volumen máximo representado en rejilla discreta es <span id="eq-volumen-maximo"><span class="math display">\[V_{i,\max} = N_i \Delta, \tag{3.3}\]</span></span> <span class="math inline">\(16,200\)</span> <span class="math inline">\(Mm^3\)</span> para Angostura y <span class="math inline">\(9,600\)</span> <span class="math inline">\(Mm^3\)</span> para Malpaso.</p>
+<p>Así, el espacio de estados se define como <span class="math display">\[\mathcal{S} = \mathcal{S}_1 \times \mathcal{S}_2 \times \{0,...,5\} = \{s = (s_1,s_2,m)\},\]</span> en donde <span class="math inline">\((s_1,s_2,m)\)</span> representa el volumen discretizado de Angostura, el volumen discretizado de Malpaso y la etapa hidrológica correspondiente a la quincena <span class="math inline">\(q\)</span>.</p>
+</div>
+</section>
+<section id="espacio-de-acciones-mathcala" class="level3" data-number="3.2.3">
+<h3 data-number="3.2.3" class="anchored" data-anchor-id="espacio-de-acciones-mathcala"><span class="header-section-number">3.2.3</span> Espacio de acciones <span class="math inline">\((\mathcal{A})\)</span></h3>
+<div style="text-align: justify">
+<p>Para cada etapa <span class="math inline">\(m\)</span>, se define una unidad de extracción de agua <span class="math inline">\(u_m = \{100, 200, 300, 300, 400, 250\}\)</span>, así la decisión de operación en la etapa <span class="math inline">\(m\)</span> corresponderá a los niveles de turbinado <span class="math inline">\(k_1, k_2\)</span>. Cada nivel de turbinado se multiplica por la unidad de extracción <span class="math inline">\(u_m\)</span>, la cual está en <span class="math inline">\(Mm^3,\)</span> para obtener el volumen de agua extraído en cada presa. Por lo tanto, el espacio de acciones se define como <span class="math display">\[\mathcal{A}_m = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m},\]</span> donde <span class="math inline">\(\mathcal{K}_{1,m} = \mathcal{K}_{2,m}\)</span> representan el conjunto de niveles de turbinado disponibles para ambas presas en la etapa hidrológica <span class="math inline">\(m\)</span>. En la práctica, tanto la Angostura como Malpaso tienen el mismo conjunto de niveles de turbinado y mismas unidades de extracción por etapa.</p>
+<p>Una acción denotada por <span class="math inline">\(a = (k_1, k_2)\)</span>, produce el volumen real turbinado <span class="math inline">\(k_i\cdot u_m\)</span> aplicado simultaneamente en ambas presas. Por ejemplo, suponga que <span class="math inline">\(m = 0\)</span> entonces <span class="math display">\[u_0 = 100 \quad \text{y} \quad \mathcal{K}_{1,0}, \mathcal{K}_{2,0} = \{0,1,...,20\},\]</span> y así <span class="math inline">\(a = (3,5)\)</span> significaría que Angostura turbina <span class="math inline">\(3\times 100 = 300\)</span> <span class="math inline">\(Mm^3\)</span> de agua y Malpaso turbina <span class="math inline">\(5\times 100 = 500\)</span> <span class="math inline">\(Mm^3\)</span> de agua. Cabe mencionar que Los valores de <span class="math inline">\(u_m\)</span> y <span class="math inline">\(\mathcal{K}_{i,m}\)</span> se seleccionaron para que el turbinado máximo por etapa hidrológica <span class="math inline">\(k_{i} \cdot u_m\)</span> no exceda la capacidad instalada de las plantas ni los caudales históricos máximos registrados, garantizando la factibilidad física de todas las acciones evaluadas.</p>
+</div>
+</section>
+<section id="dinámica-de-transición-mathbbp" class="level3" data-number="3.2.4">
+<h3 data-number="3.2.4" class="anchored" data-anchor-id="dinámica-de-transición-mathbbp"><span class="header-section-number">3.2.4</span> Dinámica de transición <span class="math inline">\((\mathbb{P})\)</span></h3>
+<div style="text-align: justify">
+<p>La ecuación de transición continua tras la operación del sistema se define por <span id="eq-transicion"><span class="math display">\[V_{i,t,q+1} = V_{i,t,q} + W_{i, t, q+1}-k_iu_m, \quad q&lt;23 \tag{3.4}\]</span></span> donde <span class="math inline">\(V_{i,t,q}\)</span> representa el volumen almacenado en la presa <span class="math inline">\(i\)</span> antes de tomar la acción de turbinado, <span class="math inline">\(W_{i, t,q+1}\)</span> representa el afluente neto (caudal de ingreso) para la presa <span class="math inline">\(i\)</span> en la quincena <span class="math inline">\(q+1\)</span> del año <span class="math inline">\(t\)</span>, tales valores serán obtenidos de los datos históricos con los que ya se cuentan. Por último <span class="math inline">\(k_iu_m\)</span>, <span class="math inline">\(k_i \in \mathcal{K}_{i,m},\)</span> representa el volumen de agua extraído por la acción de turbinado aplicada en la etapa hidrológica correspondiente a la quincena <span class="math inline">\(q\)</span>.</p>
+<p>Cuando <span class="math inline">\(q=23\)</span>, la transición se define por <span id="eq-transicion23"><span class="math display">\[V_{i,t+1,0} = V_{i,t,23} + W_{i, t+1, 0}-k_iu_m. \tag{3.5}\]</span></span></p>
+<p>En ambos casos, el volumen discretizado de la quincena <span class="math inline">\(q+1\)</span> se obtiene aplicando el operador de discretización <span class="math inline">\(\mathcal{D}\)</span> al volumen resultante, es decir, <span class="math display">\[s_i' = \mathcal{D}(V_{i,t,q+1}, N_i),\]</span> mientras que la etapa hidrológica evoluciona mediante <span class="math inline">\(m' = (m+1) \mod M\)</span>.</p>
+<p>Por lo tanto, el estado discreto siguiente está dado por <span class="math display">\[s' = (s_1', s_2', m').\]</span></p>
+<p>Desde el punto de vista de <span class="citation" data-cites="puterman1994markov">Puterman (<a href="references.html#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, la transición de MDP se define mediante una función de probabilidad condicional <span id="eq-transicion"><span class="math display">\[\mathbb{P}(s'|s,a), \tag{3.6}\]</span></span> la cual especifica la probabilidad de transicionar al estado <span class="math inline">\(s'\)</span> dado que se tomó la acción <span class="math inline">\(a\)</span> en el estado <span class="math inline">\(s\)</span>.</p>
+</div>
+</section>
+<section id="función-de-recompensa-mathcalr" class="level3" data-number="3.2.5">
+<h3 data-number="3.2.5" class="anchored" data-anchor-id="función-de-recompensa-mathcalr"><span class="header-section-number">3.2.5</span> Función de recompensa <span class="math inline">\((\mathcal{R})\)</span></h3>
+<section id="modelo-hidráulico-energético-linealizado" class="level4" data-number="3.2.5.1">
+<h4 data-number="3.2.5.1" class="anchored" data-anchor-id="modelo-hidráulico-energético-linealizado"><span class="header-section-number">3.2.5.1</span> Modelo hidráulico-energético linealizado</h4>
+<div style="text-align: justify">
+<p>La energía generada depende del volumen de agua turbinado y una aproximación lineal de la altura hidraúlica. Para cada presa <span class="math inline">\(i\)</span>, se define la función de altura <span id="eq-altura"><span class="math display">\[H_i (s_i,s'_i) =\frac{20(s_i + s_i'+2)}{2} =10 (s_i + s_i'+2). \tag{3.7}\]</span></span> Tal expresión corresponde a un modelo lineal basado en estados discretizados, el término <span class="math inline">\(+2\)</span> se introdujo para evitar alturas nulas en estados con bajo volumen y el término <span class="math inline">\(20\)</span> como intercepto que representa la altura hidráulica mínima mientras que como pendiente representa cuántos metros de altura se ganan por cada incremento en el estado discretizado, es decir, la ganancia por cada incremento de <span class="math inline">\(\Delta\)</span> en el volumen de agua almacenado.</p>
+<p>Sea <span class="math inline">\(\eta = 0.9\)</span> eficiencia de conversión hidráulica a eléctrica, y <span class="math inline">\(g = 9.81\)</span> <span class="math inline">\(m/s^2\)</span> aceleración de la gravedad, entonces la energía generada por la presa <span class="math inline">\(i\)</span> al tomar la acción <span class="math inline">\(a\)</span> en el estado <span class="math inline">\(s\)</span> y transicionar a <span class="math inline">\(s'\)</span> se define por <span id="eq-energia"><span class="math display">\[E_i(s,a,s') = \frac{\eta g  H_i(s_i,s'_i) (k_iu_m\times 10^6)}{3600\times 10^6}, \tag{3.8}\]</span></span> donde <span class="math inline">\(10^6\)</span> representa la conversión de <span class="math inline">\(Mm^3\)</span> a <span class="math inline">\(m^3\)</span> y <span class="math inline">\(3600\times 10^6\)</span> la conversión de <span class="math inline">\(kWh\)</span> a <span class="math inline">\(GWh\)</span>.</p>
+<p>Por lo tanto la energía total generada por el sistema es <span id="eq-energia-total"><span class="math display">\[E = E_1+E_2. \tag{3.9}\]</span></span></p>
+</div>
+</section>
+<section id="estructura-de-penalizaciones" class="level4" data-number="3.2.5.2">
+<h4 data-number="3.2.5.2" class="anchored" data-anchor-id="estructura-de-penalizaciones"><span class="header-section-number">3.2.5.2</span> Estructura de penalizaciones</h4>
+<div style="text-align: justify">
+<p>La recompensa incorpora penalizaciones para garantizar el cumplimiento de restricciones operativas. Se definen las siguientes penalizaciones:</p>
+<ul>
+<li><p>Penalización por derrame: si <span class="math inline">\(V_{i,t,q+1} &gt; N_i \Delta\)</span> se aplica <span id="eq-penalizacion-derrame"><span class="math display">\[\Pi_{derr} = C_{derr}\cdot\left(\frac{V_{i,t,q+1}-N_i \Delta}{\Delta}\right) \tag{3.10}\]</span></span></p></li>
+<li><p>Penalización por déficit de agua: si <span class="math inline">\(V_{i,t,q+1} &lt; 0\)</span> se aplica <span id="eq-penalizacion-deficit"><span class="math display">\[\Pi_{def} = C_{def} \tag{3.11}\]</span></span></p></li>
+<li><p>Penalización por violación de curva guía: si <span class="math inline">\(s_i' &lt; \text{CG}_i(m)\)</span> se aplica <span id="eq-penalizacion-curva-guia"><span class="math display">\[\Pi_{CG} = C_{CG}\cdot(s_i'- \text{CG}_i(m)) \tag{3.12}\]</span></span></p></li>
+<li><p>Penalización por niveles críticos (casi desbordamiento): si <span class="math inline">\(s_i' \geq N_i-1\)</span> se aplica <span id="eq-penalizacion-niveles-criticos"><span class="math display">\[\Pi_{crit} = C_{crit} \tag{3.13}\]</span></span></p></li>
+</ul>
+<p>donde <span class="math inline">\(C_{derr}, C_{def}, C_{CG}, C_{crit}\)</span> son constantes de penalización ajustadas empíricamente con valores <span class="math inline">\(10000, 10000, 5000, 20000\)</span> respectivamente y <span class="math inline">\(\text{CG}_i(m)\)</span> representa la curva guía para la presa <span class="math inline">\(i\)</span> en la etapa <span class="math inline">\(m\)</span>.</p>
+<p>La función de recompensa total se define finalmente por <span id="eq-recompensa"><span class="math display">\[\mathcal{R}(s,a,s') = E - \Pi_{derr} - \Pi_{def} - \Pi_{CG} - \Pi_{crit}. \tag{3.14}\]</span></span></p>
+<p>En el presente trabajo no se modela una distribución analítica explícita, por lo que en la práctica se construye un dataset empírico basado en datos históricos. La dinámica se construye a partir de trayectorias históricas <span class="math display">\[(s_t, a_t, r_t, s_{t+1}')\]</span> en donde cada una de ellas representa una experiencia de transición observada en los datos históricos, siendo <span class="math inline">\(r_t\)</span> el valor obtenido de la <a href="modelo_matematico_fqi_corregido.html#eq-recompensa" class="quarto-xref">Ecuación&nbsp;<span>4.21</span></a>, representando la recompensa obtenida al tomar la acción <span class="math inline">\(a_t\)</span> en el estado <span class="math inline">\(s_t\)</span> y transicionar a <span class="math inline">\(s_{t+1}'\)</span>. Este enfoque se alinea con un esquema de <strong><em>Batch Reinforcement Learning.</em></strong></p>
+</div>
+</section>
+</section>
+</section>
+<section id="ecuación-de-optimalidad-de-bellman" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="ecuación-de-optimalidad-de-bellman"><span class="header-section-number">3.3</span> Ecuación de optimalidad de Bellman</h2>
+<div style="text-align: justify">
+<p>Conforme a la teoría clásica de control estocástico, por ejemplo <span class="citation" data-cites="puterman1994markov">Puterman (<a href="references.html#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, Teorema 6.2.3, en un MDP descontado existe una única función de valor de acción óptima <span class="math inline">\(V^*:\mathcal{S}\times\mathcal{A} \to \mathbb{R}\)</span> que satisface la ecuación de optimalidad de Bellman cuando los conjuntos de estados y acciones son finitos: <span id="eq-bellman"><span class="math display">\[V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \sum_{s'\in \mathcal{S}} P(s'|s,a) \max_{a' \in \mathcal{A}} V^*(s',a'). \tag{3.15}\]</span></span></p>
+<p>Dado que en lugar de una función de transición analítica se cuenta con un dataset empírico de trayectorias <span class="math inline">\((s_t, a_t, r_t, s_{t+1}'),\)</span> para todo <span class="math inline">\(t,\)</span> la ecuación de Bellman se reformula en su versión empírica como <span id="eq-bellman-empirica"><span class="math display">\[V^*(s,a) = \mathcal{R}(s,a,s') + \gamma \max_{a' \in \mathcal{A}} V^*(s',a'), \tag{3.16}\]</span></span></p>
+<p>para más detalles consultar <span class="citation" data-cites="Ernst2005">Ernst et&nbsp;al. (<a href="references.html#ref-Ernst2005" role="doc-biblioref">2005</a>)</span>.</p>
+</div>
+</section>
+<section id="aproximación-numérica-mediante-fitted-q-iteration-fqi" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="aproximación-numérica-mediante-fitted-q-iteration-fqi"><span class="header-section-number">3.4</span> Aproximación numérica mediante Fitted Q-Iteration (FQI)</h2>
+<div style="text-align: justify">
+<p>Si bien es sabido que la programación dinámica estocástica está afectada por la maldición de la dimensionalidad, <span class="citation" data-cites="Castelletti2010">Castelletti et&nbsp;al. (<a href="references.html#ref-Castelletti2010" role="doc-biblioref">2010</a>)</span>, mientras más variables de estado hayan, el requisito computacional crece exponencialmente, además de que se debe contar con un modelo de transición del sistema explícito, por ello el presente trabajo se basa en un enfoque de aproximación funcional mediante Fitted Q-Iteration (FQI), el cual es un algoritmo de aprendizaje por refuerzo que permite aproximar la función de valor de acción óptima <span class="math inline">\(V^*\)</span> a partir de un conjunto de transiciones empíricas.</p>
+</div>
+<section id="iteración-de-bellman-empírica" class="level3" data-number="3.4.1">
+<h3 data-number="3.4.1" class="anchored" data-anchor-id="iteración-de-bellman-empírica"><span class="header-section-number">3.4.1</span> Iteración de Bellman empírica</h3>
+<div style="text-align: justify">
+<p>Al principio, se supone una función de valor de acción inicial <span class="math inline">\(V^{(0)}\)</span> (<span class="math inline">\(V^{(0)}(s,a) = 0\)</span> para todo <span class="math inline">\((s,a)\)</span>). Luego, sucesivamente se generan nuevas aproximaciones para cada iteración <span class="math inline">\(n\)</span>, actualizando la función de valor de acción mediante la ecuación de Bellman empírica. Para cada transición observada <span class="math inline">\((s_t, a_t, r_t, s_{t+1}')\)</span> en el dataset, se define el <strong>objetivo de Bellman</strong> por <span id="eq-objetivo-bellman"><span class="math display">\[y^{(n)} := r + \gamma \max_{a' \in \mathcal{A}} V^{(n-1)}(s',a'), \tag{3.17}\]</span></span> el cual representa una estimación del valor de acción óptimo asociado al par <span class="math inline">\((s,a)\)</span> basada en la recompensa obtenida <span class="math inline">\(r\)</span> y el valor de acción máximo en el estado siguiente <span class="math inline">\(s'\)</span> según la función de valor de acción de la iteración anterior <span class="math inline">\(V^{(n-1)}\)</span>.</p>
+</div>
+</section>
+<section id="aproximación-funcional-por-regresión-no-paramétrica-extratrees" class="level3" data-number="3.4.2">
+<h3 data-number="3.4.2" class="anchored" data-anchor-id="aproximación-funcional-por-regresión-no-paramétrica-extratrees"><span class="header-section-number">3.4.2</span> Aproximación funcional por regresión no paramétrica (ExtraTrees)</h3>
+<div style="text-align: justify">
+<p>Una vez calculados los objetivos de Bellman <span class="math inline">\(y^{(n)}\)</span> <a href="modelo_matematico_fqi_corregido.html#eq-objetivo-bellman" class="quarto-xref">Ecuación&nbsp;<span>4.25</span></a>, se ajusta una función de valor de acción <span class="math inline">\(V^{(n)}\)</span> que aproxime la relación entre los pares <span class="math inline">\((s,a)\)</span> y los valores objetivos <span class="math inline">\(y^{(n)}\)</span>, dicha función se obtiene resolviendo un problema de aprendizaje supervisado que se explicó en la sección (pendiente).</p>
+<p>El procedimiento se formula como un problema de regresión no paramétrica, en donde se busca encontrar una función <span class="math inline">\(V^{(n)}\)</span> que minimice el error entre las predicciones <span class="math inline">\(V^{(n)}(s,a)\)</span> y los objetivos <span class="math inline">\(y^{(n)}\)</span> para todas las transiciones <span class="math inline">\((s_t, a_t, r_t, s_{t+1}')\)</span> en el dataset. En la práctica, se utiliza el algoritmo de <em>ExtraTrees</em>, que como propone <span class="citation" data-cites="Ernst2005">Ernst et&nbsp;al. (<a href="references.html#ref-Ernst2005" role="doc-biblioref">2005</a>)</span>, el cual argumenta que ofrece gran flexibilidad para aproximar funciones de valor en espacios continuos o de alta dimensionalidad.</p>
+<p>La modelación mediante ExtraTrees compuesto por <span class="math inline">\(300\)</span> árboles de decisión, con una profundidad máxima de <span class="math inline">\(14\)</span> y un mínimo de <span class="math inline">\(5\)</span> muestras por hoja. Cada árbol de decisión particiona el espacio estado-acción en regiones homogéneas, (grupo de <span class="math inline">\((s,a)\)</span> similares) y proporciona una estimación local de la función de valor. La predicción final corresponde al promedio de las predicciones individuales de todos los árboles de decisión.</p>
+<div id="fig-arbol" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-arbol-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Imagenes/arbol-decision.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-arbol-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;3.1: Árbol de decisión con profundidad máxima de 14 y un mínimo de 5 muestras por hoja.
+</figcaption>
+</figure>
+</div>
+<p>El algoritmo de FQI se repite iterativamente hasta que la función de valor de acción converge. En la práctica se definió una métrica de convergencia empírica por <span id="eq-convergencia"><span class="math display">\[\Delta = \frac{1}{L}\sum_{l=1}^L |V^{(n)}(s_l,a_l) - V^{(n-1)}(s_l,a_l)|, \tag{3.18}\]</span></span> la cual se define sobre <span class="math inline">\(\mathcal{T} \subset \{(s_t, a_t, r_t, s_{t+1}')\}\)</span> siendo <span class="math inline">\(L\)</span> la cardinalidad de <span class="math inline">\(\mathcal{T}\)</span>.</p>
+<p>Por lo que el algoritmo se detiene hasta que el <span class="math inline">\(\Delta &lt; \epsilon\)</span>, es decir, cuando el cambio entre <span class="math inline">\(V^{(n)}\)</span> y <span class="math inline">\(V^{(n-1)}\)</span> sea menor a un umbral predefinido o bien cuando se alcance un número máximo de iteraciones.</p>
+</div>
+</section>
+</section>
+<section id="política-óptima-y-simulación-operativa" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="política-óptima-y-simulación-operativa"><span class="header-section-number">3.5</span> Política óptima y simulación operativa</h2>
+<div style="text-align: justify">
+<p>Una vez obtenida la función de valor de acción óptima <span class="math inline">\(V^*,\)</span> se deriva la política óptima <span class="math inline">\(\pi^*:\mathcal{S} \to \mathcal{A}\)</span> que asigna a cada estado <span class="math inline">\(s\)</span> la acción <span class="math inline">\(a\)</span> que maximiza el valor de acción <span id="eq-politica-optima"><span class="math display">\[\pi^*(s) := \arg\max_{a \in \mathcal{A}} V^*(s,a), \tag{3.19}\]</span></span></p>
+<p>es decir, para cada estado <span class="math inline">\(s\)</span>, la política óptima <span class="math inline">\(\pi^*(s)\)</span> indica la acción que se debe tomar para maximizar el valor de acción estimado.</p>
+<p>Finalmente, se valida la política óptima <span class="math inline">\(\pi^*\)</span> mediante simulación en lazo cerrado, es decir, se simula la operación del sistema hidroeléctrico utilizando la política <span class="math inline">\(\pi^*\)</span> para tomar decisiones de turbinado en cada estado observado durante las trayectorias históricas.</p>
+<p>La evaluación de la política se realiza mediante un recorrido determinista sobre la serie histórica completa. El algoritmo opera de la siguiente manera:</p>
+<ol type="1">
+<li><p><strong>Inicialización:</strong> Se fijan los volúmenes iniciales <span class="math inline">\(V_{1,0}\)</span> y <span class="math inline">\(V_{2,0}\)</span>.</p></li>
+<li><p><strong>Mapeo estacional:</strong> Para cada quincena <span class="math inline">\(q\)</span>, se determina <span class="math inline">\(m = \mu(q)\)</span> y la unidad de extracción <span class="math inline">\(u_m\)</span>.</p></li>
+<li><p><strong>Discretización:</strong></p>
+<p><span class="math display">\[
+s_i = \mathcal{D}(V_i,N_i),
+\quad i\in\{1,2\}.
+\]</span></p></li>
+<li><p><strong>Selección de acción:</strong></p>
+<p><span class="math display">\[
+(k_1^*,k_2^*)
+=
+\arg\max_{k_1,k_2}\hat{V}^{*}(s,a),
+\]</span></p>
+<p>donde</p>
+<p><span class="math display">\[
+(s,a)=(s_1,s_2,m,k_1,k_2).
+\]</span></p></li>
+<li><p><strong>Balance hídrico:</strong></p>
+<p><span class="math display">\[
+V_{i,t,q+1}
+=
+V_{i,t,q}
++
+W_{i,t,q+1}
+-
+k_i^*u_m.
+\]</span></p></li>
+<li><p><strong>Proyección física:</strong></p>
+<p><span class="math display">\[
+V_i^{\text{new}}
+=
+\min\{V_{i,t,q+1},N_i\Delta V\},
+\]</span></p>
+<p><span class="math display">\[
+\text{derrame}_i
+=
+\max\{0,V_{i,t,q+1}-N_i\Delta V\}.
+\]</span></p></li>
+<li><p><strong>Cálculo energético:</strong></p>
+<p><span class="math display">\[
+H_i
+=
+10\left(s_i+\mathcal{D}(V_{i,t,q+1},N_i)+2\right),
+\]</span></p>
+<p><span class="math display">\[
+E_i(s,a,s')
+=
+\frac{\eta g H_i(s_i,s'_i)\left(k_i^*u_m\times10^6\right)}
+     {3600\times10^6}.
+\]</span></p></li>
+<li><p><strong>Registro y actualización:</strong> Se almacenan métricas de energía, derrames y volúmenes, y se actualiza el estado para la siguiente iteración.</p></li>
+</ol>
+<p>La metodología sigue la práctica estándar en aprendizaje por refuerzo aplicado a sistemas de control documentado en <span class="citation" data-cites="Bertsekas2019">Bertsekas (<a href="references.html#ref-Bertsekas2019" role="doc-biblioref">2019</a>)</span>, en el cual la política aprendida se valida mediante una simulación en lazo cerrado sobre trayectorias históricas.</p>
+</div>
+<section id="métricas-de-desempeño-y-validación-estadística" class="level3" data-number="3.5.1">
+<h3 data-number="3.5.1" class="anchored" data-anchor-id="métricas-de-desempeño-y-validación-estadística"><span class="header-section-number">3.5.1</span> Métricas de desempeño y validación estadística</h3>
+<div style="text-align: justify">
+<p>Una vez obtenidos los resultados de la simulación en lazo cerrado, se evalúa el desempeño de la política óptima <span class="math inline">\(\pi^*\)</span> utilizando métricas clave como las siguientes:</p>
+<div id="tbl-desempeno-energetico" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-desempeno-energetico-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla&nbsp;3.1: Resumen del desempeño energético del sistema bajo la política óptima aprendida mediante FQI. Los valores corresponden al promedio sobre el periodo de simulación 1959–2008.
+</figcaption>
+<div aria-describedby="tbl-desempeno-energetico-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Métrica</th>
+<th>Angostura</th>
+<th>Malpaso</th>
+<th>Sistema Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Energía promedio quincenal [GWh]</td>
+<td>242.85</td>
+<td>139.92</td>
+<td>382.78</td>
+</tr>
+<tr class="even">
+<td>Energía anual estimada [GWh]</td>
+<td>4,857</td>
+<td>2,798</td>
+<td>7,656</td>
+</tr>
+<tr class="odd">
+<td>Contribución al sistema [%]</td>
+<td>63.4</td>
+<td>36.6</td>
+<td>100.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Por otro lado, los derrames promedio quincenales y anuales se presentan en la siguiente tabla:</p>
+<div id="tbl-desempeno-hidrico" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-desempeno-hidrico-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla&nbsp;3.2: Resumen del desempeño hídrico del sistema bajo la política óptima aprendida mediante FQI. Los valores corresponden al promedio sobre el periodo de simulación 1959–2008.
+</figcaption>
+<div aria-describedby="tbl-desempeno-hidrico-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Métrica</th>
+<th>Angostura</th>
+<th>Malpaso</th>
+<th>Sistema Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Derrame total [Mm^3]</td>
+<td>7,722.10</td>
+<td>26,330.80</td>
+<td>34,052.90</td>
+</tr>
+<tr class="even">
+<td>Derrame promedio Anual [Mm^3]</td>
+<td>154.44</td>
+<td>526.62</td>
+<td>681.06</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>De acuerdo con los resultados obtenidos y con la información obtenida de <span class="citation" data-cites="Alegria2010">Díaz (<a href="references.html#ref-Alegria2010" role="doc-biblioref">2010</a>)</span>, se observa que la política no está gestionando adecuadamente los recursos hídricos, ya que el volumen de agua derramada es considerablemente alto, lo que sugiere que la política aprendida no está optimizando eficientemente el uso del agua disponible para generación energética. Además, la contribución energética de cada presa al sistema total no refleja un balance adecuado, lo que podría indicar que la política está favoreciendo excesivamente una presa sobre la otra, lo que no es deseable desde el punto de vista de la gestión integrada del sistema hidroeléctrico. Estos resultados sugieren que la política óptima aprendida mediante FQI no está logrando un equilibrio adecuado entre la generación de energía y la gestión eficiente del recurso hídrico, lo que podría requerir una revisión de la formulación del problema, la función de recompensa o la metodología de aprendizaje utilizada para mejorar el desempeño del sistema en términos de ambos objetivos.</p>
+</div>
+</section>
+</section>
+<section id="conclusiones-del-capítulo" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="conclusiones-del-capítulo"><span class="header-section-number">3.6</span> Conclusiones del capítulo</h2>
+<div style="text-align: justify">
+<ul>
+<li>Síntesis de contribuciones matemáticas y numéricas.</li>
+<li>Reafirmación de la coherencia entre formulación teórica, implementación algorítmica y validación operativa.</li>
+<li>Declaración de cierre alineada con los objetivos de la tesis.</li>
+</ul>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-Bertsekas2019" class="csl-entry" role="listitem">
+Bertsekas, Dimitri P. 2019. <em>Reinforcement Learning and Optimal Control</em>. Athena Scientific.
+</div>
+<div id="ref-Castelletti2010" class="csl-entry" role="listitem">
+Castelletti, A., S. Galelli, M. Restelli, y R. Soncini-Sessa. 2010. <span>«Tree-based reinforcement learning for optimal water reservoir operation»</span>. <em>Water Resources Research</em> 46: W09507. <a href="https://doi.org/10.1029/2009WR008898">https://doi.org/10.1029/2009WR008898</a>.
+</div>
+<div id="ref-Alegria2010" class="csl-entry" role="listitem">
+Díaz, Arallely Alegría. 2010. <span>«Política de operación óptima del sistema de presas del Río Grijalva. Efectos de la curva guía»</span>. Tesis de Maestría en Ingeniería Civil -- Hidráulica, Universidad Nacional Autónoma de México, Facultad de Ingeniería.
+</div>
+<div id="ref-Ernst2005" class="csl-entry" role="listitem">
+Ernst, Damien, Pierre Geurts, y Louis Wehenkel. 2005. <span>«Tree-Based Batch Mode Reinforcement Learning»</span>. <em>Journal of Machine Learning Research</em> 6: 503-56. <a href="http://www.jmlr.org/papers/volume6/ernst05a/ernst05a.pdf">http://www.jmlr.org/papers/volume6/ernst05a/ernst05a.pdf</a>.
+</div>
+<div id="ref-puterman1994markov" class="csl-entry" role="listitem">
+Puterman, Martin L. 1994. <em>Markov Decision Processes: Discrete Stochastic Dynamic Programming</em>. Wiley Series en Probability y Statistics. John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9780470316887">https://doi.org/10.1002/9780470316887</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./Fundamentos_Hidraulicos.html" class="pagination-link" aria-label="Fundamentos Hidráulicos">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Fundamentos Hidráulicos</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./modelo_matematico_fqi_corregido.html" class="pagination-link" aria-label="Modelo Matemático Fitted Q-Iteration para Optimizar la Operación de un Sistema Hidroeléctrico.">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Modelo Matemático Fitted Q-Iteration para Optimizar la Operación de un Sistema Hidroeléctrico.</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
