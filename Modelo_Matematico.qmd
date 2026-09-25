@@ -1,36 +1,44 @@
 ---
 lang: es
 ---
-# Modelo Matemático para Optimizar la Operación de un Sistema Hidroeléctrico.
+# Modelo Matemático de Programación Dinámica Estocástica para Optimizar la Operación de un Sistema Hidroeléctrico.
 
 ::: {style="text-align: justify"}
-El objetivo de este capítulo es presentar una formulación rigurosa del problema de optimización de la operación de un sistema hidroeléctrico como un Proceso de Decisión de Markov (MDP), junto con una descripción detallada del algoritmo de Fitted Q-Iteration (FQI) utilizado para aproximar la política óptima. Se enfatizará la conexión entre los elementos matemáticos formales y su implementación numérica, así como la validación operativa mediante simulación en lazo cerrado.
+En este capítulo se presenta una formulación del problema de optimización de la operación de un sistema hidroeléctrico mediante un Proceso de Decisión de Markov (MDP), usando Programación Dinámica Estocástica (PDE) con el fin de obtener la política óptima de operación tomando en cuenta el concepto de curva guía. Lo anterior se propone tal y como lo describe @Alegria2010, quien aplica la PDE para optimizar la operación del sistema hidroeléctrico del río Grijalva. Se enfatiza la conexión entre los elementos matemáticos formales y su implementación numérica.
 :::
-
-## Formulación como Proceso de Decisión de Markov (MDP)
-
-Siguiendo la notación de @puterman1994markov, se define el MDP como la colección de objetos $$\{(T, \mathcal{S}, \mathcal{A}, \mathbb{P}, \mathcal{R})\},$$ donde cada componente se especifica a continuación:
-
-### Estructura Temporal $(T)$
+## Datos históricos
 ::: {style="text-align: justify"}
-Se considera un horizonte temporal de operación compuesto por $T = 50$ años históricos, en donde cada uno de ellos se dividieron en $q = 24$ quincenas. Con el fin de reducir la dimensionalidad temporal y poder capturar la estacionalidad, se agruparon las quincenas en $M = 6$ etapas hidrológicas (segmentación temporal del año) mediante la siguiente función de agregación $\mu: \{0,\dots,q-1\} \to \{0,\dots,M-1\}$ definida por $$\mu(q) = \begin{cases} 0, & 0 \leq q <10\\ 1, & 10 \leq q <14\\ 2, & 14 \leq q < 16\\ 3, & 16 \leq q < 18\\ 4, & 18 \leq q < 20\\ 5, & 20 \leq q \leq 23\\ \end{cases}$$ {#eq-etapas}
+Sea $T = 50$ los años históricos disponibles $(1959–2008)$, indexados por $t \in \{0,\dots,T-1\}$. Cada uno de ellos se subdividieron en $q = 24$ quincenas (correspondientes a las columnas de los datos históricos proporcionados por @Alegria2010). 
+
+El sistema está compuesto por dos presas: [La Angostura](https://maps.app.goo.gl/NHNQdHdfYAoRGxhPA) $(i = 1)$ y [Malpaso](https://maps.app.goo.gl/acX7hVXswX5uYYUBA) $(i =2)$. El volumen de almacenamiento de cada una de ellas en la quincena $q$ del año $t$ se representará por $V_{i,t,q} \in \mathbb{R}_{+} \cup \{0\}$ (Millones de metros cúbicos-$Mm^3$).
+
+## Formulación del Proceso de Decisión de Markov (MDP)
+
+Conforme a @puterman1994markov, se define el MDP como la colección de objetos $$\{(T, \mathcal{S}, \mathcal{A}, \mathbb{P}, \mathcal{R})\},$$ donde cada componente se describe a continuación.
+
+:::
+### Estructura temporal: quincenas y etapas hidrológicas
+::: {style="text-align: justify"}
+Para reducir la dimensionalidad temporal del problema y poder capturar la estacionalidad, las $24$ quincenas se agrupan en $M = 6$ etapas hidrológicas (segmentación temporal del año) mediante la siguiente función de agregación $\mu: \{0,\dots,q-1\} \to \{0,\dots,M-1\}$ definida por $$\mu(q) = \begin{cases} 0, & 0 \leq q <10 & \text{Ene-Mayo}\\ 1, & 10 \leq q <14 & \text{Jun-Jul}\\ 2, & 14 \leq q < 16 & \text{Agosto}\\ 3, & 16 \leq q < 18 & \text{Septiembre}\\ 4, & 18 \leq q < 20 & \text{Octubre}\\ 5, & 20 \leq q \leq 23 & \text{Nov-Dic}\\ \end{cases}$$ {#eq-etapas}
 así, la variable $m = \mu(q)$ representará la etapa hidrológica correspondiente a la quincena $q$.
 :::
 
+
 ### Espacio de estados y operador de discretización $(\mathcal{S})$
 ::: {style="text-align: justify"}
-El sistema está compuesto por dos presas: [La Angostura](https://maps.app.goo.gl/NHNQdHdfYAoRGxhPA) $(i = 1)$ y [Malpaso](https://maps.app.goo.gl/acX7hVXswX5uYYUBA) $(i =2)$. El volumen de almacenamiento de cada una de ellas en la quincena $q$ del año $t$ se representará por $V_{i,t,q} \in \mathbb{R}_{+} \cup \{0\}$ (Millones de metros cúbicos-$Mm^3$).
+Se introduce un operador de discretización uniforme $\mathcal{D}$ del espacio de estados $\mathcal{S}$ mediante el parámetro $\Delta = 600$ $Mm^3$ (paso de discretización). Dicha unidad permite discretizar el volumen almacenado y la afluencia agregada por etapa, así como también, subdividir la capacidad de almacenamiento de cada presa en un número manejable de estados. Para un volumen continuo $V_{i,t,q},$ se define el operador de discretización $\mathcal{D}: \mathbb{R} \times \mathbb{N} \longrightarrow \{0,\dots,N-1\}$ dado por $$s_i = \mathcal{D}(V_{i,t,q}, N_i) := \min \left(\max\left(\left\lfloor \frac{V_{i,t,q}}{\Delta} + \frac{1}{2}\right\rfloor, 0\right), N_i-1\right),$$ {#eq-discretizacion}
+donde $N_1 = 27$ y $N_2 = 16$ son las capacidades discretas máximas de cada presa. El volumen máximo representado en rejilla discreta es $$V_{i,\max} = N_i \Delta,$$ {#eq-volumen-maximo}
+$16,200$ $Mm^3$ para Angostura y $9,600$ $Mm^3$ para Malpaso.
 
-Dado que los datos históricos se utilizan para construir un conjunto de transición empírica, se introduce un operador de discretización uniforme $\mathcal{D}$ del espacio de estados $\mathcal{S}$ mediante el parámetro $\Delta = 600$ $Mm^3.$ Dicha unidad permite subdividir la capacidad de almacenamiento de cada presa en un número manejable de estados. Así, el espacio de estados se define como $\mathcal{S} = \mathcal{S}_1 \times \mathcal{S}_2 \times \{0,...,5\} = \{s = (s_1,s_2,m)\}$ en donde $s_i$ representa el volumen discretizado de la presa $i.$ Tal estado discreto se obtiene mediante el operador de discretización $\mathcal{D}: \mathbb{R} \times \mathbb{N} \longrightarrow \{0,\dots,N-1\}$ definido por $$s_i = \mathcal{D}(V_{i,t,q}, N_i) := \min \left(\max\left(\left\lfloor \frac{V_{i,t,q}}{\Delta} + \frac{1}{2}\right\rfloor, 0\right), N_i-1\right),$$ {#eq-discretizacion}
-donde $N_1 = 27$ y $N_2 = 16$ son las capacidades discretas máximas de cada presa.
+Así, el espacio de estados se define como $$\mathcal{S} = \mathcal{S}_1 \times \mathcal{S}_2 \times \{0,...,5\} = \{s = (s_1,s_2,m)\},$$ en donde $(s_1,s_2,m)$ representa el volumen discretizado de Angostura, el volumen discretizado de Malpaso y la etapa hidrológica correspondiente a la quincena $q$.
 :::
 
 ### Espacio de acciones $(\mathcal{A})$
 ::: {style="text-align: justify"}
-Para cada etapa $m$, se define una unidad de extracción de agua $u_m = \{60, 150, 300, 300, 300, 150\}$, así la decisión de operación en la etapa $m$ corresponderá a los niveles de turbinado $k_1, k_2$. Cada nivel de turbinado se multiplica por la unidad de extracción $u_m$, la cual está en $Mm^3,$ para obtener el volumen de agua extraído en cada presa. Por lo tanto, el espacio de acciones se define como $$\mathcal{A}_m = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m},$$
-donde $\mathcal{K}_{i,m}$ representa el conjunto de niveles de turbinado disponibles para la presa $i$ en la etapa hidrológica $m$.
+Para cada etapa $m$, se define una unidad de extracción de agua $u_m = \{100, 200, 300, 300, 400, 250\}$, así la decisión de operación en la etapa $m$ corresponderá a los niveles de turbinado $k_1, k_2$. Cada nivel de turbinado se multiplica por la unidad de extracción $u_m$, la cual está en $Mm^3,$ para obtener el volumen de agua extraído en cada presa. Por lo tanto, el espacio de acciones se define como $$\mathcal{A}_m = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m},$$
+donde $\mathcal{K}_{1,m} = \mathcal{K}_{2,m}$ representan el conjunto de niveles de turbinado disponibles para ambas presas en la etapa hidrológica $m$. En la práctica, tanto la Angostura como Malpaso tienen el mismo conjunto de niveles de turbinado y mismas unidades de extracción por etapa.
 
-Una acción denotada por $a = (k_1, k_2)$, representará el nivel de turbinado aplicado simultaneamente en ambas presas. Por ejemplo, suponga que $m = 0$ entonces $$u_0 = 60 \quad \text{y} \quad \mathcal{K}_{1,0}, \mathcal{K}_{2,0} = \{0,1,...,10\},$$ y así $a = (3,5)$ significaría que Angostura turbina $3\times 60 = 180$ $Mm^3$ de agua y Malpaso turbina $5\times 60 = 300$ $Mm^3$ de agua. Cabe mencionar que Los valores de $u_m$ y $\mathcal{K}_{i,m}$ se seleccionaron para que el turbinado máximo por etapa hidrológica $k_{i} \cdot u_m$ no exceda la capacidad instalada de las plantas ni los caudales históricos máximos registrados, garantizando la factibilidad física de todas las acciones evaluadas.
+Una acción denotada por $a = (k_1, k_2)$, produce el volumen real turbinado $k_i\cdot u_m$ aplicado simultaneamente en ambas presas. Por ejemplo, suponga que $m = 0$ entonces $$u_0 = 100 \quad \text{y} \quad \mathcal{K}_{1,0}, \mathcal{K}_{2,0} = \{0,1,...,20\},$$ y así $a = (3,5)$ significaría que Angostura turbina $3\times 100 = 300$ $Mm^3$ de agua y Malpaso turbina $5\times 100 = 500$ $Mm^3$ de agua. Cabe mencionar que Los valores de $u_m$ y $\mathcal{K}_{i,m}$ se seleccionaron para que el turbinado máximo por etapa hidrológica $k_{i} \cdot u_m$ no exceda la capacidad instalada de las plantas ni los caudales históricos máximos registrados, garantizando la factibilidad física de todas las acciones evaluadas.
 :::
 
 ### Dinámica de transición $(\mathbb{P})$

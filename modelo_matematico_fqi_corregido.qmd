@@ -1,7 +1,7 @@
 ---
 lang: es
 ---
-# Modelo Matemático para Optimizar la Operación de un Sistema Hidroeléctrico.
+# Modelo Matemático Fitted Q-Iteration para Optimizar la Operación de un Sistema Hidroeléctrico.
 
 ::: {style="text-align: justify"}
 El objetivo de este capítulo es presentar una formulación rigurosa del problema de optimización de la operación de un sistema hidroeléctrico como un Proceso de Decisión de Markov (MDP), junto con una descripción detallada del algoritmo de Fitted Q-Iteration (FQI) utilizado para aproximar la política óptima. Se enfatizará la conexión entre los elementos matemáticos formales y su implementación numérica, así como la validación operativa mediante simulación en lazo cerrado.
@@ -14,32 +14,31 @@ Siguiendo la notación de @puterman1994markov, se define el MDP como la colecci�
 ### Estructura Temporal $(T)$
 ::: {style="text-align: justify"}
 Se considera un horizonte temporal de operación compuesto por $T = 50$ años históricos (periodo 1959–2008), en donde cada uno de ellos se divide en $q = 24$ quincenas. Con el fin de reducir la dimensionalidad temporal y capturar la estacionalidad, las quincenas se agrupan en $M = 6$ etapas hidrológicas mediante la función de agregación $\mu: \{0,\dots,23\} \to \{0,\dots,5\}$ definida por $$\mu(q) = \begin{cases} 0, & 0 \leq q <10\\ 1, & 10 \leq q <14\\ 2, & 14 \leq q < 16\\ 3, & 16 \leq q < 18\\ 4, & 18 \leq q < 20\\ 5, & 20 \leq q \leq 23\\ \end{cases}$$ {#eq-etapas}
-de modo que $m = \mu(q)$ es la etapa hidrológica correspondiente a la quincena $q$. Esta partición reproduce exactamente la agrupación implementada en el código (`etapas_quinc`), verificada como correcta.
+de modo que $m = \mu(q)$ es la etapa hidrológica correspondiente a la quincena $q.$ Esta partición reproduce exactamente la agrupación implementada en el código (`etapas_quinc`), verificada como correcta.
 
-**Dos resoluciones temporales distintas.** Es indispensable distinguir, desde ahora, dos usos diferentes de esta estructura temporal: (i) para **construir el conjunto de aprendizaje** del algoritmo de FQI (Sec. @sec-conjunto-aprendizaje), la afluencia se agrega a nivel de *etapa* ($M=6$ decisiones por año) y no se recorre la serie quincena por quincena; (ii) para **desplegar y evaluar la política** ya aprendida (Sec. @sec-simulacion), la decisión sí se reconsulta en cada una de las 24 quincenas del año, usando en cada una la afluencia real de esa quincena, aunque los parámetros vigentes (capacidad máxima, curva guía, grilla de acción) sean los de la etapa $m=\mu(q)$ que la contiene.
+**Dos resoluciones temporales distintas.** Es indispensable distinguir, desde ahora, dos usos diferentes de esta estructura temporal: (i) para **construir el conjunto de aprendizaje** del algoritmo de FQI (@sec-conjunto-aprendizaje), la afluencia se agrega a nivel de *etapa* ($M=6$ decisiones por año) y no se recorre la serie quincena por quincena; (ii) para **desplegar y evaluar la política** ya aprendida (@sec-simulacion), la decisión sí se reconsulta en cada una de las 24 quincenas del año, usando en cada una la afluencia real de esa quincena, aunque los parámetros vigentes (capacidad máxima, curva guía, grilla de acción) sean los de la etapa $m=\mu(q)$ que la contiene.
 :::
 
 ### Espacio de estados $(\mathcal{S})$ {#sec-espacio-estados}
 ::: {style="text-align: justify"}
 El sistema está compuesto por dos presas: [La Angostura](https://maps.app.goo.gl/NHNQdHdfYAoRGxhPA) $(i = 1)$ y [Malpaso](https://maps.app.goo.gl/acX7hVXswX5uYYUBA) $(i =2)$. El volumen almacenado en la presa $i$ en la quincena $q$ del año $t$ se representa por $V_{i,t,q} \in \mathbb{R}_{+} \cup \{0\}$ (millones de metros cúbicos, Mm³).
 
-A diferencia del enfoque de Programación Dinámica Estocástica (PDE), en el que el almacenamiento se discretiza en celdas y el estado es un índice entero, **en FQI el almacenamiento se mantiene como variable continua**. El parámetro $\Delta = 600$ Mm³ (el cual permite subdividir la capacidad de almacenamiento de cada presa) y los enteros $N_1 = 27$, $N_2 = 16$ (capacidades discretas máximas de cada presa) —heredados de la discretización de la PDE precedente— no se usan aquí para discretizar el estado, sino únicamente para fijar las **capacidades máximas continuas** de cada presa,
-$$V_{1,\max} := N_1 \Delta = 16{,}200 \ \text{Mm}^3, \qquad V_{2,\max} := N_2 \Delta = 9{,}600\ \text{Mm}^3,$$ {#eq-capacidad-maxima}
-y para convertir a volumen la curva guía, definida originalmente en unidades de índice (Sec. @sec-recompensa).
+A diferencia del enfoque de Programación Dinámica Estocástica (PDE), en el que el almacenamiento se discretiza en celdas y el estado es un índice entero, **en FQI el almacenamiento se mantiene como variable continua**. El parámetro $\Delta = 600$ Mm³ (el cual permite subdividir la capacidad de almacenamiento de cada presa) y los enteros $N_1 = 27$, $N_2 = 16$ (capacidades discretas máximas de cada presa) heredados de la discretización de la PDE precedente, no se usan aquí para discretizar el estado, sino únicamente para fijar las **capacidades máximas continuas** de cada presa,
+$$V_{1,\max} := N_1 \Delta = 16{,}200  \text{Mm}^3, \quad V_{2,\max} := N_2 \Delta = 9{,}600 \text{Mm}^3,$$ {#eq-capacidad-maxima}
+y para convertir a volumen la curva guía, definida originalmente en unidades de índice (@sec-recompensa).
 
 El espacio de estados del MDP es entonces
 $$
 \begin{aligned}
 \mathcal{S}
 &= [0,V_{1,\max}]\times[0,V_{2,\max}]
-   \times\{0,\dots,5\} \\
-&= \left\{s=(s_1,s_2,m):
-s_i\in[0,V_{i,\max}],\ i=1,2,\ 
-m\in\{0,\dots,5\}\right\}.
+   \times\{0,\dots,5\} = \{s=(s_1,s_2,m)\},
 \end{aligned}
 $$ {#eq-espacio-estados}
+donde $$s_i\in[0,V_{i,\max}],\ i=1,2,\ 
+m\in\{0,\dots,5\}.$$
 
-**Grilla gruesa de referencia.** Aunque el estado en sí no se discretiza, tanto la construcción del conjunto de aprendizaje (Sec. @sec-conjunto-aprendizaje) como la aproximación del operador de maximización (Sec. @sec-max-operador) requieren evaluar funciones en un conjunto finito y manejable de puntos de almacenamiento. Se define para ello una grilla de referencia de $N_s=9$ puntos equiespaciados por presa,
+**Grilla gruesa de referencia.** Aunque el estado en sí no se discretiza, tanto la construcción del conjunto de aprendizaje (@sec-conjunto-aprendizaje) como la aproximación del operador de maximización (@sec-max-operador) requieren evaluar funciones en un conjunto finito y manejable de puntos de almacenamiento. Se define para ello una grilla de referencia de $N_s=9$ puntos equiespaciados por presa,
 $$
 \mathcal S_i^{\text{grid}} := \Big\{0,\ \tfrac{V_{i,\max}}{8},\ \tfrac{2V_{i,\max}}{8},\ \dots,\ V_{i,\max}\Big\}, \qquad i=1,2,
 $$ {#eq-grilla-estado}
@@ -58,17 +57,17 @@ $$
 \mathcal{K}_{4} &= \mathcal{K}_{5} = \{0,\dots,12\}.
 \end{aligned}
 $$
-(idéntico para ambas presas en cada etapa). Estos índices **no enumeran directamente el conjunto de acciones factibles del FQI**: se usan únicamente para obtener la cota superior del turbinado factible en la etapa,
+(idéntico para ambas presas en cada etapa, es decir, $\mathcal K_{1,m} = \mathcal K_{2,m} = \mathcal K_{m}$). Estos índices **no enumeran directamente el conjunto de acciones factibles del FQI**: se usan únicamente para obtener la cota superior del turbinado factible en la etapa,
 $$
 A_{\max}(m) := u_m \cdot \max(\mathcal K_{m}).
 $$ {#eq-accion-max}
-Por ejemplo, para $m=0$: $u_0=100$, $\max(\mathcal K_0)=20$, de modo que $A_{\max}(0)=2{,}000$ Mm³ (así, un par de índices como $(k_1,k_2)=(3,5)$ de la PDE correspondería a turbinar $300$ y $500$ Mm³ respectivamente —dentro de la cota—, pero el FQI no restringe la acción a estos múltiplos enteros de $u_m$).
+Por ejemplo, para $m=0$: $u_0=100$, $\max(\mathcal K_0)=20$, de modo que $A_{\max}(0)=2{,}000$ Mm³ (así, un par de índices como $(k_1,k_2)=(3,5)$ de la PDE correspondería a turbinar $300$ y $500$ Mm³ respectivamente, dentro de la cota, pero el FQI no restringe la acción a estos múltiplos enteros de $u_m$).
 
 El **espacio de acciones factible** para el MDP continuo es el intervalo
 $$
 \mathcal{A}_m := [0,A_{\max}(m)]\times[0,A_{\max}(m)] = \{a=(a_1,a_2)\}
 $$ {#eq-espacio-acciones}
-con $a_i$ el volumen turbinado en la presa $i$, continuo. Al igual que con el estado, para fines de muestreo (Sec. @sec-conjunto-aprendizaje) y de maximización aproximada (Sec. @sec-max-operador) este intervalo se discretiza en una grilla gruesa de $N_a=9$ puntos equiespaciados,
+con $a_i$ el volumen turbinado en la presa $i$, continuo. Al igual que con el estado, para fines de muestreo (@sec-conjunto-aprendizaje) y de maximización aproximada (@sec-max-operador) este intervalo se discretiza en una grilla gruesa de $N_a=9$ puntos equiespaciados,
 $$
 \mathcal A_m^{\text{grid}} := \Big\{0,\ \tfrac{A_{\max}(m)}{8},\ \dots,\ A_{\max}(m)\Big\}, \qquad |\mathcal A_m^{\text{grid}}|=9.
 $$ {#eq-grilla-accion}
@@ -89,7 +88,7 @@ Los valores de $u_m$ y $\mathcal K_{m}$ se seleccionaron, en el diseño original
 
 ### Dinámica de transición $(\mathbb{P})$
 ::: {style="text-align: justify"}
-**Balance de masa a nivel de etapa (usado para el conjunto de aprendizaje).** Para construir las transiciones de entrenamiento (Sec. @sec-conjunto-aprendizaje), la afluencia se agrega a nivel de etapa: sea
+**Balance de masa a nivel de etapa (usado para el conjunto de aprendizaje).** Para construir las transiciones de entrenamiento (@sec-conjunto-aprendizaje), la afluencia se agrega a nivel de etapa: sea
 $$
 \xi_{i,t,m} := \sum_{q\,:\,\mu(q)=m} W_{i,t,q}
 $$ {#eq-afluencia-etapa}
@@ -98,15 +97,16 @@ $$
 \tilde s_i := s_i + \xi_{i,t,m} - a_i, \qquad i=1,2.
 $$ {#eq-transicion}
 
-**Balance de masa a nivel de quincena (usado en el despliegue de la política).** Al simular la política ya aprendida sobre la trayectoria histórica completa (Sec. @sec-simulacion), la decisión se toma en cada quincena $q$, usando el afluente histórico de esa **misma** quincena:
+**Balance de masa a nivel de quincena (usado en el despliegue de la política).** Al simular la política ya aprendida sobre la trayectoria histórica completa (@sec-simulacion), la decisión se toma en cada quincena $q$, usando el afluente histórico de esa **misma** quincena:
 $$
 V_{i,t,q+1} = V_{i,t,q} + W_{i,t,q} - a_i, \qquad q=0,\dots,22,
 $$ {#eq-transicion-quincenal}
-y, al cerrar el año ($q=23$), la transición conecta con el primer registro del año siguiente,
+con manejo de frontera anual, si $q=23$, entonces  
 $$
-V_{i,t+1,0} = V_{i,t,23} + W_{i,t+1,0} - a_i.
+V_{i,t+1,0} = V_{i,t,23} + W_{i,t,23} - a_i.
 $$ {#eq-transicion23}
-En ambos casos $a_i$ es el volumen turbinado decidido para la etapa $m=\mu(q)$ vigente en esa quincena (Sec. @sec-espacio-acciones); $a_i$ no cambia de valor dentro de la misma quincena, pero sí puede cambiar de una quincena a otra dentro de la misma etapa, porque la política se reconsulta con el estado continuo corriente en cada quincena.
+
+En ambos casos $a_i$ es el volumen turbinado decidido para la etapa $m=\mu(q)$ vigente en esa quincena (@sec-espacio-acciones); $a_i$ no cambia de valor dentro de la misma quincena, pero sí puede cambiar de una quincena a otra dentro de la misma etapa, porque la política se reconsulta con el estado continuo corriente en cada quincena.
 
 **Proyección al conjunto factible.** En ambos regímenes, el volumen teórico $\tilde s_i$ (o $V_{i,t,q+1}$) puede exceder $V_{i,\max}$ o resultar negativo. El volumen físicamente realizable se obtiene proyectando sobre el intervalo factible,
 $$
@@ -120,7 +120,7 @@ con $x^+:=\max(x,0)$.
 
 La etapa evoluciona de manera determinista y cíclica, $m'=(m+1)\bmod M$, y el estado siguiente es $s'=(s_1',s_2',m')$.
 
-Desde la perspectiva de @puterman1994markov, la dinámica del MDP se resume en el núcleo de transición $\mathbb P(\cdot\,|\,s,a)$, que en este modelo **no se especifica en forma analítica cerrada**: toda la incertidumbre proviene de la afluencia histórica $\xi_{i,t,m}$ (o $W_{i,t,q}$), tratada como una variable aleatoria cuya ley se aproxima por la distribución empírica de las $T=50$ realizaciones históricas disponibles para cada etapa —no por una tabla de probabilidades de transición sobre estados discretos, puesto que $\mathcal S$ es ahora un continuo—.
+Desde el punto de vista de @puterman1994markov, la dinámica del MDP se resume en el núcleo de transición $\mathbb P(\cdot\,|\,s,a)$, que en este modelo **no se especifica en forma analítica cerrada**: toda la incertidumbre proviene de la afluencia histórica $\xi_{i,t,m}$ (o $W_{i,t,q}$), tratada como una variable aleatoria cuya ley se aproxima por la distribución empírica de las $T=50$ realizaciones históricas disponibles para cada etapa, no por una tabla de probabilidades de transición sobre estados discretos, puesto que $\mathcal S$ es ahora un continuo.
 :::
 
 ### Función de recompensa $(\mathcal{R})$ {#sec-recompensa}
