@@ -79,10 +79,11 @@ format:
 
   pdf:
     documentclass: scrreprt
+    hyperref: true
     papersize: letter
     toc: true
     number-sections: true
-    pdf-engine: lualatex
+    pdf-engine: xelatex
 
   epub:
     cover-image: Imagenes\fcfm.png
