@@ -75,6 +75,7 @@ format:
     toc-location: right
     code-fold: true
     code-copy: true
+    citation-hover: true
 
   pdf:
     documentclass: scrreprt
