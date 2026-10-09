@@ -37,16 +37,16 @@ Para reducir la dimensionalidad temporal del problema y poder capturar la estaci
 ### Espacio de estados y operador de discretización $(\mathcal{S})$
 
 ::: {style="text-align: justify"}
-Se introduce un operador de discretización uniforme $\mathcal{D}$ del espacio de estados $\mathcal{S}$ mediante el parámetro $\Delta = 600$ $Mm^3$ (paso de discretización). Dicha unidad permite discretizar el volumen almacenado y la afluencia agregada por etapa, así como también, subdividir la capacidad de almacenamiento de cada presa en un número manejable de estados. Para un volumen continuo $V_{i,t,q},$ se define el operador de discretización $\mathcal{D}: \mathbb{R} \times \mathbb{N} \longrightarrow \{0,\dots,N-1\}$ dado por $$s_i = \mathcal{D}(V_{i,t,q}, N_i) := \min \left(\max\left(\left\lfloor \frac{V_{i,t,q}}{\Delta} + \frac{1}{2}\right\rfloor, 0\right), N_i-1\right),$$ {#eq-discretizacion} donde $N_1 = 27$ y $N_2 = 16$ son las capacidades discretas máximas de cada presa. El volumen máximo representado en rejilla discreta es $$V_{i,\max} = N_i \Delta,$$ {#eq-volumen-maximo} $16,200$ $Mm^3$ para Angostura y $9,600$ $Mm^3$ para Malpaso.
+Se introduce un operador de discretización uniforme $\mathcal{D}$ del espacio de estados $\mathcal{S}$ mediante el parámetro $\Delta = 600$ $Mm^3$ (paso de discretización). Dicha unidad permite discretizar el volumen almacenado y la afluencia agregada por etapa, así como también, subdividir la capacidad de almacenamiento de cada presa en un número manejable de estados. Para un volumen continuo $V_{i,t,q},$ se define el operador de discretización $\mathcal{D}: \mathbb{R} \times \mathbb{N} \longrightarrow \{0,\dots,N-1\}$ dado por $$s_i = \mathcal{D}(V_{i,t,q}, N_i) := \min \left(\max\left(\left\lfloor \frac{V_{i,t,q}}{\Delta} + \frac{1}{2}\right\rfloor, 0\right), N_i-1\right),$$ {#eq-discretizacion} donde $\lfloor \cdot \rfloor$ denota la función piso (redondeo al entero más cercano) y $N_1 = 27$ y $N_2 = 16$ son las capacidades discretas máximas de cada presa. El volumen máximo representado en rejilla discreta es $$V_{i,\max} = N_i \Delta,$$ {#eq-volumen-maximo} $16,200$ $Mm^3$ para Angostura y $9,600$ $Mm^3$ para Malpaso.
 
 Así, el espacio de estados se define como $$\mathcal{S} = \mathcal{S}_1 \times \mathcal{S}_2 \times \{0,...,5\} = \{s = (s_1,s_2,m)\},$$ en donde $(s_1,s_2,m)$ representa el volumen discretizado de Angostura, el volumen discretizado de Malpaso y la etapa hidrológica correspondiente a la quincena $q$.
 :::
 
-#### Discretización del proceso de afluencia
+#### Discretización del proceso de afluencia {#sec-discretizacion-afluencia}
 
 ::: {style="text-align: justify"}
 A diferencia de la simulación que usa la afluencia histórica $V_{i,t,q}$ (quincenal), la fase de planeación, trabaja con la afluencia agregada por etapa hidrológica $m$, esto se debe a que cada paso de la ecuación de Bellman corresponde a una etapa completa. Así, para la presa $i$, en el año $t$ y la etapa $m$, se define la afluencia agregada como $$W_{i,t,m} = \sum_{q:\mu(q)=m} W_{i,t,q},$$ {#eq-discretizacion-afluencia}
-y su versión discretizada $$X_{i,t,m} := \max\left(0, \lfloor \frac{W_{i,t,m}}{\Delta} + \frac{1}{2} \rfloor \right).$$
+y su versión discretizada $$X_{i,t,m} := \max\left(0, \left\lfloor \frac{W_{i,t,m}}{\Delta} + \frac{1}{2}\right\rfloor \right).$$
 
 Lo anterior permite generar, para cada presa, una matriz histórica $X_{i} \in \mathbb{N}\cup\{0\}^{T\times M}$, las cuales constituyen la muestra empírica sobre la que se construye el modelo probabilístico de transición.
 :::
@@ -56,28 +56,40 @@ Lo anterior permite generar, para cada presa, una matriz histórica $X_{i} \in \
 ::: {style="text-align: justify"}
 Para cada etapa $m$, se define una unidad de extracción de agua $u_m = \{100, 200, 300, 300, 400, 250\}$, así la decisión de operación en la etapa $m$ corresponderá a los niveles de turbinado $k_1, k_2$. Cada nivel de turbinado se multiplica por la unidad de extracción $u_m$, la cual está en $Mm^3,$ para obtener el volumen de agua extraído en cada presa. Por lo tanto, el espacio de acciones se define como $$\mathcal{A}_m = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m},$$ donde $\mathcal{K}_{1,m} = \mathcal{K}_{2,m}$ representan el conjunto de niveles de turbinado disponibles para ambas presas en la etapa hidrológica $m$. En la práctica, tanto la Angostura como Malpaso tienen el mismo conjunto de niveles de turbinado y mismas unidades de extracción por etapa.
 
-| $m$ | Etapa | $u_m$ (Mm³) | $\mathcal{K}_{i,m}$ | $\max$ turbinado ($\kappa_m u_m$) |
-|---------------|---------------|---------------|---------------|---------------|
-| 0 | Ene–May | 100 | $\{0,\dots,20\}$ | 2{,}000 Mm³ |
-| 1 | Jun–Jul | 200 | $\{0,\dots,15\}$ | 3{,}000 Mm³ |
-| 2 | Ago | 300 | $\{0,\dots,7\}$ | 2{,}100 Mm³ |
-| 3 | Sep | 300 | $\{0,\dots,9\}$ | 2{,}700 Mm³ |
-| 4 | Oct | 400 | $\{0,\dots,12\}$ | 4{,}800 Mm³ |
-| 5 | Nov–Dic | 250 | $\{0,\dots,12\}$ | 3{,}000 Mm³ |
+| $m$ | $u_m$ (Mm³) | $\mathcal{K}_{i,m}$ | turbinado máximo ($k_m, u_m$)|
+|---------------|---------------|---------------|---------------|
+| 0 | 100 | $\{0,\dots,20\}$ | 2,000 Mm³ |
+| 1 | 200 | $\{0,\dots,15\}$ | 3,000 Mm³ |
+| 2 | 300 | $\{0,\dots,7\}$ | 2,100 Mm³ |
+| 3 | 300 | $\{0,\dots,9\}$ | 2,700 Mm³ |
+| 4 | 400 | $\{0,\dots,12\}$ | 4,800 Mm³ |
+| 5 | 250 | $\{0,\dots,12\}$ | 3,000 Mm³ |
+: Unidades de extracción y niveles de turbinado por etapa hidrológica para ambas presas.
 
 Una acción denotada por $a = (k_1, k_2)$, produce el volumen real turbinado $k_i\cdot u_m$ aplicado simultaneamente en ambas presas. Por ejemplo, suponga que $m = 0$ entonces $$u_0 = 100 \quad \text{y} \quad \mathcal{K}_{1,0}, \mathcal{K}_{2,0} = \{0,1,...,20\},$$ y así $a = (3,5)$ significaría que Angostura turbina $3\times 100 = 300$ $Mm^3$ de agua y Malpaso turbina $5\times 100 = 500$ $Mm^3$ de agua. Cabe mencionar que Los valores de $u_m$ y $\mathcal{K}_{i,m}$ se seleccionaron para que el turbinado máximo por etapa hidrológica $k_{i} \cdot u_m$ no exceda la capacidad instalada de las plantas ni los caudales históricos máximos registrados, garantizando la factibilidad física de todas las acciones evaluadas.
 :::
 
-### Dinámica de transición $(\mathbb{P})$
+### Dinámica de transición de estados $(\mathbb{P})$
 
 ::: {style="text-align: justify"}
-La ecuación de transición continua tras la operación del sistema se define por $$V_{i,t,q+1} = V_{i,t,q} + W_{i, t, q}-k_iu_m, \quad q<23$$ {#eq-transicion} donde $V_{i,t,q}$ representa el volumen almacenado en la presa $i$ antes de tomar la acción de turbinado, $W_{i, t,q}$ representa el afluente neto (caudal de ingreso) para la presa $i$ en la quincena $q$ del año $t$, tales valores serán obtenidos de los datos históricos con los que ya se cuentan. Por último $k_iu_m$, $k_i \in \mathcal{K}_{i,m},$ representa el volumen de agua extraído por la acción de turbinado aplicada en la etapa hidrológica correspondiente a la quincena $q$.
+Dado el estado físico $(s_1,s_2, m)$ del sistema, una acción $a = (k_1, k_2)$ y una realización de la afluencia agregada por etapa $(x_1,x_2)$, el cual es un elemento de la muestra empírica (@sec-discretizacion-afluencia), se define el siguiente estado por $$j_i = s_i+x_i-k_iu_m$$ {#eq-transicion} donde $s_i$ representa el volumen almacenado en la presa $i$ (discretizado) antes de tomar la acción de turbinado, $x_i$ representa el afluente neto discretizado (caudal de ingreso) para la presa $i$ en la etapa hidrológica $m$. Por último $k_iu_m$, representa el volumen de agua extraído por la acción de turbinado aplicada en la etapa hidrológica correspondiente.
 
-Cuando $q=23$, la transición se define por $$V_{i,t+1,0} = V_{i,t,23} + W_{i, t, 23}-k_iu_m.$$ {#eq-transicion23}
-
-En ambos casos, el volumen discretizado de la quincena $q+1$ se obtiene aplicando el operador de discretización $\mathcal{D}$ al volumen resultante, es decir, $$s_i' = \mathcal{D}(V_{i,t,q+1}, N_i),$$ mientras que la etapa hidrológica evoluciona mediante $m' = (m+1) \mod M$.
+La ecuación @eq-transicion representa exactamente la ecuación de continuidad $j=i+x-k$ que menciona @Alegria2010. En la práctica, el valor $j_i$ puede exceder los límites físicos del sistema, es decir, puede ser mayor que $N_i$ (embalse lleno) o menor que $0$ (embalse vacío). Por lo tanto, se define el estado discreto siguiente $s_i'$ como $$s_i' = \min(\max(j_i,0),N_i),$$ {#eq-proyeccion} lo cual garantiza que el estado discreto resultante esté dentro del rango permitido por la capacidad de almacenamiento de cada presa.
 
 Por lo tanto, el estado discreto siguiente está dado por $$s' = (s_1', s_2', m').$$
+
+> **Ejemplo numérico.** Sea $\Delta=600$ Mm³, presa Angostura
+> ($N_1=27$), etapa $m=0$ (Ene–May, $u_0=100$ Mm³). Supóngase que el
+> sistema está en el estado $s_1=20$ (almacenamiento discretizado
+> $\approx 20\times600=12{,}000$ Mm³), que la afluencia agregada de la
+> etapa resulta $x_1=3$ (en unidades de $\Delta$) y que la política
+> decide $k_1=5$ (es decir, turbinar $v_1=5\times100=500$ Mm³ reales,
+> ec. 2.5). Entonces $$j_1^{\text{raw}}=20+3-5=18,$$ que está dentro del
+> rango $\{1,\dots,27\}$, de modo que no hay derrame ni déficit y el
+> estado siguiente es $s_1'=18$. Si en cambio $s_1=27$ (embalse lleno),
+> $x_1=5$ y $k_1=0$, entonces $j_1^{\text{raw}}=27+5-0=32>27$: hay un
+> excedente de $5$ estados ($3{,}000$ Mm³) que no cabe en el embalse y
+> que se trata como derrame (§2.9).
 
 Desde el punto de vista de @puterman1994markov, la transición de MDP se define mediante una función de probabilidad condicional $$\mathbb{P}(s'|s,a),$$ la cual especifica la probabilidad de transicionar al estado $s'$ dado que se tomó la acción $a$ en el estado $s$.
 :::

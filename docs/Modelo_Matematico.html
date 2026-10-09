@@ -447,7 +447,7 @@ window.Quarto = {
   <li><a href="#estructura-temporal-quincenas-y-etapas-hidrológicas" id="toc-estructura-temporal-quincenas-y-etapas-hidrológicas" class="nav-link" data-scroll-target="#estructura-temporal-quincenas-y-etapas-hidrológicas"><span class="header-section-number">3.2.1</span> Estructura temporal: quincenas y etapas hidrológicas</a></li>
   <li><a href="#espacio-de-estados-y-operador-de-discretización-mathcals" id="toc-espacio-de-estados-y-operador-de-discretización-mathcals" class="nav-link" data-scroll-target="#espacio-de-estados-y-operador-de-discretización-mathcals"><span class="header-section-number">3.2.2</span> Espacio de estados y operador de discretización <span class="math inline">\((\mathcal{S})\)</span></a></li>
   <li><a href="#espacio-de-acciones-mathcala" id="toc-espacio-de-acciones-mathcala" class="nav-link" data-scroll-target="#espacio-de-acciones-mathcala"><span class="header-section-number">3.2.3</span> Espacio de acciones <span class="math inline">\((\mathcal{A})\)</span></a></li>
-  <li><a href="#dinámica-de-transición-mathbbp" id="toc-dinámica-de-transición-mathbbp" class="nav-link" data-scroll-target="#dinámica-de-transición-mathbbp"><span class="header-section-number">3.2.4</span> Dinámica de transición <span class="math inline">\((\mathbb{P})\)</span></a></li>
+  <li><a href="#dinámica-de-transición-de-estados-mathbbp" id="toc-dinámica-de-transición-de-estados-mathbbp" class="nav-link" data-scroll-target="#dinámica-de-transición-de-estados-mathbbp"><span class="header-section-number">3.2.4</span> Dinámica de transición de estados <span class="math inline">\((\mathbb{P})\)</span></a></li>
   <li><a href="#función-de-recompensa-mathcalr" id="toc-función-de-recompensa-mathcalr" class="nav-link" data-scroll-target="#función-de-recompensa-mathcalr"><span class="header-section-number">3.2.5</span> Función de recompensa <span class="math inline">\((\mathcal{R})\)</span></a></li>
   </ul></li>
   <li><a href="#ecuación-de-optimalidad-de-bellman" id="toc-ecuación-de-optimalidad-de-bellman" class="nav-link" data-scroll-target="#ecuación-de-optimalidad-de-bellman"><span class="header-section-number">3.3</span> Ecuación de optimalidad de Bellman</a></li>
@@ -517,13 +517,14 @@ window.Quarto = {
 <section id="espacio-de-estados-y-operador-de-discretización-mathcals" class="level3" data-number="3.2.2">
 <h3 data-number="3.2.2" class="anchored" data-anchor-id="espacio-de-estados-y-operador-de-discretización-mathcals"><span class="header-section-number">3.2.2</span> Espacio de estados y operador de discretización <span class="math inline">\((\mathcal{S})\)</span></h3>
 <div style="text-align: justify">
-<p>Se introduce un operador de discretización uniforme <span class="math inline">\(\mathcal{D}\)</span> del espacio de estados <span class="math inline">\(\mathcal{S}\)</span> mediante el parámetro <span class="math inline">\(\Delta = 600\)</span> <span class="math inline">\(Mm^3\)</span> (paso de discretización). Dicha unidad permite discretizar el volumen almacenado y la afluencia agregada por etapa, así como también, subdividir la capacidad de almacenamiento de cada presa en un número manejable de estados. Para un volumen continuo <span class="math inline">\(V_{i,t,q},\)</span> se define el operador de discretización <span class="math inline">\(\mathcal{D}: \mathbb{R} \times \mathbb{N} \longrightarrow \{0,\dots,N-1\}\)</span> dado por <span id="eq-discretizacion"><span class="math display">\[s_i = \mathcal{D}(V_{i,t,q}, N_i) := \min \left(\max\left(\left\lfloor \frac{V_{i,t,q}}{\Delta} + \frac{1}{2}\right\rfloor, 0\right), N_i-1\right), \tag{3.2}\]</span></span> donde <span class="math inline">\(N_1 = 27\)</span> y <span class="math inline">\(N_2 = 16\)</span> son las capacidades discretas máximas de cada presa. El volumen máximo representado en rejilla discreta es <span id="eq-volumen-maximo"><span class="math display">\[V_{i,\max} = N_i \Delta, \tag{3.3}\]</span></span> <span class="math inline">\(16,200\)</span> <span class="math inline">\(Mm^3\)</span> para Angostura y <span class="math inline">\(9,600\)</span> <span class="math inline">\(Mm^3\)</span> para Malpaso.</p>
+<p>Se introduce un operador de discretización uniforme <span class="math inline">\(\mathcal{D}\)</span> del espacio de estados <span class="math inline">\(\mathcal{S}\)</span> mediante el parámetro <span class="math inline">\(\Delta = 600\)</span> <span class="math inline">\(Mm^3\)</span> (paso de discretización). Dicha unidad permite discretizar el volumen almacenado y la afluencia agregada por etapa, así como también, subdividir la capacidad de almacenamiento de cada presa en un número manejable de estados. Para un volumen continuo <span class="math inline">\(V_{i,t,q},\)</span> se define el operador de discretización <span class="math inline">\(\mathcal{D}: \mathbb{R} \times \mathbb{N} \longrightarrow \{0,\dots,N-1\}\)</span> dado por <span id="eq-discretizacion"><span class="math display">\[s_i = \mathcal{D}(V_{i,t,q}, N_i) := \min \left(\max\left(\left\lfloor \frac{V_{i,t,q}}{\Delta} + \frac{1}{2}\right\rfloor, 0\right), N_i-1\right), \tag{3.2}\]</span></span> donde <span class="math inline">\(\lfloor \cdot \rfloor\)</span> denota la función piso (redondeo al entero más cercano) y <span class="math inline">\(N_1 = 27\)</span> y <span class="math inline">\(N_2 = 16\)</span> son las capacidades discretas máximas de cada presa. El volumen máximo representado en rejilla discreta es <span id="eq-volumen-maximo"><span class="math display">\[V_{i,\max} = N_i \Delta, \tag{3.3}\]</span></span> <span class="math inline">\(16,200\)</span> <span class="math inline">\(Mm^3\)</span> para Angostura y <span class="math inline">\(9,600\)</span> <span class="math inline">\(Mm^3\)</span> para Malpaso.</p>
 <p>Así, el espacio de estados se define como <span class="math display">\[\mathcal{S} = \mathcal{S}_1 \times \mathcal{S}_2 \times \{0,...,5\} = \{s = (s_1,s_2,m)\},\]</span> en donde <span class="math inline">\((s_1,s_2,m)\)</span> representa el volumen discretizado de Angostura, el volumen discretizado de Malpaso y la etapa hidrológica correspondiente a la quincena <span class="math inline">\(q\)</span>.</p>
 </div>
-<section id="discretización-del-proceso-de-afluencia" class="level4" data-number="3.2.2.1">
-<h4 data-number="3.2.2.1" class="anchored" data-anchor-id="discretización-del-proceso-de-afluencia"><span class="header-section-number">3.2.2.1</span> Discretización del proceso de afluencia</h4>
+<section id="sec-discretizacion-afluencia" class="level4" data-number="3.2.2.1">
+<h4 data-number="3.2.2.1" class="anchored" data-anchor-id="sec-discretizacion-afluencia"><span class="header-section-number">3.2.2.1</span> Discretización del proceso de afluencia</h4>
 <div style="text-align: justify">
-<p>A diferencia de la simulación que usa la afluencia histórica <span class="math inline">\(V_{i,t,q}\)</span> (quincenal), la fase de planeación, trabaja con la afluencia agregada por etapa hidrológica <span class="math inline">\(m\)</span>, esto se debe a que cada paso de la ecuación de Bellman corresponde a una etapa completa. Así, para la presa <span class="math inline">\(i\)</span>, en el año <span class="math inline">\(t\)</span> y la etapa <span class="math inline">\(m\)</span>, se define la afluencia agregada como <span id="eq-discretizacion-afluencia"><span class="math display">\[W_{i,t,m} = \sum_{q:\mu(q)=m} W_{i,t,q}, \tag{3.4}\]</span></span></p>
+<p>A diferencia de la simulación que usa la afluencia histórica <span class="math inline">\(V_{i,t,q}\)</span> (quincenal), la fase de planeación, trabaja con la afluencia agregada por etapa hidrológica <span class="math inline">\(m\)</span>, esto se debe a que cada paso de la ecuación de Bellman corresponde a una etapa completa. Así, para la presa <span class="math inline">\(i\)</span>, en el año <span class="math inline">\(t\)</span> y la etapa <span class="math inline">\(m\)</span>, se define la afluencia agregada como <span id="eq-discretizacion-afluencia"><span class="math display">\[W_{i,t,m} = \sum_{q:\mu(q)=m} W_{i,t,q}, \tag{3.4}\]</span></span> y su versión discretizada <span class="math display">\[X_{i,t,m} := \max\left(0, \left\lfloor \frac{W_{i,t,m}}{\Delta} + \frac{1}{2}\right\rfloor \right).\]</span></p>
+<p>Lo anterior permite generar, para cada presa, una matriz histórica <span class="math inline">\(X_{i} \in \mathbb{N}\cup\{0\}^{T\times M}\)</span>, las cuales constituyen la muestra empírica sobre la que se construye el modelo probabilístico de transición.</p>
 </div>
 </section>
 </section>
@@ -531,16 +532,73 @@ window.Quarto = {
 <h3 data-number="3.2.3" class="anchored" data-anchor-id="espacio-de-acciones-mathcala"><span class="header-section-number">3.2.3</span> Espacio de acciones <span class="math inline">\((\mathcal{A})\)</span></h3>
 <div style="text-align: justify">
 <p>Para cada etapa <span class="math inline">\(m\)</span>, se define una unidad de extracción de agua <span class="math inline">\(u_m = \{100, 200, 300, 300, 400, 250\}\)</span>, así la decisión de operación en la etapa <span class="math inline">\(m\)</span> corresponderá a los niveles de turbinado <span class="math inline">\(k_1, k_2\)</span>. Cada nivel de turbinado se multiplica por la unidad de extracción <span class="math inline">\(u_m\)</span>, la cual está en <span class="math inline">\(Mm^3,\)</span> para obtener el volumen de agua extraído en cada presa. Por lo tanto, el espacio de acciones se define como <span class="math display">\[\mathcal{A}_m = \mathcal{K}_{1,m} \times \mathcal{K}_{2,m},\]</span> donde <span class="math inline">\(\mathcal{K}_{1,m} = \mathcal{K}_{2,m}\)</span> representan el conjunto de niveles de turbinado disponibles para ambas presas en la etapa hidrológica <span class="math inline">\(m\)</span>. En la práctica, tanto la Angostura como Malpaso tienen el mismo conjunto de niveles de turbinado y mismas unidades de extracción por etapa.</p>
+<table class="caption-top table">
+<caption>Unidades de extracción y niveles de turbinado por etapa hidrológica para ambas presas.</caption>
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(m\)</span></th>
+<th><span class="math inline">\(u_m\)</span> (Mm³)</th>
+<th><span class="math inline">\(\mathcal{K}_{i,m}\)</span></th>
+<th>turbinado máximo (<span class="math inline">\(k_m, u_m\)</span>)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>100</td>
+<td><span class="math inline">\(\{0,\dots,20\}\)</span></td>
+<td>2,000 Mm³</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>200</td>
+<td><span class="math inline">\(\{0,\dots,15\}\)</span></td>
+<td>3,000 Mm³</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>300</td>
+<td><span class="math inline">\(\{0,\dots,7\}\)</span></td>
+<td>2,100 Mm³</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>300</td>
+<td><span class="math inline">\(\{0,\dots,9\}\)</span></td>
+<td>2,700 Mm³</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>400</td>
+<td><span class="math inline">\(\{0,\dots,12\}\)</span></td>
+<td>4,800 Mm³</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>250</td>
+<td><span class="math inline">\(\{0,\dots,12\}\)</span></td>
+<td>3,000 Mm³</td>
+</tr>
+</tbody>
+</table>
 <p>Una acción denotada por <span class="math inline">\(a = (k_1, k_2)\)</span>, produce el volumen real turbinado <span class="math inline">\(k_i\cdot u_m\)</span> aplicado simultaneamente en ambas presas. Por ejemplo, suponga que <span class="math inline">\(m = 0\)</span> entonces <span class="math display">\[u_0 = 100 \quad \text{y} \quad \mathcal{K}_{1,0}, \mathcal{K}_{2,0} = \{0,1,...,20\},\]</span> y así <span class="math inline">\(a = (3,5)\)</span> significaría que Angostura turbina <span class="math inline">\(3\times 100 = 300\)</span> <span class="math inline">\(Mm^3\)</span> de agua y Malpaso turbina <span class="math inline">\(5\times 100 = 500\)</span> <span class="math inline">\(Mm^3\)</span> de agua. Cabe mencionar que Los valores de <span class="math inline">\(u_m\)</span> y <span class="math inline">\(\mathcal{K}_{i,m}\)</span> se seleccionaron para que el turbinado máximo por etapa hidrológica <span class="math inline">\(k_{i} \cdot u_m\)</span> no exceda la capacidad instalada de las plantas ni los caudales históricos máximos registrados, garantizando la factibilidad física de todas las acciones evaluadas.</p>
 </div>
 </section>
-<section id="dinámica-de-transición-mathbbp" class="level3" data-number="3.2.4">
-<h3 data-number="3.2.4" class="anchored" data-anchor-id="dinámica-de-transición-mathbbp"><span class="header-section-number">3.2.4</span> Dinámica de transición <span class="math inline">\((\mathbb{P})\)</span></h3>
+<section id="dinámica-de-transición-de-estados-mathbbp" class="level3" data-number="3.2.4">
+<h3 data-number="3.2.4" class="anchored" data-anchor-id="dinámica-de-transición-de-estados-mathbbp"><span class="header-section-number">3.2.4</span> Dinámica de transición de estados <span class="math inline">\((\mathbb{P})\)</span></h3>
 <div style="text-align: justify">
-<p>La ecuación de transición continua tras la operación del sistema se define por <span id="eq-transicion"><span class="math display">\[V_{i,t,q+1} = V_{i,t,q} + W_{i, t, q}-k_iu_m, \quad q&lt;23 \tag{3.5}\]</span></span> donde <span class="math inline">\(V_{i,t,q}\)</span> representa el volumen almacenado en la presa <span class="math inline">\(i\)</span> antes de tomar la acción de turbinado, <span class="math inline">\(W_{i, t,q}\)</span> representa el afluente neto (caudal de ingreso) para la presa <span class="math inline">\(i\)</span> en la quincena <span class="math inline">\(q\)</span> del año <span class="math inline">\(t\)</span>, tales valores serán obtenidos de los datos históricos con los que ya se cuentan. Por último <span class="math inline">\(k_iu_m\)</span>, <span class="math inline">\(k_i \in \mathcal{K}_{i,m},\)</span> representa el volumen de agua extraído por la acción de turbinado aplicada en la etapa hidrológica correspondiente a la quincena <span class="math inline">\(q\)</span>.</p>
-<p>Cuando <span class="math inline">\(q=23\)</span>, la transición se define por <span id="eq-transicion23"><span class="math display">\[V_{i,t+1,0} = V_{i,t,23} + W_{i, t, 23}-k_iu_m. \tag{3.6}\]</span></span></p>
-<p>En ambos casos, el volumen discretizado de la quincena <span class="math inline">\(q+1\)</span> se obtiene aplicando el operador de discretización <span class="math inline">\(\mathcal{D}\)</span> al volumen resultante, es decir, <span class="math display">\[s_i' = \mathcal{D}(V_{i,t,q+1}, N_i),\]</span> mientras que la etapa hidrológica evoluciona mediante <span class="math inline">\(m' = (m+1) \mod M\)</span>.</p>
+<p>Dado el estado físico <span class="math inline">\((s_1,s_2, m)\)</span> del sistema, una acción <span class="math inline">\(a = (k_1, k_2)\)</span> y una realización de la afluencia agregada por etapa <span class="math inline">\((x_1,x_2)\)</span>, el cual es un elemento de la muestra empírica (<a href="#sec-discretizacion-afluencia" class="quarto-xref"><span>Sección 3.2.2.1</span></a>), se define el siguiente estado por <span id="eq-transicion"><span class="math display">\[j_i = s_i+x_i-k_iu_m \tag{3.5}\]</span></span> donde <span class="math inline">\(s_i\)</span> representa el volumen almacenado en la presa <span class="math inline">\(i\)</span> (discretizado) antes de tomar la acción de turbinado, <span class="math inline">\(x_i\)</span> representa el afluente neto discretizado (caudal de ingreso) para la presa <span class="math inline">\(i\)</span> en la etapa hidrológica <span class="math inline">\(m\)</span>. Por último <span class="math inline">\(k_iu_m\)</span>, representa el volumen de agua extraído por la acción de turbinado aplicada en la etapa hidrológica correspondiente.</p>
+<p>La ecuación <a href="modelo_matematico_fqi_corregido.html#eq-transicion" class="quarto-xref">Ecuación&nbsp;<span>4.9</span></a> representa exactamente la ecuación de continuidad <span class="math inline">\(j=i+x-k\)</span> que menciona <span class="citation" data-cites="Alegria2010">Díaz (<a href="references.html#ref-Alegria2010" role="doc-biblioref">2010</a>)</span>. En la práctica, el valor <span class="math inline">\(j_i\)</span> puede exceder los límites físicos del sistema, es decir, puede ser mayor que <span class="math inline">\(N_i\)</span> (embalse lleno) o menor que <span class="math inline">\(0\)</span> (embalse vacío). Por lo tanto, se define el estado discreto siguiente <span class="math inline">\(s_i'\)</span> como <span id="eq-proyeccion"><span class="math display">\[s_i' = \min(\max(j_i,0),N_i), \tag{3.6}\]</span></span> lo cual garantiza que el estado discreto resultante esté dentro del rango permitido por la capacidad de almacenamiento de cada presa.</p>
 <p>Por lo tanto, el estado discreto siguiente está dado por <span class="math display">\[s' = (s_1', s_2', m').\]</span></p>
+<blockquote class="blockquote">
+<p><strong>Ejemplo numérico.</strong> Sea <span class="math inline">\(\Delta=600\)</span> Mm³, presa Angostura (<span class="math inline">\(N_1=27\)</span>), etapa <span class="math inline">\(m=0\)</span> (Ene–May, <span class="math inline">\(u_0=100\)</span> Mm³). Supóngase que el sistema está en el estado <span class="math inline">\(s_1=20\)</span> (almacenamiento discretizado <span class="math inline">\(\approx 20\times600=12{,}000\)</span> Mm³), que la afluencia agregada de la etapa resulta <span class="math inline">\(x_1=3\)</span> (en unidades de <span class="math inline">\(\Delta\)</span>) y que la política decide <span class="math inline">\(k_1=5\)</span> (es decir, turbinar <span class="math inline">\(v_1=5\times100=500\)</span> Mm³ reales, ec. 2.5). Entonces <span class="math display">\[j_1^{\text{raw}}=20+3-5=18,\]</span> que está dentro del rango <span class="math inline">\(\{1,\dots,27\}\)</span>, de modo que no hay derrame ni déficit y el estado siguiente es <span class="math inline">\(s_1'=18\)</span>. Si en cambio <span class="math inline">\(s_1=27\)</span> (embalse lleno), <span class="math inline">\(x_1=5\)</span> y <span class="math inline">\(k_1=0\)</span>, entonces <span class="math inline">\(j_1^{\text{raw}}=27+5-0=32&gt;27\)</span>: hay un excedente de <span class="math inline">\(5\)</span> estados (<span class="math inline">\(3{,}000\)</span> Mm³) que no cabe en el embalse y que se trata como derrame (§2.9).</p>
+</blockquote>
 <p>Desde el punto de vista de <span class="citation" data-cites="puterman1994markov">Puterman (<a href="references.html#ref-puterman1994markov" role="doc-biblioref">1994</a>)</span>, la transición de MDP se define mediante una función de probabilidad condicional <span class="math display">\[\mathbb{P}(s'|s,a),\]</span> la cual especifica la probabilidad de transicionar al estado <span class="math inline">\(s'\)</span> dado que se tomó la acción <span class="math inline">\(a\)</span> en el estado <span class="math inline">\(s\)</span>.</p>
 </div>
 </section>
