@@ -39,15 +39,26 @@ A diferencia del aprendizaje supervisado, en este tipo de aprendizaje no se util
 ### Aprendizaje por Refuerzo
 En este tipo de aprendizaje automático, los agentes autónomos aprenden a tomar decisiones a partir de la interección con un entorno en el cual reciben recompensas o penalizaciones según sus acciones. A continuación se presentan los conceptos fundamentales de este tipo de aprendizaje
 
-- ***Agente:*** es el sistema que toma decisiones y aprende de la experiencia.
-- ***Entorno:***  en donde el agente opera y recibe retroalimentación.
-- ***Estado:*** Situación actual del agente en el entorno.
-- ***Acción:*** Decisión que el agente toma en un estado determinado.
-- ***Recompensa:*** Retroalimentación que el agente recibe después de realizar una acción, indicando si fue beneficiosa o no.
-- ***Política:*** Estrategia que el agente sigue para decidir qué acción tomar en cada estado.
+- ***Agente:*** es el decisor, este selecciona las acciones en cada estado.
+- ***Entorno:***  descrito como un Markov Decision Process (MDP), el entorno se define como $(\mathcal{S}, \mathcal{A}, \mathbb{P}, \mathcal{R})$, en donde 
+
+    - $\mathcal{S}$ es el conjunto de estados, 
+    - $\mathcal{A}$ es el conjunto de acciones, 
+    - $\mathbb{P}$ es la función de transición de probabilidad,  
+    - $\mathcal{R}$ es la función de recompensa.
+
+- ***Estado $(\mathcal{S})$:*** situación actual del agente en el entorno.
+- ***Acción $(\mathcal{A})$:*** decisión elegida por agente en el estado $s \in \mathcal{S}$. El conjunto de acciones posibles en un estado se denota como $\mathcal{A}(s)$.
+- ***Recompensa $(\mathcal{R})$:*** función que asigna un valor numérico a cada par $(s, a)$, indicando el beneficio o costo de esa acción.
+- ***Política $(\pi)$:*** regla de decisión que especifica cómo el agente selecciona acciones en cada estado. La política puede ser:
+    - Determinista $\pi(s) = a$: dado un estado $s$, el agente selecciona una única acción $a$.
+    - Estocástica $\pi(a|s) = P(A_t = a | S_t = s)$: asigna una probabilidad a cada acción $a$ posible en un estado determinado $s$.
 
 El aprendizaje por refuerzo se centra esencialmente en la relación entre un agente, entorno y el objetivo (lo que se desea lograr). La literatura formula esta relación en términos de un **Proceso de Decisión de Markov (MDP)**.
+
+![Diagrama del proceso de interacción en el aprendizaje por refuerzo.](Imagenes/diagramaRL.jpg){#fig-diagramaRL width="100%"}
 ::: 
+
 Véase @ibmRL para más información sobre estos tipos de aprendizaje y sus aplicaciones.
 :::
 
