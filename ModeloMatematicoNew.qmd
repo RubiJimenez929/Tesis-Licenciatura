@@ -308,7 +308,7 @@ Esta concavidad asegura que el problema de maximización posea rendimientos marg
 La Curva Guía POL 7 representa el instrumento normativo que establece los niveles máximos de almacenamiento seguro para cada embalse y cada etapa del año hidrológico. Esta restricción surge del conflicto operativo entre la Comisión Federal de Electricidad (CFE), que tiene incentivos para mantener los embalses lo más llenos posible con el fin de maximizar la generación, y la Comisión Nacional del Agua (CONAGUA), que exige niveles de almacenamiento suficientemente bajos para garantizar la capacidad de control de avenidas durante la temporada de lluvias.
 Los niveles máximos de almacenamiento seguro $\bar{s}_i(m)$, expresados en unidades discretas, se muestran en la siguiente tabla:
 
-| Etapa $m$ | $\bar{s}_1(m)$ (La Angostura) | Vol. equiv. (hm³) | $\bar{s}_2(m)$ (Malpaso) | Vol. equiv. (hm³) |
+| Etapa $m$ | $\bar{s}_1(m)$ (La Angostura) | Vol. equiv. ($hm^3$) | $\bar{s}_2(m)$ (Malpaso) | Vol. equiv. ($hm^3$) |
 |:---------:|:-----------------------------:|:-----------------:|:------------------------:|:-----------------:|
 | 0         | 27                            | 16,200            | 16                       | 9,600             |
 | 1         | 27                            | 16,200            | 16                       | 9,600             |
@@ -317,10 +317,12 @@ Los niveles máximos de almacenamiento seguro $\bar{s}_i(m)$, expresados en unid
 | 4         | 22                            | 13,200            | 16                       | 9,600             |
 | 5         | 20                            | 12,000            | 15                       | 9,000             |
 : Niveles máximos de almacenamiento seguro según Curva Guía POL 7 {#tbl-pol7}
+
 El rebase de la Curva Guía en la presa $i$ durante la etapa $m$ se cuantifica como:
 $$
 \text{rebaseCG}_i = \max(0,\ s_i' - \bar{s}_i(m))
 $$
+
 La incorporación explícita de esta restricción en la función de recompensa, mediante una penalización proporcional al rebase, permite que el algoritmo aprenda a respetar la Curva Guía como parte de la política óptima, sin necesidad de imponer restricciones duras que complicarían la estructura del problema de optimización.
 :::
 
