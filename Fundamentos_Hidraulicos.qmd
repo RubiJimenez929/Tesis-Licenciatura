@@ -2,9 +2,31 @@
 lang: es
 ---
 
-# Fundamentos Hidráulicos 
+# Fundamentos del Sistema Hidroeléctrico
+
+
 ::: {style="text-align: justify"}
-Algoritmo de aprendizaje por refuerzo...
+## Configuración Hidrológica y Operativa de la Cuenca del Río Grijalva
+
+El sistema hidroeléctrico del río Grijalva, localizado en el sureste de México entre los estados de Chiapas y Tabasco, representa la infraestructura hidroenergética más importante del país, aportando una fracción sustancial de la energía hidroeléctrica del Sistema Eléctrico Nacional. El complejo hidrológico comprende cuatro grandes centrales hidroeléctricas dispuestas en serie a lo largo del cauce principal del río: La Angostura (Belisario Domínguez), Chicoasén (Manuel Moreno Torres), Malpaso (Nezahualcóyotl) y Peñitas (Ángel Albino Corzo).
+
+Desde una perspectiva operativa e hidrológica, los cuatro embalses presentan marcadas diferencias estructurales en sus capacidades de almacenamiento útil:
+- **La Angostura:** Es el embalse de cabecera con la mayor capacidad de almacenamiento del país ($16,200\text{ hm}^3$ en su nivel de aguas máximas ordinarias), funcionando como el principal vaso regulador plurianual de la cuenca alta.
+- **Chicoasén:** Es una central hidroeléctrica de muy alta caída hidráulica con un vaso de regulación pequeña, cuya dinámica operativa consiste fundamentalmente en turbinar el agua descargada por La Angostura, operando a nivel de vaso prácticamente constante.
+- **Malpaso:** Es el segundo gran embalse del sistema ($9,600\text{ hm}^3$ de capacidad máxima), ubicado en la cuenca media. Recibe directamente los volúmenes turbinados y derramados por La Angostura y Chicoasén, más las aportaciones tributarias de su cuenca propia intermedia.
+- **Peñitas:** Es la obra de toma y regulación terminal de la cascada, con capacidad de almacenamiento reducida, cuya misión primordial es amortiguar las fluctuaciones horarias de turbinado y regular el gasto hacia la planicie de Tabasco.
+
+Conforme a la metodología establecida por @Alegria2010, esta asimetría estructural justifica plenamente modelar la cascada a través de un **sistema equivalente de dos presas mayores con acoplamiento hidráulico en serie**:
+1. El subsistema superior, constituido por la presa **La Angostura**, la cual incorpora en su beneficio de generación la carga hidráulica efectiva aportada aguas abajo por la presa **Chicoasén**.
+2. El subsistema inferior, integrado por la presa **Malpaso**, que recibe en tránsito los caudales desfogados por el subsistema superior, incorpora las afluencias por cuenca propia intermedia y absorbe en su salto hidráulico el beneficio de la presa **Peñitas**.
+
+## El Problema de Optimización Operativa Multiobjetivo
+
+La gestión operativa del sistema del río Grijalva involucra un conflicto estructural entre dos entidades gubernamentales con objetivos contrapuestos (@Alegria2010):
+1. **Comisión Federal de Electricidad (CFE):** Cuyo mandato rector es maximizar la generación de energía eléctrica limpia y firme, lo que incentiva mantener los embalses en cotas elevadas para maximizar la carga neta disponible en las turbinas hidroeléctricas.
+2. **Comisión Nacional del Agua (CONAGUA):** Cuyo mandato institucional es mitigar los riesgos de inundación en las poblaciones ribereñas y centros urbanos de la planicie tabasqueña (especialmente Villahermosa), lo que exige mantener un volumen de resguardo o capacidad de amortiguamiento libre ante crecidas extraordinarias durante la temporada ciclónica.
+
+Para conciliar estos requerimientos, el Comité Técnico de Operación de Obras Hidráulicas (CTOOH) establece una **curva guía** (o curva índice estacional de seguridad), la cual define la trayectoria máxima de almacenamiento admisible a lo largo del año. La optimización de la operación consiste en determinar la regla de extracción de agua de cada vaso que maximice la energía esperada, garantice la confiabilidad de suministro (evitando déficits en estiaje) y minimice estrictamente los vertidos incontrolados y las violaciones a la curva guía.
 :::
 
 ::: {#def-sub style="text-align: justify"}

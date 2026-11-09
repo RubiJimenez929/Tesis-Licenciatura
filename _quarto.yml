@@ -1,3 +1,7 @@
+lang: es
+citeproc: true
+bibliography: references.bib
+
 project:
   type: book
   output-dir: docs
@@ -52,7 +56,7 @@ book:
       
     - part: "Modelo Matemático"
       chapters:
-        - Modelo_Matematico.qmd
+        - ModeloMatematicoNew.qmd
         - modelo_matematico_fqi_corregido.qmd
 
 
@@ -63,7 +67,7 @@ book:
   comments:
     hypothesis: true 
 
-bibliography: references.bib
+
 
 format:
   html:
@@ -78,10 +82,16 @@ format:
     citation-hover: true
 
   pdf:
+    lang: es
+    include-in-header:
+      text: |
+        \usepackage{tikz}
+        \usetikzlibrary{arrows.meta, positioning, calc}
     documentclass: scrreprt
     hyperref: true
     papersize: letter
     toc: true
+    link-citations: true
     number-sections: true
     pdf-engine: xelatex
 
