@@ -124,7 +124,7 @@ $$V_{1,\max} = N_1 \cdot \Delta V = 27 \times 600\text{ hm}^3 = 16,200\text{ hm}
 $$V_{2,\max} = N_2 \cdot \Delta V = 16 \times 600\text{ hm}^3 = 9,600\text{ hm}^3$$
 
 Para cualquier volumen físico continuo $V_{i} \in [0, V_{i,\max}]$ en la presa $i \in \{1, 2\}$, se define el operador de cuantización (transforma un estado continuo $V_i$ en su estado discreto correspondiente) $\mathcal{D} : \mathbb{R}^+ \to \{0, \dots, N_i\}$ dado por: $$s_i = \mathcal{D}(V_{i}) := \min\left(\max\left(\left\lfloor \frac{V_{i}}{\Delta} + \frac{1}{2} \right\rfloor, 0\right), N_i\right) \label{eq:operador-discretizacion}$$
-donde $\lfloor \cdot \rfloor$ es la función piso y $s_i$ denota el estado discreto de almacenamiento de la presa $i$, adoptando la nomenclatura clásica de @Alegria2010.
+donde $\lfloor \cdot \rfloor$ es la función piso y $s_i$ denota el estado discreto de almacenamiento de la presa $i$, adoptando la nomenclatura clásica de @puterman1994markov.
 
 El espacio de estados conjunto de la cascada para una etapa estacional dada se define como el producto cartesiano de los conjuntos discretos de cada presa:
 $$\mathcal{S} = \mathcal{S}_1 \times \mathcal{S}_2 = \big\{ s = (s_1, s_2) \mid s_1 \in \{0, 1, \dots, 27\}, \, s_2 \in \{0, 1, \dots, 16\} \big\}$$
@@ -146,30 +146,30 @@ con $K_{1,\max} = 10$ y $K_{2,\max} = 10$. El volumen total extraído programado
 $$V_{turb,i} = k_i \cdot \Delta V = k_i \times 600\text{ hm}^3$$
 
 El conjunto de acciones conjuntas posibles consta de:
-$$|\mathcal{A}| = (K_{1,\max} + 1) \times (K_{2,\max} + 1) = 11 \times 11 = 121\text{ decisiones conjuntas por estado}$$
+$$|\mathcal{A}| = (K_{1,\max} + 1) \times (K_{2,\max} + 1) = 11 \times 11 = 121$$
 
-Esta discretización acotada garantiza que los gastos máximos no sobrepasen la capacidad hidroeléctrica instalada ni los límites de flujo seguro aguas abajo, asegurando la factibilidad física de cada trayectoria evaluada en el espacio de decisiones.
+decisiones conjuntas por estado. Esta discretización acotada garantiza que los gastos máximos no sobrepasen la capacidad hidroeléctrica instalada ni los límites de flujo seguro aguas abajo, asegurando la factibilidad física de cada trayectoria evaluada en el espacio de decisiones.
 :::
 
-## Caracterización Probabilística y Dinámica de Transición en Cascada
-
-### Distribución Bivariada de Afluencias y Probabilidad Clásica
+## Proceso Estocástico de Afluencias y Distribución Clásica {#sec-afluencias}
+### Registro hidroclimático histórico y agregación temporal
 ::: {style="text-align: justify"}
-El disturbio estocástico del sistema hidrológico proviene de las afluencias naturales por cuenca propia que ingresan a los embalses en cada etapa. Sea $W_{i,t,q}$ el volumen histórico registrado en la presa $i$ durante la quincena $q$ del año $t \in \{0, \dots, T\}$, lo cual produce dos matrices de dimensión $50 \times 24$ (una por presa) que constituyen la base de datos empírica del modelo.
+El disturbio estocástico del sistema hidrológico proviene de las afluencias naturales por cuenca propia que ingresan a los embalses en cada etapa. Sea $W_{i,t,q}$ el volumen histórico registrado en la presa $i$ durante la quincena $q$ del año $t \in \{0, \dots, T-1\}$, lo cual produce dos matrices de dimensión $50 \times 24$ (una por presa) que constituyen la base de datos empírica del modelo.
 
 Dado que la política de optimización opera a nivel de etapa estacional (y no de quincena individual), el primer paso es agregar la afluencia quincenal a la escala de etapa. Para la etapa estacional $m$, el volumen acumulado de aportación en el año $t$ es:
-$$W_{i,t,m} = \sum_{q : \mu(q) = m} W_{i,t,q}, \quad i \in \{1, 2\}$$
+$$W_{i,t,m} = \sum_{q : \mu(q) = m} W_{i,t,q}, \quad i \in \{1, 2\}$$ {#eq-afluencias-etapa}
 
-El resultado es, para cada etapa $m$, un par de vectores de longitud $N$:
+El resultado es, para cada etapa $m$, un par de vectores de longitud $T$:
 $$
-\mathbf{W}_{1,m} = \bigl(W_{1,1,m},\; W_{1,2,m},\; \ldots,\; W_{1,T,m}\bigr)^\top \in \mathbb{R}^N
+\mathbf{W}_{1,m} = \bigl(W_{1,0,m},\; W_{1,1,m},\; \ldots,\; W_{1,T-1,m}\bigr)^\top \in \mathbb{R}^T
+$$ 
 $$
-$$
-\mathbf{W}_{2,m} = \bigl(W_{2,1,m},\; W_{2,2,m},\; \ldots,\; W_{2,T,m}\bigr)^\top \in \mathbb{R}^N
-$$
+\mathbf{W}_{2,m} = \bigl(W_{2,0,m},\; W_{2,1,m},\; \ldots,\; W_{2,T-1,m}\bigr)^\top \in \mathbb{R}^T
+$$ 
 
 que representan la serie histórica de afluencias totales de cada presa durante la etapa $m$.
 
+### Discretización y espacio muestral de pares conjuntos
 Para que las afluencias puedan indexar el espacio de probabilidad del MDP, se proyectan los volúmenes continuos $W_{i,t,m}$ a discretos de utilizando el mismo operador de discretización que para el espacio de estados:
 $$
 x_{i,t,m} = \max\!\left(0,\; \left\lfloor \frac{W_{i,t,m}}{\Delta V} \right\rfloor\right) \in \mathbb{Z}_{\ge 0}
@@ -178,7 +178,7 @@ $$
 
 Con esta operación se obtiene, para cada etapa $m$, la **serie histórica de afluencias discretizadas** de cada presa:
 $$
-\mathbf{x}_{i,m} = \bigl(x_{i,1,m},\; x_{i,2,m},\; \ldots,\; x_{i,N,m}\bigr)^\top \in \mathbb{Z}_{\ge 0}^N
+\mathbf{x}_{i,m} = \bigl(x_{i,1,m},\; x_{i,2,m},\; \ldots,\; x_{i,N,m}\bigr)^\top \in \mathbb{Z}_{\ge 0}^T
 \quad i \in \{1,2\}
 $$
 
@@ -189,26 +189,26 @@ $$
 $$
 La colección de todos los pares observados a lo largo del registro histórico forma la **muestra empírica bivariada**:
 $$
-\bigl\{\xi_{1,m},\; \xi_{2,m},\; \ldots,\; \xi_{N,m}\bigr\}
+\bigl\{\xi_{0,m},\; \xi_{1,m},\; \ldots,\; \xi_{T-1,m}\bigr\}
 $$
 
 Dentro de esta muestra de $T = 50$ realizaciones pueden existir pares repetidos. Identificando los valores distintos se obtiene el **espacio muestral de pares únicos** de la etapa $m$:
 $$
 \Omega_m = \bigl\{(x_1, x_2) \in \mathbb{Z}_{\ge 0}^2 \;\big|\; \exists\, t : \xi_{t,m} = (x_1, x_2)\bigr\}
-\quad \text{con cardinalidad}\quad S_m = |\Omega_m|
+\quad \text{con cardinalidad}\quad S_m = |\Omega_m|.
 $$
 
 **Probabilidad clásica**
 
 Con el espacio muestral $\Omega_m$ construido, se aplica la **definición clásica (laplaciana) de probabilidad**: la probabilidad de un evento es el cociente entre el número de casos favorables y el número de casos posibles (igualmente probables). Dado que cada año del registro es un "caso posible" con la misma verosimilitud a priori, y que el número de años en que se observó exactamente el par $(x_1, x_2)$ es el "número de casos favorables", la probabilidad clásica empírica del par $(x_1, x_2) \in \Omega_m$ en la etapa $m$ es:
 $$
-\boxed{P_m(x_1, x_2) = \frac{n_m(x_1, x_2)}{T}}
-$$
+P_m(x_1, x_2) = \frac{n_m(x_1, x_2)}{T}
+$$ {#eq-probabilidad-clasica}
 
 donde:
 
 - $T = 50$ es el número total de años de registro (casos posibles, igualmente ponderados),
-- $n_m(x_1, x_2) = \#\bigl\{t \in \{1,\ldots,T\} : x_{1,t,m} = x_1 \text{ y } x_{2,t,m} = x_2\bigr\}$ es la frecuencia absoluta (casos favorables) del par en la etapa $m$.
+- $n_m(x_1, x_2) = \bigl\{t \in \{0,\ldots,T-1\} : x_{1,t,m} = x_1 \text{ y } x_{2,t,m} = x_2\bigr\}$ es la frecuencia absoluta (casos favorables) del par en la etapa $m$.
 Esta definición es operacionalmente equivalente a la frecuencia relativa empírica, pero su interpretación es estrictamente laplaciana: se computa el cociente entre el número de años en que el sistema se encontró en ese par de afluencias y el total de años del registro.
 
 La coherencia probabilística de la distribución estimada se verifica comprobando que la suma de todas las probabilidades asignadas a los pares únicos de cada etapa es exactamente la unidad:
@@ -236,7 +236,7 @@ La siguiente tabla reporta el número de pares únicos $S_m$ identificados en ca
 La etapa 0 presenta la menor diversidad de pares ($S_0 = 8$), consistente con el comportamiento hidrológico predecible y de baja varianza del estiaje prolongado. Las etapas de mayor actividad convectiva y ciclónica (3 y 4) alcanzan los valores más altos de $S_m$ (21 y 26), lo que refleja la alta irregularidad interanual de los escurrimientos durante los meses de máximas avenidas. La cardinalidad máxima posible es $T = 50$ pares únicos (un par distinto por año); en ninguna etapa se alcanza este límite, lo que indica la presencia de realizaciones repetidas que concentran la masa de probabilidad en los escenarios hidrológicos más frecuentes.
 ::: 
 
-### Ecuaciones de Continuidad y Balance de Masa Acoplado en Serie
+## Ecuaciones de Balance Físico y Transición en Cascada {#sec-transicion}
 ::: {style="text-align: justify"}
 La evolución del sistema está gobernada por la ley física de conservación de masa hidrológica. En un sistema de presas en cascada, la interacción hidrodinámica impone un **acoplamiento unidireccional en serie**: todo el volumen descargado por el embalse superior (La Angostura) ingresa directamente al embalse inferior (Malpaso).
 
@@ -248,17 +248,17 @@ $$v_1 = s_1 + x_1 - k_1$$
 
 Debido a que el volumen físico de almacenamiento está acotado por la capacidad máxima $N_1$ y el fondo muerto ($0$), se presentan dos condiciones de frontera física:
 
-- **Derrame volumétrico ($derr_1$):** Si el balance potencial excede la capacidad máxima del vaso ($v_1 > N_1$), el excedente se derrama por vertedor:
+- **Derrame volumétrico ($derr_1$):** Si el balance potencial excede la capacidad máxima de la presa ($v_1 > N_1$), el excedente se derrama por vertedor:
   $$derr_1 = \max(0, \, v_1 - N_1)$$
 
-- **Déficit de extracción ($def_1$):** Si la extracción decidida supera el agua disponible en el vaso ($v_1 < 0$), se incurre en una insatisfacción de la meta de extracción:
+- **Déficit de extracción ($def_1$):** Si la extracción decidida supera el agua disponible en la presa ($v_1 < 0$), se incurre en una insatisfacción de la meta de extracción:
   $$def_1 = \max(0, \, -v_1)$$
 
 El estado discreto final efectivo $s_{1}'$ de La Angostura queda proyectado dentro del intervalo admisible:
-$$s_{1}' = \min\big(N_1, \, \max(0, \, v_1)\big)$$
+$$s_{1}' = \min\big(N_1, \, \max(0, \, v_1)\big)$$ {#eq-balance-angostura}
 
 **2. Balance en Cascada en el Embalse Inferior (Malpaso):**
-El embalse de Malpaso recibe sus aportaciones naturales por cuenca propia $x_2$, efectúa su extracción $k_2$ y **recibe la descarga turbinada de La Angostura ($k_1$)**:
+El embalse de Malpaso recibe sus aportaciones naturales por cuenca propia $x_2$, efectúa su extracción $k_2$ y recibe la descarga turbinada de La Angostura ($k_1$), la continuidad física en cascada establece:
 $$v_2 = s_2 + x_2 - k_2 + k_1$$
 
 De forma análoga, se cuantifican el derrame y el déficit en Malpaso mediante:
@@ -266,21 +266,35 @@ $$derr_2 = \max(0, \, v_2 - N_2)$$
 $$def_2 = \max(0, \, -v_2)$$
 
 El estado discreto final efectivo $s_{2}'$ se obtiene como:
-$$s_{2}' = \min\big(N_2, \, \max(0, \, v_2)\big)$$
+$$s_{2}' = \min\big(N_2, \, \max(0, \, v_2)\big)$$ {#eq-balance-malp}
 
-Este acoplamiento en serie asegura que el volumen turbinado en la presa alta sea aprovechado en la presa baja para generación hidroeléctrica, reflejando fielmente la física de la cascada del río Grijalva.
+Este acoplamiento en serie asegura que el volumen turbinado en la presa alta sea aprovechado en la presa baja para generación hidroeléctrica, reflejando fielmente la física de la cascada del río Grijalva. La aplicación conjunta de las @eq-balance-angostura y @eq-balance-malp permite definir la función de transición determinista $f_m(s, a, x)$ que mapea el estado actual, la acción y la realización de afluencias al estado sucesor:
+$$
+s' = (s_1', s_2') = f_m\bigl(s,\, a,\, x \bigr).
+$$ {#eq-mapeo-transicion}
 :::
 
-### Construcción del Núcleo de Transición de Estados Markoviano
+### Construcción del Núcleo de Transición de Estados Markoviano {#sec-nucleo-transicion} 
 ::: {style="text-align: justify"}
-La función de transición determinista $f_m(s, a, x)$, que mapea el estado actual, la acción y la realización de afluencias al estado sucesor, se combina con la distribución de probabilidad de las afluencias para construir el **núcleo de transición Markoviano**:
+De acuerdo con @puterman1994markov, la probabilidad condicional de que el sistema transite al estado $s' \in S$ al aplicar la acción $a \in A$ sobre el estado $s \in S$ en la etapa $m$ se define formalmente mediante el núcleo estocástico:
 $$
-p_m(s' \mid s, a) = \sum_{(x_1, x_2) \in \Omega_m} P_m(x_1, x_2) \cdot \mathbf{1}\!\left[f_m(s, a, (x_1, x_2)) = s'\right]
-$$
+p_m(s' \mid s, a) = \sum_{(x_1, x_2) \in \Omega_m} P_m(x_1, x_2) \cdot \mathbf{1}\!\left[f_m(s, a, (x_1, x_2)) = s'\right] 
+$$ {#eq-nucleo-markoviano}
+
 donde $\mathbf{1}[\cdot]$ es la función indicadora. Este núcleo de transición satisface la **propiedad de Markov**: dada la acción $a$ y el estado actual $s$, la distribución de probabilidad del estado sucesor $s'$ es independiente de todos los estados y acciones anteriores a $s$. Esta propiedad es fundamental para la validez del principio de optimalidad de Bellman, que se desarrolla en la @sec-bellman (@puterman1994markov).
+
+Por construcción, para cada par $(s, a)$ y cada etapa $m$, este operador satisface los axiomas fundacionales de Puterman:
+$$
+p_m(s' \mid s, a) \ge 0 \quad \forall\, s' \in S, \qquad \sum_{s' \in S} p_m(s' \mid s, a) = 1
+$$ {#eq-axiomas-puterman-prob}
+Asimismo, en virtud de que el escurrimiento aleatorio $X_m$ se modela como independiente del historial previo condicionada la etapa estacional $m$, el proceso satisface rigurosamente la **propiedad de Markov**:
+$$
+\mathbb{P}\left(X_{t+1} = s' \;\middle|\; X_1 = s^{(1)}, Y_1 = a^{(1)}, \ldots, X_t = s, Y_t = a\right) = p_m(s' \mid s, a)
+$$ {#eq-propiedad-markov}
+donde $X_t$ e $Y_t$ denotan las variables aleatorias que representan el estado y la acción en la época $t$, respectivamente.
 :::
 
-## Función de Beneficio Inmediato y Mecanismo de Penalizaciones {#sec-recompensa}
+## Función de Recompensa y Sistema de Penalizaciones Exteriores {#sec-recompensa}
 
 ### Modelo Hidráulico-Energético Relativo y Concavidad
 ::: {style="text-align: justify"}
@@ -352,69 +366,79 @@ $$b_m(s, a, x) = \big(ge_1 + ge_2\big) - \Pi_{derr} - \Pi_{def} - \Pi_{CG}$$
 La magnitud de los coeficientes ($C_{derr} = 10^4$, $C_{def} = 10^4$, $C_{CG} = 5 \times 10^3$) es órdenes de magnitud superior a la generación relativa máxima ($\sim 10^2$), lo que convierte a estas penalizaciones en barreras casi-exactas que fuerzan a la política óptima a permanecer dentro del dominio físicamente admisible.
 :::
 
-### Operador de Esperanza del Beneficio Inmediato (Cálculo de las Funciones Phi)
-::: {style="text-align: justify"}
-El beneficio inmediato esperado $\Phi_m(s, a)$ es la esperanza matemática del beneficio inmediato $b_m(s, a, x)$ con respecto a la distribución de probabilidad de las afluencias en la etapa $m$:
-$$
-\Phi_m(s, a) = \mathbb{E}_{X_m}\!\left[b_m(s, a, X_m)\right] = \sum_{(x_1, x_2) \in \Omega_m} P_m(x_1, x_2) \cdot b_m\!\left(s, a, (x_1, x_2)\right)
-$$
+### Operador de Esperanza del Beneficio Inmediato (Cálculo de las Funciones Phi){#sec-beneficio-esperado}
 
-Este tensor tridimensional, indexado por etapa $m$, estado $s$ y acción $a$, se precalcula antes de iniciar el algoritmo de inducción hacia atrás. La precalculación es computacionalmente conveniente porque la esperanza del beneficio es independiente de la iteración del algoritmo: su valor depende únicamente de los parámetros del modelo, que son fijos. De este modo, el costo computacional de evaluar $\Phi_m(s, a)$ se incurre una sola vez, y las iteraciones del algoritmo de Bellman se reducen a operaciones de comparación sobre la función de valor, con acceso constante a la tabla precalculada de beneficios esperados.
+::: {style="text-align: justify"}
+Conforme a la Ecuación (2.1.1) de @puterman1994markov (Capítulo 2, Sección 2.1.3), la recompensa inmediata esperada $r_m(s, a)$ se obtiene integrando la función de beneficio sobre la distribución de transición estocástica:
+$$
+r_m(s, a) = \mathbb{E}_{X_m}\bigl[b_m(s, a, X_m)\bigr] = \sum_{(x_1, x_2) \in \Omega_m} P_m(x_1, x_2) \cdot b_m\bigl(s, a, (x_1, x_2)\bigr)
+$$ {#eq-beneficio-esperado}
+
+Este tensor tridimensional, indexado por etapa $m$, estado $s$ y acción $a$, se precalcula antes de iniciar el algoritmo de inducción hacia atrás. La precalculación es computacionalmente conveniente porque la esperanza del beneficio es independiente de la iteración del algoritmo: su valor depende únicamente de los parámetros del modelo, que son fijos. De este modo, el costo computacional de evaluar $r_m(s, a)$ se incurre una sola vez, y las iteraciones del algoritmo de Bellman se reducen a operaciones de comparación sobre la función de valor, con acceso constante a la tabla precalculada de beneficios esperados.
 :::
 
-## Ecuación de Optimalidad de Bellman e Inducción hacia Atrás {sec-bellman}
+## Ecuación de Optimalidad de Bellman e Inducción hacia Atrás {#sec-bellman}
 
-### Principio de Optimalidad y Recursión Periódica de Bellman
+### Reglas de decisión y operador de Bellman
 ::: {style="text-align: justify"}
-Una política determinista estacionaria por etapas se define como la secuencia $\pi = \{\pi_0, \ldots, \pi_5\}$, donde cada componente $\pi_m: \mathcal{S} \to \mathcal{A}$ es una **regla de decisión** que asigna a cada estado una acción de control para la etapa $m$. El objetivo del agente de optimización es encontrar la política óptima $\pi^* = \{\pi_0^*, \ldots, \pi_5^*\}$ que maximiza el beneficio total acumulado a lo largo del horizonte de planificación.
+Una **regla de decisión determinista markoviana** para la etapa $m$ es una función $\pi_m: S \to A$ que prescribe una acción de extracción $a = \pi_m(s)$ para cada estado $s \in S$. Una política determinista estacionaria por etapas se define como la secuencia $\pi = \{\pi_0, \ldots, \pi_5\}$, que consiste en la aplicación sucesiva de las reglas de decisión $\pi_m$. El objetivo del agente de optimización es encontrar la política óptima $\pi^* = \{\pi_0^*, \ldots, \pi_5^*\}$ que maximiza el beneficio total acumulado a lo largo del horizonte de planificación.
 
-El principio de optimalidad de Bellman (@puterman1994markov) establece que toda sub-política de una política óptima es también óptima para el subproblema correspondiente. Este principio permite descomponer el problema global en una secuencia de subproblemas locales resolubles mediante **inducción hacia atrás** sobre las etapas del año hidrológico.
+Siguiendo la Definición 6.2.1 y la Ecuación (6.2.2) de @puterman1994markov, adaptadas al caso sin descuento temporal ($\lambda = 1$), se define el **operador de optimalidad de Bellman** para la etapa $m$, denotado $L_m: \mathbb{R}^{|S|} \to \mathbb{R}^{|S|}$, como:
+$$
+(L_m\, v)(s) = \max_{a \in A} \left\{ \Phi_m(s, a) + \sum_{s' \in S} p_m(s' \mid s, a)\, v(s') \right\} \quad \forall\, s \in S
+$$ {#eq-operador-bellman-etapa}
 
-La **función de acción-valor** $Q_m(s, a)$ mide el beneficio total esperado de tomar la acción $a$ en el estado $s$ durante la etapa $m$, y luego seguir la política óptima en todas las etapas subsecuentes:
+Sustituyendo el núcleo estocástico (@eq-nucleo-markoviano), el operador de Bellman se reescribe operativamente sobre el espacio muestral de afluencias como:
 $$
-Q_m(s, a) = \Phi_m(s, a) + \sum_{(x_1, x_2) \in \Omega_m} P_m(x_1, x_2) \cdot V_{m+1}^*\!\left(f_m\!\left(s, a, (x_1, x_2)\right)\right)
-$$
+(L_m\, v)(s) = \max_{a \in A} \left\{ \Phi_m(s, a) + \sum_{(x_1, x_2) \in \Omega_m} P_m(x_1, x_2) \cdot v\Bigl(f_m\bigl(s, a, (x_1, x_2)\bigr)\Bigr) \right\}
+$$ {#eq-bellman-operativo}
 
-La **función de valor óptima** en la etapa $m$ se obtiene maximizando sobre el espacio de acciones:
-$$
-V_m^*(s) = \max_{a \in \mathcal{A}}\ Q_m(s, a) \qquad \forall\, s \in \mathcal{S}
-$$
-La **política óptima** queda determinada por:
-$$
-\pi_m^*(s) = \arg\max_{a \in \mathcal{A}}\ Q_m(s, a) \qquad \forall\, s \in \mathcal{S}
-$$
+donde $\Phi_m(s,a)$ es el beneficio inmediato esperado definido en la @sec-beneficio-esperado y $f_m$ es la función de transición en cascada de la @sec-transicion. El operador $L_m$ es monótono (conserva el orden parcial entre funciones de valor) y, para $\lambda < 1$, es una contracción en norma infinito.
 
-Dado que el año hidrológico es un ciclo que se repite indefinidamente, el problema se trata como un **MDP periódico de horizonte infinito**. Para el caso estacionario periódico, la condición de enlace entre ciclos sucesivos es:
+La acción que maximiza el término entre llaves en la Ecuación (@eq-bellman-operativo) define la regla de decisión codiciosa (*greedy*) asociada a la función de valor $v$:
 $$
-V_6^{(c)}(s) = V_0^{(c-1)}(s) \qquad \forall\, s \in \mathcal{S}
+\pi_m^v(s) \in \arg\max_{a \in A} \left\{ \Phi_m(s, a) + \sum_{(x_1, x_2) \in \Omega_m} P_m(x_1, x_2) \cdot v\Bigl(f_m\bigl(s, a, (x_1, x_2)\bigr)\Bigr) \right\}.
+$$ {#eq-regla-greedy}
+
+### Algoritmo de inducción hacia atrás cíclico
+Dentro de un ciclo anual determinado $c \in \{1, 2, \ldots\}$, el principio de optimalidad de Bellman [@puterman1994markov, Algoritmo 4.3.1] se aplica en sentido cronológico inverso, retrocediendo desde la etapa 5 hasta la etapa 0:
 $$
-la cual establece que la función de valor de inicio del ciclo actual es igual a la función de valor óptima del inicio del ciclo previo, es decir, en la iteración $c$ el año siguiente comenzará con el mismo valor estimado para el inicio del año en la iteración anterior. En el primer ciclo de iteración, la función de valor terminal se inicializa como:
+u_m^{(c)}(s) = (L_m\, u_{m+1}^{(c)})(s) \quad \text{para } m = 5,\, 4,\, 3,\, 2,\, 1, \, 0.
+$$ {#eq-recorrido-etapas}
+El enlace inter-anual fundamental que conecta los ciclos de planificación consecutivos establece que la función de valor terminal de la etapa 6 en el ciclo $c$ corresponde a la función de valor calculada al inicio del año previo [@Alegria2010]:
 $$
-V_6^{(1)}(s) = 0 \qquad \forall\, s \in \mathcal{S}
+u_{M+1}^{(c)}(s) \equiv v^{(c-1)}(s) \quad \forall\, s \in S
+$$ {#eq-enlace-ciclos}
+con condición inicial nula $v^{(0)}(s) = 0$ para todo $s \in S$.
+Por tanto, el resultado de una barrida anual completa que integra las seis etapas queda encapsulado por el **operador anual compuesto**:
 $$
-Esta inicialización en cero es equivalente a asumir que al final del primer ciclo no hay beneficio futuro; los ciclos sucesivos corrigen progresivamente esta suposición hasta alcanzar la convergencia a la política estacionaria óptima.
+L = L_1 \circ L_2 \circ L_3 \circ L_4 \circ L_5 \circ L_6 : \mathbb{R}^{|S|} \to \mathbb{R}^{|S|}
+$$ {#eq-operador-anual-compuesto}
+La sucesión de funciones de valor anuales $\{v^{(c)}\}_{c \ge 1}$ generada por el algoritmo de iteración de valor (*Value Iteration*) satisface:
+$$
+v^{(c)} = L\bigl(v^{(c-1)}\bigr) = L^c\bigl(v^{(0)}\bigr) \quad \forall\, c = 1, 2, 3, \ldots
+$$ {#eq-iteracion-valor-anual}
 ::: 
 
-### Convergencia y Semi-norma Span de Puterman
+## Convergencia y Semi-norma Span de Puterman {#sec-convergencia}
+En problemas de optimización con horizonte infinito y sin descuento ($\lambda = 1$), los beneficios se acumulan ilimitadamente en cada ciclo anual. Conforme a la teoría general de procesos unichain de @puterman1994markov (Capítulo 8, Sección 8.4; Sección 8.5), cuando el proceso posee una única clase recurrente bajo la política óptima, los iterados de valor admiten la **descomposición de Laurent de ganancia y sesgo** [Teorema 8.5.1]:
+$$
+v^{(c)}(s) = c \cdot g^* + h^*(s) + \varepsilon^{(c)}(s) \quad \forall\, s \in S
+$$ {#eq-descomposicion-laurent}
+donde:
 
-El problema de horizonte infinito con factor de descuento unitario ($\gamma = 1$) presenta una particularidad matemática importante: la función de valor $V^{(c)}$ crece linealmente con el número de ciclos $c$, puesto que en cada ciclo se acumula el beneficio promedio del año hidrológico. Este crecimiento lineal implica que la norma infinito $\|V^{(c+1)} - V^{(c)}\|_\infty$ no converge a cero, sino que tiende al valor del beneficio anual promedio óptimo. Por esta razón, el criterio estándar de convergencia basado en la norma infinito no es aplicable en este contexto.
-@puterman1994markov propone la **semi-norma Span** como el criterio apropiado para problemas de maximización de tasa promedio. Para el diferencial de funciones de valor entre ciclos consecutivos, definido como:
-$$
-d^{(c)}(s) = V_1^{(c)*}(s) - V_1^{(c-1)*}(s)
-$$
-la semi-norma Span se calcula como la diferencia entre el máximo y el mínimo de $d^{(c)}$ sobre el espacio de estados:
-$$
-\text{sp}(d^{(c)}) = \max_{s \in \mathcal{S}}\ d^{(c)}(s) - \min_{s \in \mathcal{S}}\ d^{(c)}(s)
-$$
-Esta semi-norma mide la variabilidad relativa de las ganancias por ciclo, eliminando el componente de crecimiento lineal que impide la convergencia en norma infinito. Según el Teorema 6.6.1 de @puterman1994markov, la sucesión $\text{sp}(d^{(c)})$ es monótonamente no creciente y converge a cero cuando la política óptima ha sido identificada.  
+- $g^* \in \mathbb{R}$ es la **ganancia media anual óptima** (*optimal average reward* o *gain*), un escalar estrictamente idéntico para todos los estados $s \in S$ [Puterman 1994, Teorema 8.4.1, p. 344].
+- $h^*(s) \in \mathbb{R}$ es la **función de sesgo** (*bias function*), que expresa el valor diferencial o ventaja relativa de iniciar el año en el estado $s$ en comparación con un estado neutro de referencia.
+- $\varepsilon^{(c)}(s)$ es un término transitorio de aproximación que satisface $\lim_{c \to \infty} \|\varepsilon^{(c)}\|_\infty = 0$. 
 
 ### Ensamblaje de la Regla de Decisión Óptima: Matriz MEEVS
 
-Para posibilitar la instrumentación operativa en los centros de despacho y salas de control de la CFE y el Centro Nacional de Control de Energía (CENACE), la política de extracción óptima obtenida se compacta en la **Matriz de Extracciones de Embalses en Vasos del Sistema (MEEVS)** [@Diaz2010; @Dominguez2006].
+Para posibilitar la instrumentación operativa en los centros de despacho y salas de control de la CFE y el Centro Nacional de Control de Energía (CENACE), la política de extracción óptima obtenida se compacta en la **Matriz de Extracciones de Embalses en Vasos del Sistema (MEEVS)** [@Alegria2010].
 
 Para cada una de las 6 etapas estacionales, la matriz MEEVS se estructura como una retícula bidimensional de tamaño $28 \times 17$ (28 estados de La Angostura $\times$ 17 estados de Malpaso), en la cual cada elemento contiene un código entero posicional de cuatro dígitos en formato `AAMM`:
 $$\text{MEEVS}_m(i_1, i_2) = 100 \cdot k_1^*(i_1, i_2, m) + k_2^*(i_1, i_2, m)$$
 donde:
+
 - `AA` (centenas y millares): Unidades discretas de turbinado óptimo asignadas a La Angostura ($k_1^* \in [0, 10]$).
 - `MM` (decenas y unidades): Unidades discretas de turbinado óptimo asignadas a Malpaso ($k_2^* \in [0, 10]$).
 
