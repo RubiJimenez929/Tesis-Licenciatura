@@ -93,6 +93,7 @@ format:
     toc: true
     link-citations: true
     number-sections: true
+    keep-tex: true
     pdf-engine: xelatex
 
   epub:

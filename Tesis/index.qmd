@@ -1,3 +1,0 @@
-# Resumen {.unnumbered}
-
-Aquí pondré un resumen de mi tesis, que se llama "Fitted Q-Iteration: Estimación de niveles de presas".
