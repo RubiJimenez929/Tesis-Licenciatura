@@ -1,0 +1,54 @@
+\usepackage{upgreek}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{xcolor}
+\usepackage{fvextra}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{etoolbox}
+\usepackage{ifthen}
+
+\newcommand{\dashedbox}[1]{
+  \begin{tikzpicture}
+    \node[draw, dashed, rounded corners=5pt, inner sep=10pt] {
+      \begin{minipage}{0.8\textwidth}
+        #1
+      \end{minipage}
+    };
+  \end{tikzpicture}
+}
+
+% Configuración para bloques de código en Quarto
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{%
+    commandchars=\\\{\},
+    breaksymbolleft={},
+    breaklines=true,
+    breakanywhere=true,
+    breakautoindent=true,
+    breaksymbolindentleft=0pt,
+    breaksymbolsepleft=0pt,
+    breaksymbolindentright=0pt,
+    breaksymbolsepright=0pt,
+    frame=single,
+    framesep=2mm,
+    rulecolor=\color{gray!30},
+    baselinestretch=0.8,
+    fontsize=\small
+}
+
+% Permitir que los bloques de código se dividan entre páginas
+\makeatletter
+\def\verbatim@processline{%
+  \hbox to\columnwidth{\the\verbatim@line\strut\hss}%
+  \ifx\verbatim@line\verbatim@empty\else%
+    \ifnum\prevgraf>23%
+      \penalty-200%
+      \prevgraf0%
+    \fi%
+  \fi%
+}
+\makeatother
+
+% Configuración adicional para listados largos
+\emergencystretch=3em

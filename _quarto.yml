@@ -31,8 +31,8 @@ book:
         - name: "Universidad Autónoma de Chiapas"
   language: es
   date: today
-  image: Imagenes\fcfm.png
-  favicon: Imagenes\fcfm.png
+  image: Imagenes\FCFMLOGO.png
+  favicon: Imagenes\FCFMLOGO.png
   downloads: [pdf, epub]
 
   sidebar:
@@ -83,6 +83,8 @@ format:
 
   pdf:
     lang: es
+    template-partials:
+      - before-body.tex
     include-in-header:
       text: |
         \usepackage{tikz}
@@ -97,7 +99,7 @@ format:
     pdf-engine: xelatex
 
   epub:
-    cover-image: Imagenes\fcfm.png
+    cover-image: Imagenes\FCFMLOGO.png
 
 
 editor: visual
